@@ -1,0 +1,102 @@
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Stethoscope, Loader2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent } from "@/components/ui/card";
+import { useAuth } from "@/contexts/AuthContext";
+import { useLogin } from "@/services/auth.service";
+import { toast } from "sonner";
+
+export default function Login() {
+  const navigate = useNavigate();
+  const { login } = useAuth();
+  const loginMutation = useLogin();
+  const [user, setUser] = useState("");
+  const [pass, setPass] = useState("");
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    if (!user || !pass) {
+      toast.error("Por favor ingrese usuario y contrasena");
+      return;
+    }
+
+    loginMutation.mutate(
+      { usuario: user, password: pass },
+      {
+        onSuccess: (data) => {
+          login(data.token, data.user);
+          toast.success("Bienvenido, " + data.user.nombre);
+          navigate("/");
+        },
+        onError: (error) => {
+          toast.error(
+            error instanceof Error
+              ? error.message
+              : "Error al iniciar sesion"
+          );
+        },
+      }
+    );
+  };
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-accent/30">
+      <Card className="w-full max-w-md shadow-xl border-0">
+        <CardContent className="pt-10 pb-8 px-8">
+          <div className="flex flex-col items-center mb-8">
+            <div className="h-16 w-16 rounded-2xl bg-primary flex items-center justify-center mb-4">
+              <Stethoscope className="h-8 w-8 text-primary-foreground" />
+            </div>
+            <h1 className="text-2xl font-bold tracking-tight text-foreground">
+              S<span className="text-primary">C</span>M
+            </h1>
+            <p className="text-sm text-muted-foreground mt-1">Sistema Clinico Medico</p>
+          </div>
+
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="user">Usuario</Label>
+              <Input
+                id="user"
+                value={user}
+                onChange={e => setUser(e.target.value)}
+                placeholder="Ingrese su usuario"
+                disabled={loginMutation.isPending}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label htmlFor="pass">Contrasena</Label>
+              <Input
+                id="pass"
+                type="password"
+                value={pass}
+                onChange={e => setPass(e.target.value)}
+                placeholder="Ingrese su contrasena"
+                disabled={loginMutation.isPending}
+              />
+            </div>
+            <div className="flex gap-3 pt-2">
+              <Button type="submit" className="flex-1" disabled={loginMutation.isPending}>
+                {loginMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+                Aceptar
+              </Button>
+              <Button
+                type="button"
+                variant="outline"
+                className="flex-1"
+                onClick={() => { setUser(""); setPass(""); }}
+                disabled={loginMutation.isPending}
+              >
+                Cancelar
+              </Button>
+            </div>
+          </form>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
