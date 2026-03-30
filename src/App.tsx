@@ -5,9 +5,15 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
+import { DoctorProvider } from "@/contexts/DoctorContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AppLayout from "./components/AppLayout";
+import DoctorLayout from "./components/DoctorLayout";
 import Login from "./pages/Login";
+import DoctorLogin from "./pages/doctor/DoctorLogin";
+import DoctorDashboard from "./pages/doctor/DoctorDashboard";
+import DoctorAgenda from "./pages/doctor/DoctorAgenda";
+import DoctorExpediente from "./pages/doctor/DoctorExpediente";
 import Dashboard from "./pages/Dashboard";
 import BuscarExpediente from "./pages/expediente/BuscarExpediente";
 import ExpedienteDetalle from "./pages/expediente/ExpedienteDetalle";
@@ -33,9 +39,16 @@ const App = () => (
     <TooltipProvider>
       <Toaster />
       <Sonner />
+      <DoctorProvider>
       <BrowserRouter>
         <AuthProvider>
           <Routes>
+            <Route path="/doctor" element={<DoctorLogin />} />
+            <Route element={<DoctorLayout />}>
+              <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
+              <Route path="/doctor/agenda" element={<DoctorAgenda />} />
+              <Route path="/doctor/expediente/:patientId" element={<DoctorExpediente />} />
+            </Route>
             <Route path="/login" element={<Login />} />
             <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
               <Route path="/" element={<Dashboard />} />
@@ -60,6 +73,7 @@ const App = () => (
           </Routes>
         </AuthProvider>
       </BrowserRouter>
+      </DoctorProvider>
     </TooltipProvider>
     </ThemeProvider>
   </QueryClientProvider>

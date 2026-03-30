@@ -48,13 +48,13 @@ export default function Configuracion() {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <div className="p-4 md:p-6 space-y-6">
       <div className="flex items-center gap-2">
-        <Settings className="h-6 w-6 text-primary" />
-        <h1 className="text-2xl font-bold text-foreground">Configuracion del Sistema</h1>
+        <Settings className="h-5 w-5 md:h-6 md:w-6 text-primary" />
+        <h1 className="text-xl md:text-2xl font-bold text-foreground">Configuracion del Sistema</h1>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
         <Card>
           <CardHeader><CardTitle className="text-base">General</CardTitle></CardHeader>
           <CardContent className="space-y-4">
@@ -146,7 +146,7 @@ export default function Configuracion() {
                 checked={(form.cambioPasswordDias || 0) > 0}
                 onCheckedChange={v => setForm(prev => ({ ...prev, cambioPasswordDias: v ? 90 : 0 }))}
               />
-              <Label>Requerir cambio de contrasena cada 90 dias</Label>
+              <Label className="leading-tight">Requerir cambio de contrasena cada 90 dias</Label>
             </div>
             <div className="space-y-1">
               <Label>Tiempo de inactividad (min)</Label>

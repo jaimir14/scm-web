@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Pencil, Trash2, Search, Loader2, Eye, EyeOff } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { useClinics, useCreateClinic, useUpdateClinic, useDeleteClinic, useActiveClinics } from "@/services/clinics.service";
@@ -52,6 +53,7 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
 
   const [search, setSearch] = useState("");
   const [dialogOpen, setDialogOpen] = useState(false);
+  const isMobile = useIsMobile();
   const [editingItem, setEditingItem] = useState<any>(null);
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [active, setActive] = useState(true);
@@ -291,14 +293,14 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
   const isSaving = cMutation?.isPending || uMutation?.isPending;
 
   return (
-    <div className="p-6 space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground">{config.title}</h1>
+    <div className="p-4 md:p-6 space-y-4">
+      <div className="flex items-center justify-between gap-2">
+        <h1 className="text-xl md:text-2xl font-bold text-foreground">{config.title}</h1>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button onClick={openCreate}><Plus className="h-4 w-4 mr-1" /> Nuevo</Button>
+            <Button size={isMobile ? "sm" : "default"} onClick={openCreate}><Plus className="h-4 w-4 mr-1" /> Nuevo</Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="max-w-[95vw] sm:max-w-md max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>
                 {editingItem ? "Editar" : "Nuevo"} registro - {config.title}
@@ -373,32 +375,22 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
               className="pl-9"
             />
           </div>
-          <Table>
-            <TableHeader>
-              <TableRow>
-                {config.columns.map(c => <TableHead key={c.key}>{c.label}</TableHead>)}
-                <TableHead className="w-24">Acciones</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
+          {isMobile ? (
+            <div className="divide-y -mx-4">
               {dataQuery.isLoading ? (
                 Array.from({ length: 5 }).map((_, i) => (
-                  <TableRow key={i}>
-                    {config.columns.map(c => (
-                      <TableCell key={c.key}><Skeleton className="h-4 w-24" /></TableCell>
-                    ))}
-                    <TableCell><Skeleton className="h-4 w-16" /></TableCell>
-                  </TableRow>
+                  <div key={i} className="px-4 py-3 space-y-1">
+                    <Skeleton className="h-4 w-32" />
+                    <Skeleton className="h-3 w-24" />
+                  </div>
                 ))
               ) : filtered.length > 0 ? (
                 filtered.map((item: any) => {
                   const row = config.mapToRow(item);
                   return (
-                    <TableRow key={item.id}>
-                      {config.columns.map(c => (
-                        <TableCell key={c.key}>{row[c.key]}</TableCell>
-                      ))}
-                      <TableCell>
+                    <div key={item.id} className="px-4 py-3 space-y-1">
+                      <div className="flex items-center justify-between">
+                        <span className="font-medium text-sm text-foreground">{row[config.columns[0].key]}</span>
                         <div className="flex gap-1">
                           <Button
                             size="icon" variant="ghost" className="h-7 w-7"
@@ -414,19 +406,78 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
                             <Trash2 className="h-3 w-3" />
                           </Button>
                         </div>
-                      </TableCell>
-                    </TableRow>
+                      </div>
+                      {config.columns.slice(1).map(c => (
+                        <div key={c.key} className="flex justify-between text-xs">
+                          <span className="text-muted-foreground">{c.label}</span>
+                          <span>{row[c.key]}</span>
+                        </div>
+                      ))}
+                    </div>
                   );
                 })
               ) : (
-                <TableRow>
-                  <TableCell colSpan={config.columns.length + 1} className="text-center py-8 text-muted-foreground">
-                    No se encontraron registros
-                  </TableCell>
-                </TableRow>
+                <div className="px-4 py-8 text-center text-muted-foreground">
+                  No se encontraron registros
+                </div>
               )}
-            </TableBody>
-          </Table>
+            </div>
+          ) : (
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  {config.columns.map(c => <TableHead key={c.key}>{c.label}</TableHead>)}
+                  <TableHead className="w-24">Acciones</TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {dataQuery.isLoading ? (
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <TableRow key={i}>
+                      {config.columns.map(c => (
+                        <TableCell key={c.key}><Skeleton className="h-4 w-24" /></TableCell>
+                      ))}
+                      <TableCell><Skeleton className="h-4 w-16" /></TableCell>
+                    </TableRow>
+                  ))
+                ) : filtered.length > 0 ? (
+                  filtered.map((item: any) => {
+                    const row = config.mapToRow(item);
+                    return (
+                      <TableRow key={item.id}>
+                        {config.columns.map(c => (
+                          <TableCell key={c.key}>{row[c.key]}</TableCell>
+                        ))}
+                        <TableCell>
+                          <div className="flex gap-1">
+                            <Button
+                              size="icon" variant="ghost" className="h-7 w-7"
+                              onClick={() => openEdit(item)}
+                            >
+                              <Pencil className="h-3 w-3" />
+                            </Button>
+                            <Button
+                              size="icon" variant="ghost" className="h-7 w-7 text-destructive"
+                              onClick={() => handleDeleteItem(item)}
+                              disabled={dMutation?.isPending}
+                            >
+                              <Trash2 className="h-3 w-3" />
+                            </Button>
+                          </div>
+                        </TableCell>
+                      </TableRow>
+                    );
+                  })
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={config.columns.length + 1} className="text-center py-8 text-muted-foreground">
+                      No se encontraron registros
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          )}
         </CardContent>
       </Card>
     </div>

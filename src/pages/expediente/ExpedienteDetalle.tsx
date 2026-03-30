@@ -11,6 +11,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { User, Save, Loader2 } from "lucide-react";
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import { usePatient, useCreatePatient, useUpdatePatient } from "@/services/patients.service";
 import { usePatientConsultations, useCreateConsultation } from "@/services/consultations.service";
@@ -170,28 +171,31 @@ export default function ExpedienteDetalle() {
   }
 
   return (
-    <div className="p-6 space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground">Expediente</h1>
-        <Button variant="default" className="bg-primary">
+    <div className="p-4 md:p-6 space-y-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
+        <h1 className="text-xl md:text-2xl font-bold text-foreground">Expediente</h1>
+        <Button variant="default" className="bg-primary" size="sm">
           <span className="text-sm">Precio Consulta</span>
         </Button>
       </div>
 
       <Tabs defaultValue="datos" className="space-y-4">
-        <TabsList className="bg-muted">
-          <TabsTrigger value="datos">Datos Personales del Paciente</TabsTrigger>
-          <TabsTrigger value="antecedentes">Antecedentes Personales</TabsTrigger>
-          <TabsTrigger value="padecimiento">Padecimiento Actual</TabsTrigger>
-          <TabsTrigger value="notas">Notas</TabsTrigger>
-        </TabsList>
+        <ScrollArea className="w-full">
+          <TabsList className="bg-muted inline-flex w-auto min-w-full sm:min-w-0">
+            <TabsTrigger value="datos" className="text-xs sm:text-sm whitespace-nowrap">Datos Personales</TabsTrigger>
+            <TabsTrigger value="antecedentes" className="text-xs sm:text-sm whitespace-nowrap">Antecedentes</TabsTrigger>
+            <TabsTrigger value="padecimiento" className="text-xs sm:text-sm whitespace-nowrap">Padecimiento</TabsTrigger>
+            <TabsTrigger value="notas" className="text-xs sm:text-sm whitespace-nowrap">Notas</TabsTrigger>
+          </TabsList>
+          <ScrollBar orientation="horizontal" />
+        </ScrollArea>
 
         {/* Tab 1: Datos Personales */}
         <TabsContent value="datos">
           <Card>
             <CardContent className="pt-6">
               <div className="grid grid-cols-1 lg:grid-cols-[1fr_180px] gap-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Field label="Clinica" required>
                     <Select
                       value={form.clinicaId ? String(form.clinicaId) : ""}
@@ -347,9 +351,9 @@ export default function ExpedienteDetalle() {
                 </div>
 
                 {/* Photo */}
-                <div className="flex flex-col items-center gap-3">
-                  <div className="w-36 h-40 bg-muted rounded-lg flex items-center justify-center border">
-                    <User className="h-16 w-16 text-muted-foreground/40" />
+                <div className="flex flex-row lg:flex-col items-center gap-3">
+                  <div className="w-24 h-28 lg:w-36 lg:h-40 bg-muted rounded-lg flex items-center justify-center border shrink-0">
+                    <User className="h-10 w-10 lg:h-16 lg:w-16 text-muted-foreground/40" />
                   </div>
                   <Button variant="outline" size="sm">Cambiar Fotografia</Button>
                 </div>
@@ -366,7 +370,7 @@ export default function ExpedienteDetalle() {
                 <div className="space-y-2">
                   <Label className="text-sm font-semibold">Antecedentes Personales Patologicos</Label>
                   <Textarea
-                    className="min-h-[120px]"
+                    className="min-h-[100px] lg:min-h-[120px]"
                     placeholder="Ingrese antecedentes patologicos..."
                     value={form.antecedentesPatologicos || ""}
                     onChange={e => updateField("antecedentesPatologicos", e.target.value)}
@@ -374,7 +378,7 @@ export default function ExpedienteDetalle() {
                 </div>
                 <div className="space-y-3">
                   <Label className="text-sm font-semibold">Antecedentes Personales No Patologicos</Label>
-                  <div className="space-y-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-1 gap-2">
                     {["Tabaco", "Etilismo", "Ejercicio", "Transfusion", "Alergias", "Drogas"].map(item => (
                       <div key={item} className="flex items-center gap-2">
                         <Checkbox
@@ -390,7 +394,7 @@ export default function ExpedienteDetalle() {
                 <div className="space-y-2">
                   <Label className="text-sm font-semibold">Antecedentes Quirurgicos y Traumaticos</Label>
                   <Textarea
-                    className="min-h-[120px]"
+                    className="min-h-[100px] lg:min-h-[120px]"
                     placeholder="Ingrese antecedentes quirurgicos..."
                     value={form.antecedentesQuirurgicos || ""}
                     onChange={e => updateField("antecedentesQuirurgicos", e.target.value)}
@@ -398,7 +402,7 @@ export default function ExpedienteDetalle() {
                 </div>
                 <div className="space-y-3">
                   <Label className="text-sm font-semibold">Antecedentes Gineco-Obstetricos</Label>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
                     {["FUR", "Menopausia", "TRH", "Planificacion", "Patol. Mamas", "FUPAP", "IRS", "# CS", "Menarca"].map(f => (
                       <Field key={f} label={f}>
                         <Input
@@ -425,7 +429,7 @@ export default function ExpedienteDetalle() {
                 <div className="space-y-2">
                   <Label className="text-sm font-semibold">Antecedentes Heredo-Familiares</Label>
                   <Textarea
-                    className="min-h-[120px]"
+                    className="min-h-[100px] lg:min-h-[120px]"
                     placeholder="Ingrese antecedentes familiares..."
                     value={form.antecedentesHeredoFamiliares || ""}
                     onChange={e => updateField("antecedentesHeredoFamiliares", e.target.value)}
@@ -434,7 +438,7 @@ export default function ExpedienteDetalle() {
                 <div className="space-y-2">
                   <Label className="text-sm font-semibold">Otros</Label>
                   <Textarea
-                    className="min-h-[120px]"
+                    className="min-h-[100px] lg:min-h-[120px]"
                     placeholder="Otros antecedentes..."
                     value={form.antecedentesOtros || ""}
                     onChange={e => updateField("antecedentesOtros", e.target.value)}
@@ -457,8 +461,8 @@ export default function ExpedienteDetalle() {
               )}
 
               {/* New consultation form */}
-              <div className="border rounded-lg p-4 space-y-4 bg-accent/20">
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+              <div className="border rounded-lg p-3 md:p-4 space-y-4 bg-accent/20">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   <Field label="Fecha">
                     <Input
                       type="date"
@@ -490,7 +494,7 @@ export default function ExpedienteDetalle() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-4 md:grid-cols-8 gap-2">
+                <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
                   {[
                     { l: "Peso", k: "peso", u: "kg" }, { l: "Talla", k: "talla", u: "mts" },
                     { l: "IMC", k: "imc", u: "" }, { l: "Temp.", k: "temperatura", u: "" },
@@ -508,25 +512,27 @@ export default function ExpedienteDetalle() {
                   ))}
                 </div>
 
-                <div className="flex items-center gap-2 bg-warning/10 p-2 rounded">
+                <div className="flex flex-wrap items-center gap-2 bg-warning/10 p-2 rounded">
                   <Badge variant="outline" className="text-xs">Total Img: 0</Badge>
                   <span className="text-xs">Gabinete/Lab</span>
                   <Select defaultValue="lab">
-                    <SelectTrigger className="h-7 text-xs w-48"><SelectValue /></SelectTrigger>
+                    <SelectTrigger className="h-7 text-xs w-full sm:w-48"><SelectValue /></SelectTrigger>
                     <SelectContent>
                       <SelectItem value="lab">Examen de Laboratorio (0)</SelectItem>
                       <SelectItem value="rx">Rayos X (0)</SelectItem>
                     </SelectContent>
                   </Select>
-                  <Button size="sm" variant="secondary" className="h-7 text-xs">Agregar Imagenes</Button>
-                  <Button size="sm" variant="secondary" className="h-7 text-xs">Ver Imagenes</Button>
+                  <div className="flex gap-1 w-full sm:w-auto">
+                    <Button size="sm" variant="secondary" className="h-7 text-xs flex-1 sm:flex-none">Agregar Imagenes</Button>
+                    <Button size="sm" variant="secondary" className="h-7 text-xs flex-1 sm:flex-none">Ver Imagenes</Button>
+                  </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1">
                     <Label className="text-xs font-semibold">Motivo de Consulta</Label>
                     <Textarea
-                      className="min-h-[100px]"
+                      className="min-h-[80px] md:min-h-[100px]"
                       value={consultationForm.motivoConsulta || ""}
                       onChange={e => setConsultationForm(prev => ({ ...prev, motivoConsulta: e.target.value }))}
                     />
@@ -534,7 +540,7 @@ export default function ExpedienteDetalle() {
                   <div className="space-y-1">
                     <Label className="text-xs font-semibold">Indicaciones y Tratamientos</Label>
                     <Textarea
-                      className="min-h-[100px]"
+                      className="min-h-[80px] md:min-h-[100px]"
                       value={consultationForm.indicaciones || ""}
                       onChange={e => setConsultationForm(prev => ({ ...prev, indicaciones: e.target.value }))}
                     />
@@ -542,7 +548,7 @@ export default function ExpedienteDetalle() {
                   <div className="space-y-1">
                     <Label className="text-xs font-semibold">Examen Fisico</Label>
                     <Textarea
-                      className="min-h-[100px]"
+                      className="min-h-[80px] md:min-h-[100px]"
                       value={consultationForm.examenFisico || ""}
                       onChange={e => setConsultationForm(prev => ({ ...prev, examenFisico: e.target.value }))}
                     />
@@ -550,7 +556,7 @@ export default function ExpedienteDetalle() {
                   <div className="space-y-1">
                     <Label className="text-xs font-semibold">Impresion Diagnostica</Label>
                     <Textarea
-                      className="min-h-[100px]"
+                      className="min-h-[80px] md:min-h-[100px]"
                       value={consultationForm.impresionDiagnostica || ""}
                       onChange={e => setConsultationForm(prev => ({ ...prev, impresionDiagnostica: e.target.value }))}
                     />
@@ -610,7 +616,7 @@ export default function ExpedienteDetalle() {
           <Card>
             <CardContent className="pt-6">
               <Textarea
-                className="min-h-[400px]"
+                className="min-h-[300px] md:min-h-[400px]"
                 placeholder="Notas del paciente..."
                 value={form.notas || ""}
                 onChange={e => updateField("notas", e.target.value)}
@@ -632,7 +638,7 @@ export default function ExpedienteDetalle() {
 
 function Field({ label, children, required, full }: { label: string; children: React.ReactNode; required?: boolean; full?: boolean }) {
   return (
-    <div className={`space-y-1 ${full ? "md:col-span-2" : ""}`}>
+    <div className={`space-y-1 ${full ? "sm:col-span-2" : ""}`}>
       <label className="text-xs font-medium text-muted-foreground">
         {label}{required && <span className="text-destructive ml-0.5">*</span>}
       </label>

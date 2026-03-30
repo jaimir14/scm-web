@@ -8,7 +8,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Plus, Search, Loader2 } from "lucide-react";
+import { Plus, Search, Loader2, ChevronDown, ChevronUp } from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
 import { toast } from "sonner";
 import { format } from "date-fns";
 import {
@@ -38,6 +39,9 @@ export default function AgendaCitas() {
   const [editingAppointment, setEditingAppointment] = useState<Appointment | null>(null);
   const [filterProfessionalId, setFilterProfessionalId] = useState("");
   const [filterClinicId, setFilterClinicId] = useState("");
+  const [showFilters, setShowFilters] = useState(false);
+  const [showSidePanel, setShowSidePanel] = useState(false);
+  const isMobile = useIsMobile();
 
   const dateStr = date ? format(date, "yyyy-MM-dd") : "";
 
@@ -105,14 +109,16 @@ export default function AgendaCitas() {
   };
 
   return (
-    <div className="p-6 space-y-4">
-      <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-bold text-foreground">Agenda de Citas</h1>
+    <div className="p-4 md:p-6 space-y-4">
+      <div className="flex items-center justify-between gap-2">
+        <h1 className="text-xl md:text-2xl font-bold text-foreground">Agenda de Citas</h1>
         <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
           <DialogTrigger asChild>
-            <Button><Plus className="h-4 w-4 mr-1" /> Nueva Cita</Button>
+            <Button size={isMobile ? "sm" : "default"}>
+              <Plus className="h-4 w-4 mr-1" /> {isMobile ? "Nueva" : "Nueva Cita"}
+            </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-[95vw] md:max-w-md max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Crear Cita</DialogTitle>
             </DialogHeader>
@@ -120,7 +126,7 @@ export default function AgendaCitas() {
           </DialogContent>
         </Dialog>
         <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-          <DialogContent className="max-w-md">
+          <DialogContent className="max-w-[95vw] md:max-w-md max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Editar Cita</DialogTitle>
             </DialogHeader>
@@ -137,51 +143,62 @@ export default function AgendaCitas() {
         </Dialog>
       </div>
 
-      <div className="flex gap-4">
-        {/* Left panel */}
-        <div className="w-80 space-y-4 shrink-0">
-          <Card>
-            <CardContent className="p-3">
-              <Calendar mode="single" selected={date} onSelect={setDate} className="rounded-md" />
-            </CardContent>
-          </Card>
-          <Card>
-            <CardHeader className="p-3 pb-1">
-              <CardTitle className="text-xs text-muted-foreground">Datos de la Cita Seleccionada</CardTitle>
-            </CardHeader>
-            <CardContent className="p-3 pt-0">
-              {selectedAppointment ? (
-                <div className="space-y-1 text-xs">
-                  <p><strong>Paciente:</strong> {selectedAppointment.paciente?.nombre} {selectedAppointment.paciente?.apellido1}</p>
-                  <p><strong>Medico:</strong> {selectedAppointment.profesional?.nombre}</p>
-                  <p><strong>Tipo:</strong> {selectedAppointment.tipoCita?.nombre}</p>
-                  <p><strong>Hora:</strong> {selectedAppointment.horaInicio} - {selectedAppointment.horaFin}</p>
-                  <p><strong>Estado:</strong> <Badge variant="outline" className="text-[10px]">{selectedAppointment.estado}</Badge></p>
-                  {selectedAppointment.notas && <p><strong>Notas:</strong> {selectedAppointment.notas}</p>}
-                </div>
-              ) : (
-                <p className="text-xs text-muted-foreground italic">Haga clic en una cita para ver sus datos</p>
-              )}
-            </CardContent>
-          </Card>
-          <div className="space-y-2">
-            <Button
-              variant="outline" size="sm" className="w-full"
-              onClick={handleMarkAttended}
-              disabled={!selectedAppointment || updateStatus.isPending}
-            >
-              Atendida
-            </Button>
-            <div className="flex gap-2">
+      <div className="flex flex-col lg:flex-row gap-4">
+        {/* Left panel - collapsible on mobile */}
+        {isMobile && (
+          <Button
+            variant="outline"
+            size="sm"
+            className="w-full"
+            onClick={() => setShowSidePanel(!showSidePanel)}
+          >
+            {showSidePanel ? <ChevronUp className="h-4 w-4 mr-1" /> : <ChevronDown className="h-4 w-4 mr-1" />}
+            Calendario y opciones
+          </Button>
+        )}
+        {(!isMobile || showSidePanel) && (
+          <div className="w-full lg:w-80 space-y-4 shrink-0">
+            <Card>
+              <CardContent className="p-2 sm:p-3 flex justify-center">
+                <Calendar mode="single" selected={date} onSelect={setDate} className="rounded-md" />
+              </CardContent>
+            </Card>
+            <Card>
+              <CardHeader className="p-3 pb-1">
+                <CardTitle className="text-xs text-muted-foreground">Datos de la Cita Seleccionada</CardTitle>
+              </CardHeader>
+              <CardContent className="p-3 pt-0">
+                {selectedAppointment ? (
+                  <div className="space-y-1 text-xs">
+                    <p><strong>Paciente:</strong> {selectedAppointment.paciente?.nombre} {selectedAppointment.paciente?.apellido1}</p>
+                    <p><strong>Medico:</strong> {selectedAppointment.profesional?.nombre}</p>
+                    <p><strong>Tipo:</strong> {selectedAppointment.tipoCita?.nombre}</p>
+                    <p><strong>Hora:</strong> {selectedAppointment.horaInicio} - {selectedAppointment.horaFin}</p>
+                    <p><strong>Estado:</strong> <Badge variant="outline" className="text-[10px]">{selectedAppointment.estado}</Badge></p>
+                    {selectedAppointment.notas && <p><strong>Notas:</strong> {selectedAppointment.notas}</p>}
+                  </div>
+                ) : (
+                  <p className="text-xs text-muted-foreground italic">Haga clic en una cita para ver sus datos</p>
+                )}
+              </CardContent>
+            </Card>
+            <div className="grid grid-cols-2 lg:grid-cols-1 gap-2">
               <Button
-                variant="outline" size="sm" className="flex-1"
+                variant="outline" size="sm" className="w-full"
+                onClick={handleMarkAttended}
+                disabled={!selectedAppointment || updateStatus.isPending}
+              >
+                Atendida
+              </Button>
+              <Button
+                variant="outline" size="sm" className="w-full"
                 onClick={handleCancel}
                 disabled={!selectedAppointment || updateStatus.isPending}
               >
                 Cancelar
               </Button>
               <Button
-                variant="destructive" size="sm" className="flex-1"
+                variant="destructive" size="sm" className="w-full"
                 onClick={handleDelete}
                 disabled={!selectedAppointment || deleteAppointment.isPending}
               >
@@ -189,42 +206,82 @@ export default function AgendaCitas() {
               </Button>
             </div>
           </div>
-        </div>
+        )}
 
         {/* Calendar grid */}
         <Card className="flex-1 overflow-hidden">
           <CardContent className="p-0">
-            <div className="flex items-center gap-3 p-3 border-b">
-              <AgendaField label="Medico">
-                <Select value={filterProfessionalId} onValueChange={setFilterProfessionalId}>
-                  <SelectTrigger className="w-36"><SelectValue placeholder="Todos" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todos</SelectItem>
-                    {professionals?.map(p => (
-                      <SelectItem key={p.id} value={String(p.id)}>{p.nombre}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </AgendaField>
-              <AgendaField label="Clinica">
-                <Select value={filterClinicId} onValueChange={setFilterClinicId}>
-                  <SelectTrigger className="w-40"><SelectValue placeholder="Todas" /></SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">Todas</SelectItem>
-                    {clinics?.map(c => (
-                      <SelectItem key={c.id} value={String(c.id)}>{c.nombre}</SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </AgendaField>
-            </div>
+            {/* Filters */}
+            {isMobile ? (
+              <>
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="w-full border-b rounded-none"
+                  onClick={() => setShowFilters(!showFilters)}
+                >
+                  Filtros {showFilters ? <ChevronUp className="h-3 w-3 ml-1" /> : <ChevronDown className="h-3 w-3 ml-1" />}
+                </Button>
+                {showFilters && (
+                  <div className="p-3 border-b space-y-3">
+                    <AgendaField label="Medico">
+                      <Select value={filterProfessionalId} onValueChange={setFilterProfessionalId}>
+                        <SelectTrigger><SelectValue placeholder="Todos" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Todos</SelectItem>
+                          {professionals?.map(p => (
+                            <SelectItem key={p.id} value={String(p.id)}>{p.nombre}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </AgendaField>
+                    <AgendaField label="Clinica">
+                      <Select value={filterClinicId} onValueChange={setFilterClinicId}>
+                        <SelectTrigger><SelectValue placeholder="Todas" /></SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="all">Todas</SelectItem>
+                          {clinics?.map(c => (
+                            <SelectItem key={c.id} value={String(c.id)}>{c.nombre}</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </AgendaField>
+                  </div>
+                )}
+              </>
+            ) : (
+              <div className="flex items-center gap-3 p-3 border-b">
+                <AgendaField label="Medico">
+                  <Select value={filterProfessionalId} onValueChange={setFilterProfessionalId}>
+                    <SelectTrigger className="w-36"><SelectValue placeholder="Todos" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todos</SelectItem>
+                      {professionals?.map(p => (
+                        <SelectItem key={p.id} value={String(p.id)}>{p.nombre}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </AgendaField>
+                <AgendaField label="Clinica">
+                  <Select value={filterClinicId} onValueChange={setFilterClinicId}>
+                    <SelectTrigger className="w-40"><SelectValue placeholder="Todas" /></SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">Todas</SelectItem>
+                      {clinics?.map(c => (
+                        <SelectItem key={c.id} value={String(c.id)}>{c.nombre}</SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </AgendaField>
+              </div>
+            )}
 
-            <div className="overflow-auto max-h-[600px]">
-              <table className="w-full border-collapse text-xs">
+            <div className="overflow-auto max-h-[500px] md:max-h-[600px]">
+              <table className="w-full border-collapse text-xs min-w-[400px]">
                 <thead className="sticky top-0 z-10">
                   <tr>
-                    <th className="w-16 bg-muted p-2 border-b">Hora</th>
-                    <th className="p-2 border-b bg-warning/20 font-bold text-left">
+                    <th className="w-14 md:w-16 bg-muted p-1.5 md:p-2 border-b text-xs">Hora</th>
+                    <th className="p-1.5 md:p-2 border-b bg-warning/20 font-bold text-left text-xs">
                       {date ? format(date, "dd/MM/yyyy") : ""}
                     </th>
                   </tr>
@@ -242,8 +299,8 @@ export default function AgendaCitas() {
                       const appts = getAppointmentsAtHour(hour);
                       return (
                         <tr key={label} className="border-b">
-                          <td className="p-2 text-right text-muted-foreground font-mono border-r whitespace-nowrap">{label}</td>
-                          <td className="p-1 h-10">
+                          <td className="p-1 md:p-2 text-right text-muted-foreground font-mono border-r whitespace-nowrap text-[10px] md:text-xs">{label}</td>
+                          <td className="p-0.5 md:p-1 h-10">
                             <div className="flex gap-1">
                               {appts.map(appt => (
                                 <div
@@ -254,10 +311,10 @@ export default function AgendaCitas() {
                                     }`}
                                   onClick={() => handleClickAppointment(appt)}
                                 >
-                                  <p className="font-medium text-foreground">
+                                  <p className="font-medium text-foreground text-[10px] md:text-xs truncate">
                                     {appt.paciente?.nombre} {appt.paciente?.apellido1}
                                   </p>
-                                  <p className="text-muted-foreground">
+                                  <p className="text-muted-foreground text-[9px] md:text-xs truncate">
                                     {appt.tipoCita?.nombre} - {appt.profesional?.nombre}
                                   </p>
                                 </div>
@@ -331,9 +388,9 @@ function CrearCitaForm({ onClose }: { onClose: () => void }) {
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
         <Select value={searchType} onValueChange={setSearchType}>
-          <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
+          <SelectTrigger className="w-full sm:w-32"><SelectValue /></SelectTrigger>
           <SelectContent>
             <SelectItem value="nombre">Nombre</SelectItem>
             <SelectItem value="cedula">Cedula</SelectItem>
@@ -379,7 +436,7 @@ function CrearCitaForm({ onClose }: { onClose: () => void }) {
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <AgendaField label="Medico">
           <Select value={profesionalId} onValueChange={setProfesionalId}>
             <SelectTrigger><SelectValue placeholder="Seleccione..." /></SelectTrigger>
@@ -412,7 +469,7 @@ function CrearCitaForm({ onClose }: { onClose: () => void }) {
         </AgendaField>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <AgendaField label="Fecha">
           <Input type="date" value={fecha} onChange={e => setFecha(e.target.value)} />
         </AgendaField>
@@ -493,7 +550,7 @@ function EditarCitaForm({ appointment, onClose }: { appointment: Appointment; on
         </p>
       </div>
 
-      <div className="grid grid-cols-2 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <AgendaField label="Medico">
           <Select value={profesionalId} onValueChange={setProfesionalId}>
             <SelectTrigger><SelectValue placeholder="Seleccione..." /></SelectTrigger>
@@ -526,7 +583,7 @@ function EditarCitaForm({ appointment, onClose }: { appointment: Appointment; on
         </AgendaField>
       </div>
 
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <AgendaField label="Fecha">
           <Input type="date" value={fecha} onChange={e => setFecha(e.target.value)} />
         </AgendaField>

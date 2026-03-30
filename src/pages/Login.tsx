@@ -45,12 +45,12 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-accent/30">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-accent/30 p-4">
       <Card className="w-full max-w-md shadow-xl border-0">
-        <CardContent className="pt-10 pb-8 px-8">
-          <div className="flex flex-col items-center mb-8">
-            <div className="h-16 w-16 rounded-2xl bg-primary flex items-center justify-center mb-4">
-              <Stethoscope className="h-8 w-8 text-primary-foreground" />
+        <CardContent className="pt-8 pb-6 px-5 sm:pt-10 sm:pb-8 sm:px-8">
+          <div className="flex flex-col items-center mb-6 sm:mb-8">
+            <div className="h-14 w-14 sm:h-16 sm:w-16 rounded-2xl bg-primary flex items-center justify-center mb-4">
+              <Stethoscope className="h-7 w-7 sm:h-8 sm:w-8 text-primary-foreground" />
             </div>
             <h1 className="text-2xl font-bold tracking-tight text-foreground">
               S<span className="text-primary">C</span>M
