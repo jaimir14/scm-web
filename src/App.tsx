@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
 import { ThemeProvider } from "next-themes";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
@@ -8,6 +8,7 @@ import { AuthProvider } from "@/contexts/AuthContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AppLayout from "./components/AppLayout";
 import DoctorLayout from "./components/DoctorLayout";
+
 import Login from "./pages/Login";
 import DoctorLogin from "./pages/doctor/DoctorLogin";
 import DoctorDashboard from "./pages/doctor/DoctorDashboard";
@@ -49,9 +50,10 @@ const App = () => (
                 <Route path="/doctor/pacientes" element={<DoctorPacientes />} />
                 <Route path="/doctor/expediente/:patientId" element={<DoctorExpediente />} />
               </Route>
+              <Route path="/" element={<Navigate to="/login" replace />} />
               <Route path="/login" element={<Login />} />
               <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
-                <Route path="/" element={<Dashboard />} />
+                <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/citas" element={<AgendaCitas />} />
                 <Route path="/expediente/buscar" element={<BuscarExpediente />} />
                 <Route path="/expediente/nuevo" element={<ExpedienteDetalle />} />

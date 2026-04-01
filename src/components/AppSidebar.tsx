@@ -19,7 +19,7 @@ type NavItem = {
 };
 
 const navigation: NavItem[] = [
-  { label: "Inicio", icon: LayoutDashboard, href: "/" },
+  { label: "Inicio", icon: LayoutDashboard, href: "/dashboard" },
   { label: "Citas", icon: CalendarDays, href: "/citas" },
   {
     label: "Expediente", icon: FolderOpen, children: [

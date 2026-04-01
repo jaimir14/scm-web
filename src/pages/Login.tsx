@@ -34,7 +34,7 @@ export default function Login() {
           if (data.user.rol === "MEDICO") {
             navigate("/doctor/dashboard");
           } else {
-            navigate("/");
+            navigate("/dashboard");
           }
         },
         onError: (error) => {
