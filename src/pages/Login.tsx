@@ -31,7 +31,11 @@ export default function Login() {
         onSuccess: (data) => {
           login(data.token, data.user);
           toast.success("Bienvenido, " + data.user.nombre);
-          navigate("/");
+          if (data.user.rol === "MEDICO") {
+            navigate("/doctor/dashboard");
+          } else {
+            navigate("/");
+          }
         },
         onError: (error) => {
           toast.error(

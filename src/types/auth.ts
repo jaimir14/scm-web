@@ -8,6 +8,8 @@ export interface AuthUser {
   usuario: string;
   nombre: string;
   rol: string;
+  especialidad?: string;
+  clinicaId?: number;
 }
 
 export interface LoginResponse {

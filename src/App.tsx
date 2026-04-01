@@ -5,7 +5,6 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/contexts/AuthContext";
-import { DoctorProvider } from "@/contexts/DoctorContext";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import AppLayout from "./components/AppLayout";
 import DoctorLayout from "./components/DoctorLayout";
@@ -13,6 +12,7 @@ import Login from "./pages/Login";
 import DoctorLogin from "./pages/doctor/DoctorLogin";
 import DoctorDashboard from "./pages/doctor/DoctorDashboard";
 import DoctorAgenda from "./pages/doctor/DoctorAgenda";
+import DoctorPacientes from "./pages/doctor/DoctorPacientes";
 import DoctorExpediente from "./pages/doctor/DoctorExpediente";
 import Dashboard from "./pages/Dashboard";
 import BuscarExpediente from "./pages/expediente/BuscarExpediente";
@@ -36,45 +36,43 @@ const queryClient = new QueryClient({
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <ThemeProvider attribute="class" defaultTheme="light" enableSystem>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <DoctorProvider>
-      <BrowserRouter>
-        <AuthProvider>
-          <Routes>
-            <Route path="/doctor" element={<DoctorLogin />} />
-            <Route element={<DoctorLayout />}>
-              <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
-              <Route path="/doctor/agenda" element={<DoctorAgenda />} />
-              <Route path="/doctor/expediente/:patientId" element={<DoctorExpediente />} />
-            </Route>
-            <Route path="/login" element={<Login />} />
-            <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
-              <Route path="/" element={<Dashboard />} />
-              <Route path="/citas" element={<AgendaCitas />} />
-              <Route path="/expediente/buscar" element={<BuscarExpediente />} />
-              <Route path="/expediente/nuevo" element={<ExpedienteDetalle />} />
-              <Route path="/expediente/:id" element={<ExpedienteDetalle />} />
-              <Route path="/mantenimientos/clinicas" element={<MantenimientoGenerico tipo="clinicas" />} />
-              
-              <Route path="/mantenimientos/usuarios" element={<MantenimientoGenerico tipo="usuarios" />} />
-              <Route path="/mantenimientos/tipos-cita" element={<MantenimientoGenerico tipo="tipos-cita" />} />
-              <Route path="/mantenimientos/tratamientos" element={<MantenimientoGenerico tipo="tratamientos" />} />
-              <Route path="/reportes/citas" element={<ReporteGenerico tipo="citas" />} />
-              <Route path="/reportes/pacientes" element={<ReporteGenerico tipo="pacientes" />} />
-              <Route path="/reportes/clinicas" element={<ReporteGenerico tipo="clinicas" />} />
-              <Route path="/reportes/tratamientos" element={<ReporteGenerico tipo="tratamientos" />} />
-              <Route path="/reportes/usuarios" element={<ReporteGenerico tipo="usuarios" />} />
-              <Route path="/admin/bitacora" element={<Bitacora />} />
-              <Route path="/admin/configuracion" element={<Configuracion />} />
-            </Route>
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </AuthProvider>
-      </BrowserRouter>
-      </DoctorProvider>
-    </TooltipProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AuthProvider>
+            <Routes>
+              <Route path="/doctor" element={<DoctorLogin />} />
+              <Route element={<DoctorLayout />}>
+                <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
+                <Route path="/doctor/agenda" element={<DoctorAgenda />} />
+                <Route path="/doctor/pacientes" element={<DoctorPacientes />} />
+                <Route path="/doctor/expediente/:patientId" element={<DoctorExpediente />} />
+              </Route>
+              <Route path="/login" element={<Login />} />
+              <Route element={<ProtectedRoute><AppLayout /></ProtectedRoute>}>
+                <Route path="/" element={<Dashboard />} />
+                <Route path="/citas" element={<AgendaCitas />} />
+                <Route path="/expediente/buscar" element={<BuscarExpediente />} />
+                <Route path="/expediente/nuevo" element={<ExpedienteDetalle />} />
+                <Route path="/expediente/:id" element={<ExpedienteDetalle />} />
+                <Route path="/mantenimientos/clinicas" element={<MantenimientoGenerico tipo="clinicas" />} />
+                <Route path="/mantenimientos/usuarios" element={<MantenimientoGenerico tipo="usuarios" />} />
+                <Route path="/mantenimientos/tipos-cita" element={<MantenimientoGenerico tipo="tipos-cita" />} />
+                <Route path="/mantenimientos/tratamientos" element={<MantenimientoGenerico tipo="tratamientos" />} />
+                <Route path="/reportes/citas" element={<ReporteGenerico tipo="citas" />} />
+                <Route path="/reportes/pacientes" element={<ReporteGenerico tipo="pacientes" />} />
+                <Route path="/reportes/clinicas" element={<ReporteGenerico tipo="clinicas" />} />
+                <Route path="/reportes/tratamientos" element={<ReporteGenerico tipo="tratamientos" />} />
+                <Route path="/reportes/usuarios" element={<ReporteGenerico tipo="usuarios" />} />
+                <Route path="/admin/bitacora" element={<Bitacora />} />
+                <Route path="/admin/configuracion" element={<Configuracion />} />
+              </Route>
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </AuthProvider>
+        </BrowserRouter>
+      </TooltipProvider>
     </ThemeProvider>
   </QueryClientProvider>
 );

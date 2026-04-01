@@ -8,58 +8,152 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import { patients, patientHistory, appointments, type HistoryEntry } from "@/data/mockDoctorData";
-import { useDoctor } from "@/contexts/DoctorContext";
-import { ArrowLeft, User, Clock, Calendar, Save, Plus, Lock, FileText, ChevronDown, ChevronUp, Stethoscope } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/contexts/AuthContext";
+import { usePatient } from "@/services/patients.service";
+import { usePatientConsultations, useCreateConsultation, useUpdateConsultation } from "@/services/consultations.service";
+import { useAppointments } from "@/services/appointments.service";
+import type { Consultation } from "@/types";
+import { toast } from "sonner";
+import { ArrowLeft, User, Clock, Calendar, Save, Plus, Lock, FileText, ChevronDown, ChevronUp, Stethoscope, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
-
-const TODAY = "2026-03-30";
 
 function ReadOnlyField({ label, value }: { label: string; value: string }) {
   return (
     <div className="space-y-1">
       <label className="text-xs font-medium text-muted-foreground">{label}</label>
       <div className="h-9 px-3 py-2 rounded-md border border-input bg-muted/50 text-sm text-foreground flex items-center">
-        {value || "—"}
+        {value || "\u2014"}
       </div>
     </div>
   );
 }
 
-function VitalField({ label, value, editable, onChange }: { label: string; value: string; editable: boolean; onChange?: (v: string) => void }) {
+function VitalField({ label, value, editable, onChange, required, error }: { label: string; value: string; editable: boolean; onChange?: (v: string) => void; required?: boolean; error?: string }) {
   return (
     <div className="space-y-1">
-      <label className="text-[10px] text-muted-foreground">{label}</label>
+      <label className="text-[10px] text-muted-foreground">{label}{required && editable && <span className="text-destructive"> *</span>}</label>
       {editable ? (
-        <Input className="h-7 text-xs" value={value} onChange={e => onChange?.(e.target.value)} />
+        <Input className={cn("h-7 text-xs", error && "border-destructive")} value={value} onChange={e => onChange?.(e.target.value)} />
       ) : (
-        <div className="h-7 px-2 py-1 rounded border border-input bg-muted/50 text-xs flex items-center">{value || "—"}</div>
+        <div className="h-7 px-2 py-1 rounded border border-input bg-muted/50 text-xs flex items-center">{value || "\u2014"}</div>
       )}
+      {error && <p className="text-[10px] text-destructive">{error}</p>}
     </div>
   );
 }
 
-function HistoryCard({ entry, isToday }: { entry: HistoryEntry; isToday: boolean }) {
+function ConsultationCard({
+  consultation,
+  isToday,
+  patientId,
+  profesionalId,
+}: {
+  consultation: Consultation | null;
+  isToday: boolean;
+  patientId: number;
+  profesionalId: number;
+}) {
+  const createConsultation = useCreateConsultation();
+  const updateConsultation = useUpdateConsultation();
   const [expanded, setExpanded] = useState(isToday);
-  const [newNote, setNewNote] = useState("");
-  const [notes, setNotes] = useState(entry.notas);
-  const [editableEntry, setEditableEntry] = useState(entry);
+  const [saving, setSaving] = useState(false);
 
-  const updateField = (field: keyof HistoryEntry, value: string) => {
-    setEditableEntry(prev => ({ ...prev, [field]: value }));
+  const emptyFields = {
+    peso: "",
+    talla: "",
+    imc: "",
+    temperatura: "",
+    presionArterial: "",
+    frecuenciaCardiaca: "",
+    frecuenciaRespiratoria: "",
+    satO2: "",
+    motivoConsulta: "",
+    examenFisico: "",
+    impresionDiagnostica: "",
+    indicacionesTratamientos: "",
   };
 
-  const handleSaveNote = () => {
-    if (newNote.trim()) {
-      const timestamp = format(new Date(), "dd/MM/yyyy HH:mm");
-      const updated = notes ? `${notes}\n[${timestamp}] ${newNote}` : `[${timestamp}] ${newNote}`;
-      setNotes(updated);
-      setNewNote("");
+  const [editableFields, setEditableFields] = useState(
+    consultation
+      ? {
+          peso: String(consultation.peso ?? ""),
+          talla: String(consultation.talla ?? ""),
+          imc: String(consultation.imc ?? ""),
+          temperatura: String(consultation.temperatura ?? ""),
+          presionArterial: consultation.presionArterial ?? "",
+          frecuenciaCardiaca: String(consultation.frecuenciaCardiaca ?? ""),
+          frecuenciaRespiratoria: String(consultation.frecuenciaRespiratoria ?? ""),
+          satO2: String(consultation.satO2 ?? ""),
+          motivoConsulta: consultation.motivoConsulta ?? "",
+          examenFisico: consultation.examenFisico ?? "",
+          impresionDiagnostica: consultation.impresionDiagnostica ?? "",
+          indicacionesTratamientos: consultation.indicacionesTratamientos ?? "",
+        }
+      : emptyFields
+  );
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const updateField = (field: string, value: string) => {
+    setEditableFields(prev => ({ ...prev, [field]: value }));
+    if (errors[field]) setErrors(prev => { const n = { ...prev }; delete n[field]; return n; });
+  };
+
+  const handleSave = async () => {
+    // Validate required fields
+    const newErrors: Record<string, string> = {};
+    if (!editableFields.peso.trim()) newErrors.peso = "Peso es requerido";
+    if (!editableFields.motivoConsulta.trim()) newErrors.motivoConsulta = "Motivo de consulta es requerido";
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      toast.error("Complete los campos requeridos");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      const today = format(new Date(), "yyyy-MM-dd");
+      if (consultation?.id) {
+        await updateConsultation.mutateAsync({
+          id: consultation.id,
+          data: { ...editableFields },
+        });
+      } else {
+        await createConsultation.mutateAsync({
+          pacienteId: patientId,
+          profesionalId: profesionalId,
+          fecha: today,
+          ...editableFields,
+        });
+      }
+      toast.success("Consulta guardada");
+    } catch (err: any) {
+      toast.error(err?.message || "Error al guardar la consulta");
+    } finally {
+      setSaving(false);
     }
   };
 
-  const displayEntry = isToday ? editableEntry : entry;
+  const displayFields = isToday ? editableFields : {
+    peso: String(consultation?.peso ?? ""),
+    talla: String(consultation?.talla ?? ""),
+    imc: String(consultation?.imc ?? ""),
+    temperatura: String(consultation?.temperatura ?? ""),
+    presionArterial: consultation?.presionArterial ?? "",
+    frecuenciaCardiaca: String(consultation?.frecuenciaCardiaca ?? ""),
+    frecuenciaRespiratoria: String(consultation?.frecuenciaRespiratoria ?? ""),
+    satO2: String(consultation?.satO2 ?? ""),
+    motivoConsulta: consultation?.motivoConsulta ?? "",
+    examenFisico: consultation?.examenFisico ?? "",
+    impresionDiagnostica: consultation?.impresionDiagnostica ?? "",
+    indicacionesTratamientos: consultation?.indicacionesTratamientos ?? "",
+  };
+
+  const fecha = consultation?.fecha ? consultation.fecha.substring(0, 10) : format(new Date(), "yyyy-MM-dd");
+  const hora = consultation?.createdAt ? new Date(consultation.createdAt).toLocaleTimeString("es", { hour: "2-digit", minute: "2-digit" }) : format(new Date(), "HH:mm");
+  const medico = consultation?.profesional?.nombre ?? "";
 
   return (
     <div className={cn("border rounded-lg overflow-hidden", isToday ? "border-primary ring-1 ring-primary/20" : "border-border")}>
@@ -69,13 +163,13 @@ function HistoryCard({ entry, isToday }: { entry: HistoryEntry; isToday: boolean
       >
         <div className="flex items-center gap-2 shrink-0">
           <Calendar className="h-4 w-4 text-muted-foreground" />
-          <span className="text-sm font-medium text-foreground">{entry.fecha}</span>
+          <span className="text-sm font-medium text-foreground">{fecha}</span>
           <Clock className="h-3 w-3 text-muted-foreground" />
-          <span className="text-xs text-muted-foreground">{entry.hora}</span>
+          <span className="text-xs text-muted-foreground">{hora}</span>
         </div>
         <div className="flex-1 min-w-0">
           <span className="text-xs text-muted-foreground truncate block flex items-center gap-1">
-            <Stethoscope className="h-3 w-3" /> {entry.medico}
+            <Stethoscope className="h-3 w-3" /> {medico}
           </span>
         </div>
         {isToday && <Badge className="bg-primary text-primary-foreground text-[10px] shrink-0">Hoy</Badge>}
@@ -89,20 +183,22 @@ function HistoryCard({ entry, isToday }: { entry: HistoryEntry; isToday: boolean
             <Label className="text-xs font-semibold mb-2 block">Signos Vitales</Label>
             <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
               {[
-                { l: "Peso (kg)", k: "peso" as const },
-                { l: "Talla (m)", k: "talla" as const },
-                { l: "IMC", k: "imc" as const },
-                { l: "Temp.", k: "temp" as const },
-                { l: "P. Arterial", k: "presionArterial" as const },
-                { l: "FC", k: "fc" as const },
-                { l: "FR", k: "fr" as const },
-                { l: "SatO2 %", k: "satO2" as const },
+                { l: "Peso (kg)", k: "peso", req: true },
+                { l: "Talla (m)", k: "talla" },
+                { l: "IMC", k: "imc" },
+                { l: "Temp.", k: "temperatura" },
+                { l: "P. Arterial", k: "presionArterial" },
+                { l: "FC", k: "frecuenciaCardiaca" },
+                { l: "FR", k: "frecuenciaRespiratoria" },
+                { l: "SatO2 %", k: "satO2" },
               ].map(v => (
                 <VitalField
                   key={v.k}
                   label={v.l}
-                  value={displayEntry[v.k]}
+                  value={(displayFields as any)[v.k]}
                   editable={isToday}
+                  required={v.req}
+                  error={errors[v.k]}
                   onChange={isToday ? val => updateField(v.k, val) : undefined}
                 />
               ))}
@@ -111,55 +207,38 @@ function HistoryCard({ entry, isToday }: { entry: HistoryEntry; isToday: boolean
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {[
-              { l: "Motivo de Consulta", k: "motivoConsulta" as const },
-              { l: "Indicaciones y Tratamientos", k: "indicaciones" as const },
-              { l: "Examen Físico", k: "examenFisico" as const },
-              { l: "Impresión Diagnóstica", k: "impresionDiagnostica" as const },
+              { l: "Motivo de Consulta", k: "motivoConsulta", req: true },
+              { l: "Indicaciones y Tratamientos", k: "indicacionesTratamientos" },
+              { l: "Examen Fisico", k: "examenFisico" },
+              { l: "Impresion Diagnostica", k: "impresionDiagnostica" },
             ].map(f => (
               <div key={f.k} className="space-y-1">
-                <Label className="text-xs font-semibold">{f.l}</Label>
+                <Label className="text-xs font-semibold">
+                  {f.l}{f.req && isToday && <span className="text-destructive"> *</span>}
+                </Label>
                 {isToday ? (
-                  <Textarea
-                    className="min-h-[80px]"
-                    value={displayEntry[f.k]}
-                    onChange={e => updateField(f.k, e.target.value)}
-                  />
+                  <>
+                    <Textarea
+                      className={cn("min-h-[80px]", errors[f.k] && "border-destructive")}
+                      value={(displayFields as any)[f.k]}
+                      onChange={e => updateField(f.k, e.target.value)}
+                    />
+                    {errors[f.k] && <p className="text-xs text-destructive">{errors[f.k]}</p>}
+                  </>
                 ) : (
                   <div className="min-h-[60px] p-2 rounded border border-input bg-muted/50 text-sm whitespace-pre-wrap">
-                    {entry[f.k] || "—"}
+                    {(displayFields as any)[f.k] || "\u2014"}
                   </div>
                 )}
               </div>
             ))}
           </div>
 
-          <div className="space-y-2 border-t pt-3">
-            <Label className="text-xs font-semibold flex items-center gap-1">
-              <FileText className="h-3 w-3" /> Notas
-            </Label>
-            {notes && (
-              <div className="p-2 rounded bg-muted/50 border text-xs whitespace-pre-wrap text-muted-foreground">
-                {notes}
-              </div>
-            )}
-            <div className="flex gap-2">
-              <Input
-                placeholder="Agregar nota..."
-                className="text-xs h-8"
-                value={newNote}
-                onChange={e => setNewNote(e.target.value)}
-                onKeyDown={e => e.key === "Enter" && handleSaveNote()}
-              />
-              <Button size="sm" variant="outline" className="h-8 text-xs shrink-0" onClick={handleSaveNote}>
-                <Plus className="h-3 w-3 mr-1" /> Nota
-              </Button>
-            </div>
-          </div>
-
           {isToday && (
             <div className="flex justify-end pt-2">
-              <Button size="sm">
-                <Save className="h-3 w-3 mr-1" /> Guardar Consulta
+              <Button size="sm" onClick={handleSave} disabled={saving}>
+                {saving ? <Loader2 className="h-3 w-3 mr-1 animate-spin" /> : <Save className="h-3 w-3 mr-1" />}
+                Guardar Consulta
               </Button>
             </div>
           )}
@@ -173,34 +252,52 @@ export default function DoctorExpediente() {
   const { patientId } = useParams();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const { profesional } = useDoctor();
+  const { user } = useAuth();
   const appointmentId = searchParams.get("appointmentId");
 
-  const patient = patients.find(p => p.id === patientId);
-  const history = patientHistory[patientId || ""] || [];
-  const appointment = appointments.find(a => a.id === appointmentId);
+  const { data: patient, isLoading: loadingPatient } = usePatient(patientId);
+  const { data: consultations = [], isLoading: loadingConsultations } = usePatientConsultations(patientId);
+
+  const today = format(new Date(), "yyyy-MM-dd");
+
+  // Normalize date strings from backend (ISO "2026-03-30T00:00:00.000Z" -> "2026-03-30")
+  const normalizeDate = (d: string | undefined | null) => d ? d.substring(0, 10) : "";
+
+  // Fetch today's appointments for this professional
+  const { data: appointmentsToday = [] } = useAppointments({
+    fecha: today,
+    profesionalId: user?.id?.toString(),
+  });
+
+  // Find the specific appointment if provided via query param
+  const appointment = appointmentId
+    ? appointmentsToday.find(a => a.id === Number(appointmentId))
+    : null;
+
+  // Check if there's any today appointment for this patient (even without appointmentId)
+  const hasTodayAppointment = appointment
+    || appointmentsToday.some(a => a.pacienteId === Number(patientId));
 
   const fullHistory = useMemo(() => {
-    const entries = [...history];
-    const hasTodayEntry = entries.some(e => e.fecha === TODAY);
-    if (!hasTodayEntry && appointment && appointment.date === TODAY && profesional) {
-      entries.push({
-        id: "new-today",
-        fecha: TODAY,
-        hora: appointment.time.replace(/(\d{2}):(\d{2})/, (_, h, m) => {
-          const hr = parseInt(h);
-          return `${hr > 12 ? hr - 12 : hr}:${m} ${hr >= 12 ? "PM" : "AM"}`;
-        }),
-        profesionalId: profesional.id,
-        medico: profesional.nombre,
-        peso: "", talla: "", imc: "", temp: "",
-        presionArterial: "", fc: "", fr: "", satO2: "",
-        motivoConsulta: "", examenFisico: "",
-        impresionDiagnostica: "", indicaciones: "", notas: "",
-      });
-    }
-    return entries.sort((a, b) => b.fecha.localeCompare(a.fecha));
-  }, [history, appointment, profesional]);
+    const entries = [...consultations];
+    const hasTodayEntry = entries.some(e => normalizeDate(e.fecha) === today);
+    // Show a new consultation card if: today appointment exists (or doctor is viewing patient) and no consultation yet
+    const showNewToday = !hasTodayEntry && hasTodayAppointment && user;
+    return {
+      entries: entries.sort((a, b) => normalizeDate(b.fecha).localeCompare(normalizeDate(a.fecha))),
+      showNewToday,
+    };
+  }, [consultations, hasTodayAppointment, user, today]);
+
+  if (loadingPatient || loadingConsultations) {
+    return (
+      <div className="p-4 md:p-6 space-y-4">
+        <Skeleton className="h-8 w-64" />
+        <Skeleton className="h-48 w-full" />
+        <Skeleton className="h-48 w-full" />
+      </div>
+    );
+  }
 
   if (!patient) {
     return (
@@ -210,6 +307,8 @@ export default function DoctorExpediente() {
       </div>
     );
   }
+
+  const totalEntries = fullHistory.entries.length + (fullHistory.showNewToday ? 1 : 0);
 
   return (
     <div className="p-4 md:p-6 space-y-4">
@@ -223,7 +322,7 @@ export default function DoctorExpediente() {
       <Tabs defaultValue="historial" className="space-y-4">
         <ScrollArea className="w-full">
           <TabsList className="bg-muted inline-flex w-auto min-w-full sm:min-w-0">
-            <TabsTrigger value="historial" className="text-xs sm:text-sm whitespace-nowrap">Historial Clínico</TabsTrigger>
+            <TabsTrigger value="historial" className="text-xs sm:text-sm whitespace-nowrap">Historial Clinico</TabsTrigger>
             <TabsTrigger value="datos" className="text-xs sm:text-sm whitespace-nowrap">Datos del Paciente</TabsTrigger>
           </TabsList>
           <ScrollBar orientation="horizontal" />
@@ -233,20 +332,20 @@ export default function DoctorExpediente() {
           <Card>
             <CardHeader className="pb-3">
               <CardTitle className="text-base flex items-center gap-2">
-                <User className="h-4 w-4" /> Información Personal
+                <User className="h-4 w-4" /> Informacion Personal
                 <Badge variant="outline" className="ml-auto text-[10px]"><Lock className="h-3 w-3 mr-1" /> Solo lectura</Badge>
               </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                <ReadOnlyField label="Nombre" value={`${patient.nombre} ${patient.apellido1} ${patient.apellido2}`} />
-                <ReadOnlyField label="Identificación" value={patient.identificacion} />
-                <ReadOnlyField label="Teléfono" value={patient.telefono} />
-                <ReadOnlyField label="Email" value={patient.email} />
-                <ReadOnlyField label="Fecha de Nacimiento" value={patient.fechaNacimiento} />
-                <ReadOnlyField label="Sexo" value={patient.sexo} />
-                <ReadOnlyField label="Dirección" value={patient.direccion} />
-                <ReadOnlyField label="Tipo de Sangre" value={patient.tipoSangre} />
+                <ReadOnlyField label="Nombre" value={`${patient.nombre} ${patient.apellido1}${patient.apellido2 ? ` ${patient.apellido2}` : ""}`} />
+                <ReadOnlyField label="Identificacion" value={patient.numeroIdentificacion} />
+                <ReadOnlyField label="Telefono" value={patient.telefonoCelular ?? patient.telefonoCasa ?? ""} />
+                <ReadOnlyField label="Email" value={patient.email ?? ""} />
+                <ReadOnlyField label="Fecha de Nacimiento" value={patient.fechaNacimiento ?? ""} />
+                <ReadOnlyField label="Sexo" value={patient.sexo ?? ""} />
+                <ReadOnlyField label="Direccion" value={patient.direccion ?? ""} />
+                <ReadOnlyField label="Tipo de Sangre" value={patient.tipoSangre ?? ""} />
               </div>
             </CardContent>
           </Card>
@@ -255,18 +354,35 @@ export default function DoctorExpediente() {
         <TabsContent value="historial">
           <div className="space-y-3">
             <p className="text-sm text-muted-foreground">
-              {fullHistory.length} {fullHistory.length === 1 ? "consulta" : "consultas"} registradas
+              {totalEntries} {totalEntries === 1 ? "consulta" : "consultas"} registradas
             </p>
-            {fullHistory.length === 0 ? (
+
+            {/* New today consultation card (if no existing one) */}
+            {fullHistory.showNewToday && user && (
+              <ConsultationCard
+                consultation={null}
+                isToday={true}
+                patientId={patient.id}
+                profesionalId={user.id}
+              />
+            )}
+
+            {totalEntries === 0 && !fullHistory.showNewToday ? (
               <Card>
                 <CardContent className="py-12 text-center text-muted-foreground">
                   <FileText className="h-10 w-10 mx-auto mb-2 opacity-30" />
-                  <p className="text-sm">No hay historial clínico para este paciente</p>
+                  <p className="text-sm">No hay historial clinico para este paciente</p>
                 </CardContent>
               </Card>
             ) : (
-              fullHistory.map(entry => (
-                <HistoryCard key={entry.id} entry={entry} isToday={entry.fecha === TODAY} />
+              fullHistory.entries.map(entry => (
+                <ConsultationCard
+                  key={entry.id}
+                  consultation={entry}
+                  isToday={normalizeDate(entry.fecha) === today}
+                  patientId={patient.id}
+                  profesionalId={user?.id ?? 0}
+                />
               ))
             )}
           </div>

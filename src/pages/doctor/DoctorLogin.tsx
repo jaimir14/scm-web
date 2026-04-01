@@ -3,26 +3,43 @@ import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Card, CardContent } from "@/components/ui/card";
-import { Stethoscope, Eye, EyeOff, AlertCircle } from "lucide-react";
-import { useDoctor } from "@/contexts/DoctorContext";
-import { usuarios } from "@/data/mockDoctorData";
+import { Stethoscope, Eye, EyeOff, AlertCircle, Loader2 } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { useLogin } from "@/services/auth.service";
 
 export default function DoctorLogin() {
   const navigate = useNavigate();
-  const { login } = useDoctor();
+  const auth = useAuth();
+  const loginMutation = useLogin();
   const [showPass, setShowPass] = useState(false);
-  const [username, setUsername] = useState("dgarcia");
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
   const [error, setError] = useState("");
 
-  const doctorUsers = usuarios.filter(u => u.rol === "Médico");
+  // If already authenticated as MEDICO, redirect
+  if (auth.isAuthenticated && auth.user?.rol === "MEDICO") {
+    navigate("/doctor/dashboard", { replace: true });
+  }
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
-    if (login(username)) {
+
+    if (!username.trim() || !password.trim()) {
+      setError("Ingrese usuario y contrasena.");
+      return;
+    }
+
+    try {
+      const result = await loginMutation.mutateAsync({ usuario: username, password });
+      if (result.user.rol !== "MEDICO") {
+        setError("Solo medicos pueden acceder al portal.");
+        return;
+      }
+      auth.login(result.token, result.user);
       navigate("/doctor/dashboard");
-    } else {
-      setError("Usuario no encontrado o no es un profesional médico.");
+    } catch (err: any) {
+      setError(err?.message || "Credenciales invalidas.");
     }
   };
 
@@ -34,7 +51,7 @@ export default function DoctorLogin() {
             <div className="mx-auto h-14 w-14 rounded-full bg-primary/10 flex items-center justify-center">
               <Stethoscope className="h-7 w-7 text-primary" />
             </div>
-            <h1 className="text-xl font-bold text-foreground">Portal Médico</h1>
+            <h1 className="text-xl font-bold text-foreground">Portal Medico</h1>
             <p className="text-sm text-muted-foreground">Ingrese con sus credenciales</p>
           </div>
 
@@ -45,15 +62,19 @@ export default function DoctorLogin() {
                 value={username}
                 onChange={e => setUsername(e.target.value)}
                 placeholder="Ej: dgarcia"
+                autoComplete="username"
               />
-              <p className="text-[10px] text-muted-foreground">
-                Usuarios disponibles: {doctorUsers.map(u => u.usuario).join(", ")}
-              </p>
             </div>
             <div className="space-y-1">
-              <label className="text-xs font-medium text-muted-foreground">Contraseña</label>
+              <label className="text-xs font-medium text-muted-foreground">Contrasena</label>
               <div className="relative">
-                <Input type={showPass ? "text" : "password"} defaultValue="123456" />
+                <Input
+                  type={showPass ? "text" : "password"}
+                  value={password}
+                  onChange={e => setPassword(e.target.value)}
+                  placeholder="Ingrese su contrasena"
+                  autoComplete="current-password"
+                />
                 <button
                   type="button"
                   onClick={() => setShowPass(!showPass)}
@@ -66,12 +87,15 @@ export default function DoctorLogin() {
 
             {error && (
               <div className="flex items-center gap-2 text-destructive text-xs">
-                <AlertCircle className="h-3 w-3" />
+                <AlertCircle className="h-3 w-3 shrink-0" />
                 {error}
               </div>
             )}
 
-            <Button type="submit" className="w-full">Ingresar</Button>
+            <Button type="submit" className="w-full" disabled={loginMutation.isPending}>
+              {loginMutation.isPending && <Loader2 className="h-4 w-4 mr-2 animate-spin" />}
+              Ingresar
+            </Button>
           </form>
 
           <p className="text-center text-xs text-muted-foreground">

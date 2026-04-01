@@ -26,6 +26,15 @@ export function useSearchPatients(q: string, type: string = "nombre") {
   });
 }
 
+export function useProfessionalPatients(profesionalId: number | undefined) {
+  return useQuery({
+    queryKey: ["patients", "by-professional", profesionalId],
+    queryFn: () =>
+      api.get<Patient[]>(`/api/v1/patients/by-professional/${profesionalId}`),
+    enabled: !!profesionalId,
+  });
+}
+
 export function usePatient(id: string | number | undefined) {
   return useQuery({
     queryKey: ["patients", id],

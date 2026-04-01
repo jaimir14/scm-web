@@ -1,21 +1,23 @@
 import { useState } from "react";
-import { Link, Outlet, useLocation, useNavigate } from "react-router-dom";
-import { CalendarDays, LogOut, Stethoscope, Menu, LayoutDashboard } from "lucide-react";
+import { Link, Outlet, useLocation, useNavigate, Navigate } from "react-router-dom";
+import { CalendarDays, LogOut, Stethoscope, Menu, LayoutDashboard, Users } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./ThemeToggle";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
-import { useDoctor } from "@/contexts/DoctorContext";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAuth } from "@/contexts/AuthContext";
 
 function DoctorNav({ onNavigate }: { onNavigate?: () => void }) {
   const location = useLocation();
   const navigate = useNavigate();
-  const { profesional, logout } = useDoctor();
+  const { user, logout } = useAuth();
 
   const links = [
     { label: "Dashboard", href: "/doctor/dashboard", icon: LayoutDashboard },
     { label: "Mi Agenda", href: "/doctor/agenda", icon: CalendarDays },
+    { label: "Pacientes", href: "/doctor/pacientes", icon: Users },
   ];
 
   return (
@@ -44,8 +46,8 @@ function DoctorNav({ onNavigate }: { onNavigate?: () => void }) {
             <Stethoscope className="h-4 w-4" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium truncate">{profesional?.nombre ?? "Doctor"}</p>
-            <p className="text-[10px] text-sidebar-foreground/60">{profesional?.especialidad ?? ""}</p>
+            <p className="text-xs font-medium truncate">{user?.nombre ?? "Doctor"}</p>
+            <p className="text-[10px] text-sidebar-foreground/60">{user?.especialidad ?? ""}</p>
           </div>
           <ThemeToggle />
           <button onClick={() => { logout(); navigate("/doctor"); }} className="p-1 hover:bg-sidebar-accent rounded">
@@ -60,13 +62,30 @@ function DoctorNav({ onNavigate }: { onNavigate?: () => void }) {
 export default function DoctorLayout() {
   const isMobile = useIsMobile();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { isAuthenticated, isLoading, user } = useAuth();
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="space-y-4 w-64">
+          <Skeleton className="h-8 w-full" />
+          <Skeleton className="h-4 w-3/4" />
+          <Skeleton className="h-4 w-1/2" />
+        </div>
+      </div>
+    );
+  }
+
+  if (!isAuthenticated || user?.rol !== "MEDICO") {
+    return <Navigate to="/doctor" replace />;
+  }
 
   const header = (
     <div className="flex items-center gap-2 p-4 border-b border-sidebar-border">
       <Stethoscope className="h-7 w-7 text-sidebar-primary" />
       <div>
-        <h1 className="text-base font-bold text-sidebar-primary-foreground tracking-wide">Portal Médico</h1>
-        <p className="text-[10px] text-sidebar-foreground/60">Sistema Clínico Médico</p>
+        <h1 className="text-base font-bold text-sidebar-primary-foreground tracking-wide">Portal Medico</h1>
+        <p className="text-[10px] text-sidebar-foreground/60">Sistema Clinico Medico</p>
       </div>
     </div>
   );

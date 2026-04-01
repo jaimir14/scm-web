@@ -3,7 +3,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { Skeleton } from "@/components/ui/skeleton";
 
 export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
-  const { isAuthenticated, isLoading } = useAuth();
+  const { isAuthenticated, isLoading, user } = useAuth();
 
   if (isLoading) {
     return (
@@ -19,6 +19,10 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
 
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
+  }
+
+  if (user?.rol === "MEDICO") {
+    return <Navigate to="/doctor/dashboard" replace />;
   }
 
   return <>{children}</>;

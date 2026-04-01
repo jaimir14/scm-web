@@ -10,7 +10,7 @@ export interface Appointment {
   estado: "PENDIENTE" | "ATENDIDA" | "CANCELADA";
   notas?: string;
   paciente?: { id: number; nombre: string; apellido1: string; apellido2?: string };
-  profesional?: { id: number; nombre: string; clinicaId: number; clinica?: { id: number; nombre: string } };
+  profesional?: { id: number; nombre: string; especialidad?: string; clinicaId?: number; clinica?: { id: number; nombre: string } };
   clinica?: { id: number; nombre: string };
   tipoCita?: { id: number; nombre: string };
   createdAt?: string;
