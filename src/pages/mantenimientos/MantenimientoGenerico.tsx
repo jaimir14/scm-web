@@ -262,7 +262,8 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
   };
 
   const handleSave = () => {
-    const payload: Record<string, any> = { ...formData, activo: active };
+    const activeKey = tipo === "usuarios" || tipo === "tipos-cita" ? "estado" : "activo";
+    const payload: Record<string, any> = { ...formData, [activeKey]: active };
     config.formFields.forEach(f => {
       if (f.type === "number" && payload[f.key]) {
         payload[f.key] = Number(payload[f.key]);
