@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Pencil, Trash2, Search, Loader2 } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, Loader2, Eye, EyeOff } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
@@ -58,7 +58,7 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
   const [editingItem, setEditingItem] = useState<any>(null);
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [active, setActive] = useState(true);
-
+  const [showPassword, setShowPassword] = useState(false);
   useEffect(() => {
     setSearch("");
     setEditingItem(null);
@@ -344,6 +344,23 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
                         ))}
                       </SelectContent>
                     </Select>
+                  ) : f.type === "password" ? (
+                    <div className="relative">
+                      <Input
+                        type={showPassword ? "text" : "password"}
+                        value={formData[f.key] || ""}
+                        onChange={e => setFormData(prev => ({ ...prev, [f.key]: e.target.value }))}
+                        className="pr-10"
+                      />
+                      <button
+                        type="button"
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                        onClick={() => setShowPassword(v => !v)}
+                        tabIndex={-1}
+                      >
+                        {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                      </button>
+                    </div>
                   ) : (
                     <Input
                       type={f.type || "text"}
