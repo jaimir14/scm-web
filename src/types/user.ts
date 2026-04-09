@@ -3,7 +3,8 @@ export interface User {
   usuario: string;
   nombre: string;
   rol: string;
-  activo: boolean;
+  activo?: boolean;
+  estado?: boolean;
   ultimoAcceso?: string;
   createdAt?: string;
   updatedAt?: string;
