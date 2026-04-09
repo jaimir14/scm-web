@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { useClinics, useCreateClinic, useUpdateClinic, useDeleteClinic, useActiveClinics } from "@/services/clinics.service";
-import { useProfessionals, useCreateProfessional, useUpdateProfessional, useDeleteProfessional } from "@/services/professionals.service";
+
 import { useUsers, useCreateUser, useUpdateUser, useDeleteUser } from "@/services/users.service";
 import { useAppointmentTypes, useCreateAppointmentType, useUpdateAppointmentType, useDeleteAppointmentType } from "@/services/appointment-types.service";
 import { useTreatments, useCreateTreatment, useUpdateTreatment, useDeleteTreatment } from "@/services/treatments.service";
@@ -27,7 +27,7 @@ type FormFieldDef = {
 export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
   // Always call all hooks unconditionally
   const clinicsQuery = useClinics();
-  const professionalsQuery = useProfessionals();
+  
   const usersQuery = useUsers();
   const appointmentTypesQuery = useAppointmentTypes();
   const treatmentsQuery = useTreatments();
@@ -37,9 +37,6 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
   const updateClinic = useUpdateClinic();
   const deleteClinic = useDeleteClinic();
 
-  const createProfessional = useCreateProfessional();
-  const updateProfessional = useUpdateProfessional();
-  const deleteProfessional = useDeleteProfessional();
 
   const createUser = useCreateUser();
   const updateUser = useUpdateUser();
@@ -97,28 +94,6 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
           direccion: item.direccion || "",
           telefono: item.telefono || "",
           estado: item.activo ? "Activa" : "Inactiva",
-        }),
-      },
-      profesionales: {
-        title: "Profesionales / Medicos",
-        columns: [
-          { key: "nombre", label: "Nombre" },
-          { key: "especialidad", label: "Especialidad" },
-          { key: "clinica", label: "Clinica" },
-          { key: "estado", label: "Estado" },
-        ],
-        formFields: [
-          { key: "nombre", label: "Nombre completo" },
-          { key: "especialidad", label: "Especialidad" },
-          { key: "clinicaId", label: "Clinica", type: "select", options: clinicOptions },
-          { key: "telefono", label: "Telefono" },
-          { key: "email", label: "Email", type: "email" },
-        ],
-        mapToRow: (item) => ({
-          nombre: item.nombre || "",
-          especialidad: item.especialidad || "",
-          clinica: item.clinica?.nombre || "",
-          estado: item.activo ? "Activo" : "Inactivo",
         }),
       },
       usuarios: {
@@ -196,7 +171,7 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
 
   // Resolve data/mutations based on tipo
   const dataQuery = tipo === "clinicas" ? clinicsQuery
-    : tipo === "profesionales" ? professionalsQuery
+    
     : tipo === "usuarios" ? usersQuery
     : tipo === "tipos-cita" ? appointmentTypesQuery
     : tipo === "tratamientos" ? treatmentsQuery
@@ -204,7 +179,7 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
 
   const getCreateMutation = () => {
     if (tipo === "clinicas") return createClinic;
-    if (tipo === "profesionales") return createProfessional;
+    
     if (tipo === "usuarios") return createUser;
     if (tipo === "tipos-cita") return createAppointmentType;
     if (tipo === "tratamientos") return createTreatment;
@@ -213,7 +188,7 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
 
   const getUpdateMutation = () => {
     if (tipo === "clinicas") return updateClinic;
-    if (tipo === "profesionales") return updateProfessional;
+    
     if (tipo === "usuarios") return updateUser;
     if (tipo === "tipos-cita") return updateAppointmentType;
     if (tipo === "tratamientos") return updateTreatment;
@@ -222,7 +197,7 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
 
   const getDeleteMutation = () => {
     if (tipo === "clinicas") return deleteClinic;
-    if (tipo === "profesionales") return deleteProfessional;
+    
     if (tipo === "usuarios") return deleteUser;
     if (tipo === "tipos-cita") return deleteAppointmentType;
     if (tipo === "tratamientos") return deleteTreatment;
