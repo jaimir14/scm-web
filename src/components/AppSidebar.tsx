@@ -28,7 +28,6 @@ const navigation: NavItem[] = [
   {
     label: "Mantenimientos", icon: Settings, children: [
       { label: "Clinicas", href: "/mantenimientos/clinicas" },
-      { label: "Profesionales", href: "/mantenimientos/profesionales" },
       { label: "Usuarios", href: "/mantenimientos/usuarios" },
       { label: "Tipos de Cita", href: "/mantenimientos/tipos-cita" },
       { label: "Tratamientos", href: "/mantenimientos/tratamientos" },

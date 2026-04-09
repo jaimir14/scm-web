@@ -11,7 +11,7 @@ import { Switch } from "@/components/ui/switch";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { useClinics, useCreateClinic, useUpdateClinic, useDeleteClinic, useActiveClinics } from "@/services/clinics.service";
-import { useProfessionals, useCreateProfessional, useUpdateProfessional, useDeleteProfessional } from "@/services/professionals.service";
+
 import { useUsers, useCreateUser, useUpdateUser, useDeleteUser } from "@/services/users.service";
 import { useAppointmentTypes, useCreateAppointmentType, useUpdateAppointmentType, useDeleteAppointmentType } from "@/services/appointment-types.service";
 import { useTreatments, useCreateTreatment, useUpdateTreatment, useDeleteTreatment } from "@/services/treatments.service";

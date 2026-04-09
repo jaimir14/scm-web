@@ -44,7 +44,7 @@ const App = () => (
               <Route path="/expediente/nuevo" element={<ExpedienteDetalle />} />
               <Route path="/expediente/:id" element={<ExpedienteDetalle />} />
               <Route path="/mantenimientos/clinicas" element={<MantenimientoGenerico tipo="clinicas" />} />
-              <Route path="/mantenimientos/profesionales" element={<MantenimientoGenerico tipo="profesionales" />} />
+              
               <Route path="/mantenimientos/usuarios" element={<MantenimientoGenerico tipo="usuarios" />} />
               <Route path="/mantenimientos/tipos-cita" element={<MantenimientoGenerico tipo="tipos-cita" />} />
               <Route path="/mantenimientos/tratamientos" element={<MantenimientoGenerico tipo="tratamientos" />} />
