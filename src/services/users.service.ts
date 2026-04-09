@@ -9,6 +9,16 @@ export function useUsers() {
   });
 }
 
+export function useDoctors() {
+  return useQuery({
+    queryKey: ["users", "doctors"],
+    queryFn: async () => {
+      const users = await api.get<User[]>("/api/v1/users");
+      return users.filter(u => u.rol === "MEDICO" && u.estado !== false);
+    },
+  });
+}
+
 export function useCreateUser() {
   const queryClient = useQueryClient();
   return useMutation({
