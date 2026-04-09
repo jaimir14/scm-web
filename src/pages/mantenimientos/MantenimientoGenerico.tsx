@@ -294,7 +294,7 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
         }
       );
     } else {
-      cMutation?.mutate(payload, {
+      cMutation?.mutate(payload as any, {
         onSuccess: () => {
           toast.success("Registro creado");
           setDialogOpen(false);
