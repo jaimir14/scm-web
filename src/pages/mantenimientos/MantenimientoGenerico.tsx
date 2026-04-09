@@ -144,7 +144,7 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
           usuario: item.usuario || "",
           nombre: item.nombre || "",
           rol: item.rol || "",
-          estado: item.activo ? "Activo" : "Inactivo",
+          estado: (item.activo ?? item.estado) ? "Activo" : "Inactivo",
         }),
       },
       "tipos-cita": {
