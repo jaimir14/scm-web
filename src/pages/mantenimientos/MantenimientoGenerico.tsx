@@ -144,7 +144,7 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
           usuario: item.usuario || "",
           nombre: item.nombre || "",
           rol: item.rol || "",
-          estado: item.activo ? "Activo" : "Inactivo",
+          estado: (item.activo ?? item.estado) ? "Activo" : "Inactivo",
         }),
       },
       "tipos-cita": {
@@ -256,7 +256,7 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
     config.formFields.forEach(f => {
       fd[f.key] = item[f.key] != null ? String(item[f.key]) : "";
     });
-    setActive(item.activo !== false);
+    setActive(item.activo !== false && item.estado !== false);
     setFormData(fd);
     setDialogOpen(true);
   };
