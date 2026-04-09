@@ -294,7 +294,7 @@ function CrearCitaForm({ onClose }: { onClose: () => void }) {
   const [horaFin, setHoraFin] = useState("08:30");
   const [notas, setNotas] = useState("");
 
-  const { data: professionals } = useActiveProfessionals();
+  const { data: professionals } = useDoctors();
   const { data: clinics } = useActiveClinics();
   const { data: appointmentTypes } = useActiveAppointmentTypes();
 
@@ -448,7 +448,7 @@ function EditarCitaForm({ appointment, onClose }: { appointment: Appointment; on
   const [horaFin, setHoraFin] = useState(appointment.horaFin);
   const [notas, setNotas] = useState(appointment.notas || "");
 
-  const { data: professionals } = useActiveProfessionals();
+  const { data: professionals } = useDoctors();
   const { data: clinics } = useActiveClinics();
   const { data: appointmentTypes } = useActiveAppointmentTypes();
 
