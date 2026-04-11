@@ -582,8 +582,8 @@ export default function ExpedienteDetalle() {
                     </div>
                   ) : consultations && consultations.length > 0 ? (
                     consultations.map(c => (
-                      <div key={c.id} className="border rounded-lg p-3 bg-muted/30">
-                        <div className="flex items-center gap-2 mb-2">
+                      <div key={c.id} className="border rounded-lg p-3 bg-muted/30 space-y-3">
+                        <div className="flex items-center gap-2">
                           <Badge variant="outline" className="text-xs">{c.fecha}</Badge>
                           <span className="text-xs text-muted-foreground">{c.profesional?.nombre}</span>
                         </div>
@@ -591,8 +591,14 @@ export default function ExpedienteDetalle() {
                           <p className="text-xs"><strong>Motivo:</strong> {c.motivoConsulta}</p>
                         )}
                         {c.impresionDiagnostica && (
-                          <p className="text-xs"><strong>Diagnostico:</strong> {c.impresionDiagnostica}</p>
+                          <p className="text-xs"><strong>Diagnóstico:</strong> {c.impresionDiagnostica}</p>
                         )}
+                        <ConsultationImages
+                          consultaId={c.id}
+                          patientId={Number(id)}
+                          citaId={c.citaId ?? undefined}
+                          editable={false}
+                        />
                       </div>
                     ))
                   ) : (
