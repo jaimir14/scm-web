@@ -15,6 +15,7 @@ import { usePatient } from "@/services/patients.service";
 import { usePatientConsultations, useCreateConsultation, useUpdateConsultation } from "@/services/consultations.service";
 import { useConsultationImages, useRequestPresignedUrl, useRegisterImage, useDeleteConsultationImage, uploadFileToSpaces } from "@/services/consultation-images.service";
 import { ConsultationImages } from "@/components/ConsultationImages";
+import { ConsultationFiles } from "@/components/ConsultationFiles";
 import { useAppointments, useUpdateAppointmentStatus } from "@/services/appointments.service";
 import type { Consultation, ConsultationImage } from "@/types";
 import { toast } from "sonner";
@@ -254,6 +255,13 @@ function ConsultationCard({
             consultaId={consultation?.id}
             patientId={patientId}
             citaId={citaId}
+            editable={isToday}
+          />
+
+          {/* Consultation Files (Lab Results) */}
+          <ConsultationFiles
+            consultaId={consultation?.id}
+            patientId={patientId}
             editable={isToday}
           />
 
