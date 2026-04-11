@@ -16,7 +16,8 @@ import { toast } from "sonner";
 import { usePatient, useCreatePatient, useUpdatePatient } from "@/services/patients.service";
 import { usePatientConsultations, useCreateConsultation } from "@/services/consultations.service";
 import { useActiveClinics } from "@/services/clinics.service";
-import { useActiveProfessionals } from "@/services/professionals.service";
+import { useDoctors } from "@/services/users.service";
+import { ConsultationImages } from "@/components/ConsultationImages";
 import type { Patient, CreatePatientInput } from "@/types";
 
 export default function ExpedienteDetalle() {
