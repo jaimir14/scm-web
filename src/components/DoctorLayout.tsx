@@ -50,7 +50,7 @@ function DoctorNav({ onNavigate }: { onNavigate?: () => void }) {
             <p className="text-[10px] text-sidebar-foreground/60">{user?.especialidad ?? ""}</p>
           </div>
           <ThemeToggle />
-          <button onClick={() => { logout(); navigate("/doctor"); }} className="p-1 hover:bg-sidebar-accent rounded">
+          <button onClick={() => logout()} className="p-1 hover:bg-sidebar-accent rounded">
             <LogOut className="h-4 w-4" />
           </button>
         </div>
