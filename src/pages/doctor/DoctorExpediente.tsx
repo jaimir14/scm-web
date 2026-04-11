@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from "@/components/ui/alert-dialog";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -62,9 +63,10 @@ function ConsultationImages({
   const registerImage = useRegisterImage();
   const deleteImage = useDeleteConsultationImage();
   const [uploading, setUploading] = useState(false);
+  const [deleting, setDeleting] = useState<number | null>(null);
   const [viewerOpen, setViewerOpen] = useState(false);
   const [viewerIndex, setViewerIndex] = useState(0);
-  const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
+  const [deleteTarget, setDeleteTarget] = useState<{ id: number; name: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -107,13 +109,17 @@ function ConsultationImages({
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async () => {
+    if (!deleteTarget) return;
+    setDeleting(deleteTarget.id);
     try {
-      await deleteImage.mutateAsync(id);
+      await deleteImage.mutateAsync(deleteTarget.id);
       toast.success("Imagen eliminada");
-      setConfirmDelete(null);
     } catch (err: any) {
       toast.error(err?.message || "Error al eliminar imagen");
+    } finally {
+      setDeleting(null);
+      setDeleteTarget(null);
     }
   };
 
@@ -226,21 +232,16 @@ function ConsultationImages({
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    if (confirmDelete === img.id) {
-                      handleDelete(img.id);
-                    } else {
-                      setConfirmDelete(img.id);
-                      setTimeout(() => setConfirmDelete(null), 3000);
-                    }
+                    setDeleteTarget({ id: img.id, name: img.fileName });
                   }}
-                  className={cn(
-                    "absolute top-1 right-1 rounded-full p-1 transition-all opacity-0 group-hover:opacity-100",
-                    confirmDelete === img.id
-                      ? "bg-destructive text-destructive-foreground scale-110"
-                      : "bg-black/40 text-white/80 hover:bg-destructive hover:text-destructive-foreground"
-                  )}
+                  disabled={deleting === img.id}
+                  className="absolute top-1 right-1 rounded-full p-1 transition-all opacity-0 group-hover:opacity-100 bg-black/40 text-white/80 hover:bg-destructive hover:text-destructive-foreground disabled:opacity-50"
                 >
-                  <Trash2 className="h-3 w-3" />
+                  {deleting === img.id ? (
+                    <Loader2 className="h-3 w-3 animate-spin" />
+                  ) : (
+                    <Trash2 className="h-3 w-3" />
+                  )}
                 </button>
               )}
             </div>
@@ -255,6 +256,29 @@ function ConsultationImages({
         open={viewerOpen}
         onOpenChange={setViewerOpen}
       />
+
+      {/* Delete confirmation */}
+      <AlertDialog open={!!deleteTarget} onOpenChange={(open) => !open && setDeleteTarget(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>¿Eliminar imagen?</AlertDialogTitle>
+            <AlertDialogDescription>
+              Se eliminará <span className="font-medium text-foreground">"{deleteTarget?.name}"</span>. Esta acción no se puede deshacer.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={!!deleting}>Cancelar</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDelete}
+              disabled={!!deleting}
+              className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
+            >
+              {deleting ? <Loader2 className="h-4 w-4 animate-spin mr-1" /> : null}
+              Eliminar
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 }
