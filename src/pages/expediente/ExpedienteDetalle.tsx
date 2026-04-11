@@ -16,7 +16,8 @@ import { toast } from "sonner";
 import { usePatient, useCreatePatient, useUpdatePatient } from "@/services/patients.service";
 import { usePatientConsultations, useCreateConsultation } from "@/services/consultations.service";
 import { useActiveClinics } from "@/services/clinics.service";
-import { useActiveProfessionals } from "@/services/professionals.service";
+import { useDoctors } from "@/services/users.service";
+import { ConsultationImages } from "@/components/ConsultationImages";
 import type { Patient, CreatePatientInput } from "@/types";
 
 export default function ExpedienteDetalle() {
@@ -27,7 +28,7 @@ export default function ExpedienteDetalle() {
   const { data: patient, isLoading: patientLoading } = usePatient(isNew ? undefined : id);
   const { data: consultations, isLoading: consultationsLoading } = usePatientConsultations(isNew ? undefined : id);
   const { data: clinics } = useActiveClinics();
-  const { data: professionals } = useActiveProfessionals();
+  const { data: professionals } = useDoctors();
 
   const createPatient = useCreatePatient();
   const updatePatient = useUpdatePatient();
@@ -512,21 +513,13 @@ export default function ExpedienteDetalle() {
                   ))}
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2 bg-warning/10 p-2 rounded">
-                  <Badge variant="outline" className="text-xs">Total Img: 0</Badge>
-                  <span className="text-xs">Gabinete/Lab</span>
-                  <Select defaultValue="lab">
-                    <SelectTrigger className="h-7 text-xs w-full sm:w-48"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="lab">Examen de Laboratorio (0)</SelectItem>
-                      <SelectItem value="rx">Rayos X (0)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <div className="flex gap-1 w-full sm:w-auto">
-                    <Button size="sm" variant="secondary" className="h-7 text-xs flex-1 sm:flex-none">Agregar Imagenes</Button>
-                    <Button size="sm" variant="secondary" className="h-7 text-xs flex-1 sm:flex-none">Ver Imagenes</Button>
-                  </div>
-                </div>
+                {/* Consultation Images */}
+                <ConsultationImages
+                  consultaId={undefined}
+                  patientId={Number(id)}
+                  citaId={undefined}
+                  editable={false}
+                />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1">
@@ -589,8 +582,8 @@ export default function ExpedienteDetalle() {
                     </div>
                   ) : consultations && consultations.length > 0 ? (
                     consultations.map(c => (
-                      <div key={c.id} className="border rounded-lg p-3 bg-muted/30">
-                        <div className="flex items-center gap-2 mb-2">
+                      <div key={c.id} className="border rounded-lg p-3 bg-muted/30 space-y-3">
+                        <div className="flex items-center gap-2">
                           <Badge variant="outline" className="text-xs">{c.fecha}</Badge>
                           <span className="text-xs text-muted-foreground">{c.profesional?.nombre}</span>
                         </div>
@@ -598,8 +591,14 @@ export default function ExpedienteDetalle() {
                           <p className="text-xs"><strong>Motivo:</strong> {c.motivoConsulta}</p>
                         )}
                         {c.impresionDiagnostica && (
-                          <p className="text-xs"><strong>Diagnostico:</strong> {c.impresionDiagnostica}</p>
+                          <p className="text-xs"><strong>Diagnóstico:</strong> {c.impresionDiagnostica}</p>
                         )}
+                        <ConsultationImages
+                          consultaId={c.id}
+                          patientId={Number(id)}
+                          citaId={c.citaId ?? undefined}
+                          editable={false}
+                        />
                       </div>
                     ))
                   ) : (
