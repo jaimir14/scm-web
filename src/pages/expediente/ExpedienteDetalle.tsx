@@ -71,7 +71,7 @@ export default function ExpedienteDetalle() {
         notas: patient.notas || "",
       });
     }
-  }, [patient]);
+  }, [patient, isNew]);
 
   const updateField = (key: string, value: string | number) => {
     setForm(prev => ({ ...prev, [key]: value }));
