@@ -38,6 +38,10 @@ export default function ExpedienteDetalle() {
   const [form, setForm] = useState<Partial<CreatePatientInput>>({});
 
   useEffect(() => {
+    if (isNew) {
+      setForm({});
+      return;
+    }
     if (patient) {
       setForm({
         clinicaId: patient.clinicaId,
@@ -67,7 +71,7 @@ export default function ExpedienteDetalle() {
         notas: patient.notas || "",
       });
     }
-  }, [patient]);
+  }, [patient, isNew]);
 
   const updateField = (key: string, value: string | number) => {
     setForm(prev => ({ ...prev, [key]: value }));
