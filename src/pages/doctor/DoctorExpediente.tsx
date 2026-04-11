@@ -62,25 +62,26 @@ function ConsultationImages({
   const registerImage = useRegisterImage();
   const deleteImage = useDeleteConsultationImage();
   const [uploading, setUploading] = useState(false);
-  const [preview, setPreview] = useState<string | null>(null);
+  const [viewerOpen, setViewerOpen] = useState(false);
+  const [viewerIndex, setViewerIndex] = useState(0);
+  const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files?.length) return;
     if (!consultaId) {
-      toast.error("Guarde la consulta antes de subir imagenes");
+      toast.error("Guarde la consulta antes de subir imágenes");
       return;
     }
     if (!citaId) {
-      toast.error("No se encontro la cita asociada");
+      toast.error("No se encontró la cita asociada");
       return;
     }
 
     setUploading(true);
     try {
       for (const file of Array.from(files)) {
-        // 1. Get presigned URL
         const { uploadUrl, storagePath } = await requestPresignedUrl.mutateAsync({
           pacienteId: patientId,
           citaId,
@@ -88,11 +89,7 @@ function ConsultationImages({
           mimeType: file.type,
           fileSize: file.size,
         });
-
-        // 2. Upload directly to Spaces
         await uploadFileToSpaces(uploadUrl, file);
-
-        // 3. Register in backend
         await registerImage.mutateAsync({
           consultaId,
           fileName: file.name,
@@ -110,10 +107,11 @@ function ConsultationImages({
     }
   };
 
-  const handleDelete = async (img: ConsultationImage) => {
+  const handleDelete = async (id: number) => {
     try {
-      await deleteImage.mutateAsync(img.id);
+      await deleteImage.mutateAsync(id);
       toast.success("Imagen eliminada");
+      setConfirmDelete(null);
     } catch (err: any) {
       toast.error(err?.message || "Error al eliminar imagen");
     }
@@ -121,16 +119,28 @@ function ConsultationImages({
 
   if (!consultaId) {
     return (
-      <div className="text-xs text-muted-foreground italic">
-        Guarde la consulta primero para poder adjuntar imagenes.
+      <div className="flex items-center gap-2 p-3 rounded-lg border border-dashed border-border bg-muted/30">
+        <ImagePlus className="h-4 w-4 text-muted-foreground" />
+        <span className="text-xs text-muted-foreground">
+          Guarde la consulta primero para adjuntar imágenes.
+        </span>
       </div>
     );
   }
 
   return (
-    <div className="space-y-2">
+    <div className="space-y-3">
+      {/* Header */}
       <div className="flex items-center justify-between">
-        <Label className="text-xs font-semibold">Imagenes de Consulta</Label>
+        <div className="flex items-center gap-2">
+          <ImagePlus className="h-4 w-4 text-primary" />
+          <Label className="text-sm font-semibold">Imágenes</Label>
+          {images.length > 0 && (
+            <span className="text-[10px] bg-primary/10 text-primary px-1.5 py-0.5 rounded-full font-medium">
+              {images.length}
+            </span>
+          )}
+        </div>
         {editable && (
           <>
             <input
@@ -147,69 +157,104 @@ function ConsultationImages({
               size="sm"
               disabled={uploading}
               onClick={() => fileInputRef.current?.click()}
+              className="h-8 text-xs gap-1.5"
             >
               {uploading ? (
-                <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
               ) : (
-                <ImagePlus className="h-3 w-3 mr-1" />
+                <Upload className="h-3.5 w-3.5" />
               )}
-              Subir imagen
+              Subir
             </Button>
           </>
         )}
       </div>
 
+      {/* Content */}
       {isLoading ? (
-        <div className="flex gap-2">
-          <Skeleton className="h-20 w-20 rounded" />
-          <Skeleton className="h-20 w-20 rounded" />
+        <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+          {[1, 2, 3].map((i) => (
+            <Skeleton key={i} className="aspect-square rounded-lg" />
+          ))}
         </div>
       ) : images.length === 0 ? (
-        <p className="text-xs text-muted-foreground">Sin imagenes adjuntas</p>
+        <div
+          className={cn(
+            "flex flex-col items-center justify-center py-6 rounded-lg border border-dashed border-border bg-muted/20 gap-2",
+            editable && "cursor-pointer hover:bg-muted/40 transition-colors"
+          )}
+          onClick={() => editable && fileInputRef.current?.click()}
+        >
+          <ImagePlus className="h-8 w-8 text-muted-foreground/40" />
+          <p className="text-xs text-muted-foreground">
+            {editable ? "Click para subir imágenes" : "Sin imágenes adjuntas"}
+          </p>
+        </div>
       ) : (
-        <div className="flex flex-wrap gap-2">
-          {images.map((img) => (
-            <div key={img.id} className="relative group">
+        <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+          {images.map((img, idx) => (
+            <div
+              key={img.id}
+              className="group relative aspect-square rounded-lg overflow-hidden border border-border bg-muted/30 transition-shadow hover:shadow-md hover:border-primary/30"
+            >
               <img
                 src={img.viewUrl}
                 alt={img.fileName}
-                className="h-20 w-20 object-cover rounded border cursor-pointer hover:ring-2 ring-primary transition-all"
-                onClick={() => setPreview(img.viewUrl ?? null)}
+                className="h-full w-full object-cover transition-transform duration-200 group-hover:scale-105"
               />
+              {/* Overlay on hover */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200" />
+              <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <button
+                  className="bg-black/50 backdrop-blur-sm text-white rounded-full p-2 hover:bg-black/70 transition-colors"
+                  onClick={() => {
+                    setViewerIndex(idx);
+                    setViewerOpen(true);
+                  }}
+                >
+                  <Eye className="h-4 w-4" />
+                </button>
+              </div>
+              {/* File name */}
+              <div className="absolute bottom-0 left-0 right-0 px-1.5 py-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                <p className="text-[9px] text-white truncate font-medium">
+                  {img.fileName}
+                </p>
+              </div>
+              {/* Delete button */}
               {editable && (
                 <button
-                  onClick={() => handleDelete(img)}
-                  className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    if (confirmDelete === img.id) {
+                      handleDelete(img.id);
+                    } else {
+                      setConfirmDelete(img.id);
+                      setTimeout(() => setConfirmDelete(null), 3000);
+                    }
+                  }}
+                  className={cn(
+                    "absolute top-1 right-1 rounded-full p-1 transition-all opacity-0 group-hover:opacity-100",
+                    confirmDelete === img.id
+                      ? "bg-destructive text-destructive-foreground scale-110"
+                      : "bg-black/40 text-white/80 hover:bg-destructive hover:text-destructive-foreground"
+                  )}
                 >
                   <Trash2 className="h-3 w-3" />
                 </button>
               )}
-              <p className="text-[9px] text-muted-foreground truncate w-20 mt-0.5">{img.fileName}</p>
             </div>
           ))}
         </div>
       )}
 
-      {/* Full-size preview modal */}
-      {preview && (
-        <div
-          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
-          onClick={() => setPreview(null)}
-        >
-          <button
-            className="absolute top-4 right-4 text-white hover:text-gray-300"
-            onClick={() => setPreview(null)}
-          >
-            <X className="h-6 w-6" />
-          </button>
-          <img
-            src={preview}
-            alt="Preview"
-            className="max-h-[90vh] max-w-[90vw] object-contain rounded"
-            onClick={(e) => e.stopPropagation()}
-          />
-        </div>
-      )}
+      {/* Medical Image Viewer */}
+      <MedicalImageViewer
+        images={images}
+        initialIndex={viewerIndex}
+        open={viewerOpen}
+        onOpenChange={setViewerOpen}
+      />
     </div>
   );
 }
