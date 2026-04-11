@@ -18,7 +18,6 @@ export interface Patient {
   telefonoTrabajo?: string;
   otroTelefono?: string;
   ocupacion?: string;
-  foto?: string;
   antecedentesPatologicos?: string;
   antecedentesNoPatologicos?: Record<string, boolean>;
   antecedentesQuirurgicos?: string;

@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Plus, Pencil, Trash2, Search, Loader2, Eye, EyeOff } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
+import { UserPhotoUpload } from "@/components/UserPhotoUpload";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
@@ -307,6 +308,12 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
               </DialogTitle>
             </DialogHeader>
             <div className="space-y-4">
+              {/* User photo upload - only when editing an existing user */}
+              {tipo === "usuarios" && editingItem && (
+                <div className="flex justify-center pb-2">
+                  <UserPhotoUpload userId={editingItem.id} hasPhoto={!!editingItem.fotografia} />
+                </div>
+              )}
               {config.formFields.map(f => (
                 <div key={f.key} className="space-y-1">
                   <Label className="text-sm">{f.label}</Label>

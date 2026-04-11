@@ -160,7 +160,7 @@ export default function ExpedienteDetalle() {
         <TabsContent value="datos">
           <Card>
             <CardContent className="pt-6">
-              <div className="grid grid-cols-1 lg:grid-cols-[1fr_180px] gap-6">
+              <div className="grid grid-cols-1 gap-6">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <Field label="Clinica" required>
                     <Select
@@ -267,13 +267,6 @@ export default function ExpedienteDetalle() {
                       </SelectContent>
                     </Select>
                   </Field>
-                </div>
-
-                <div className="flex flex-row lg:flex-col items-center gap-3">
-                  <div className="w-24 h-28 lg:w-36 lg:h-40 bg-muted rounded-lg flex items-center justify-center border shrink-0">
-                    <User className="h-10 w-10 lg:h-16 lg:w-16 text-muted-foreground/40" />
-                  </div>
-                  <Button variant="outline" size="sm">Cambiar Fotografia</Button>
                 </div>
               </div>
             </CardContent>

@@ -3,6 +3,7 @@ export interface User {
   usuario: string;
   nombre: string;
   rol: string;
+  fotografia?: string | null;
   activo?: boolean;
   estado?: boolean;
   ultimoAcceso?: string;

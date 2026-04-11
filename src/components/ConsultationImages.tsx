@@ -48,6 +48,8 @@ export function ConsultationImages({
   const [deleteTarget, setDeleteTarget] = useState<{ id: number; name: string } | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const MAX_IMAGE_SIZE = 20 * 1024 * 1024; // 20MB
+
   const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files;
     if (!files?.length) return;
@@ -58,6 +60,14 @@ export function ConsultationImages({
     if (!citaId) {
       toast.error("No se encontró la cita asociada");
       return;
+    }
+
+    for (const file of Array.from(files)) {
+      if (file.size > MAX_IMAGE_SIZE) {
+        toast.error(`"${file.name}" supera el limite de 20MB`);
+        e.target.value = "";
+        return;
+      }
     }
 
     setUploading(true);

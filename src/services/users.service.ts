@@ -50,3 +50,48 @@ export function useDeleteUser() {
     },
   });
 }
+
+// --- User Photo ---
+
+export function useUserPhotoUrl(userId: number | undefined) {
+  return useQuery({
+    queryKey: ["user-photo", userId],
+    queryFn: () =>
+      api.get<{ viewUrl: string | null }>(`/api/v1/users/${userId}/photo/view-url`),
+    enabled: !!userId,
+  });
+}
+
+export function useRequestUserPhotoPresignedUrl() {
+  return useMutation({
+    mutationFn: ({ userId, data }: { userId: number; data: { fileName: string; mimeType: string; fileSize: number } }) =>
+      api.post<{ uploadUrl: string; storagePath: string }>(
+        `/api/v1/users/${userId}/photo/presigned-url`,
+        data
+      ),
+  });
+}
+
+export function useRegisterUserPhoto() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ userId, storagePath }: { userId: number; storagePath: string }) =>
+      api.put<User>(`/api/v1/users/${userId}/photo`, { storagePath }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      queryClient.invalidateQueries({ queryKey: ["user-photo"] });
+    },
+  });
+}
+
+export function useDeleteUserPhoto() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: (userId: number) =>
+      api.delete(`/api/v1/users/${userId}/photo`),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      queryClient.invalidateQueries({ queryKey: ["user-photo"] });
+    },
+  });
+}
