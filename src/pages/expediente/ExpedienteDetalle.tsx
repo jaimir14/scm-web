@@ -19,6 +19,7 @@ import { usePatientConsultations } from "@/services/consultations.service";
 import { useActiveClinics } from "@/services/clinics.service";
 import { useDoctors } from "@/services/users.service";
 import { ConsultationImages } from "@/components/ConsultationImages";
+import { ConsultationFiles } from "@/components/ConsultationFiles";
 import type { Patient, CreatePatientInput } from "@/types";
 import type { Consultation } from "@/types/consultation";
 
@@ -529,6 +530,13 @@ function ConsultationHistoryCard({
               consultaId={c.id}
               patientId={patientId}
               citaId={c.citaId ?? undefined}
+              editable={false}
+            />
+
+            {/* Files (Lab Results) */}
+            <ConsultationFiles
+              consultaId={c.id}
+              patientId={patientId}
               editable={false}
             />
           </div>
