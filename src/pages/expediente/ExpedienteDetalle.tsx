@@ -133,7 +133,7 @@ export default function ExpedienteDetalle() {
         pacienteId: Number(id),
         profesionalId: form.profesionalId || 0,
         fecha: consultationForm.fecha || new Date().toISOString().split("T")[0],
-        hora: consultationForm.hora,
+        
         peso: consultationForm.peso,
         talla: consultationForm.talla,
         imc: consultationForm.imc,
@@ -141,10 +141,10 @@ export default function ExpedienteDetalle() {
         presionArterial: consultationForm.presionArterial,
         frecuenciaCardiaca: consultationForm.frecuenciaCardiaca,
         frecuenciaRespiratoria: consultationForm.frecuenciaRespiratoria,
-        saturacionOxigeno: consultationForm.saturacionOxigeno,
+        satO2: consultationForm.saturacionOxigeno,
         motivoConsulta: consultationForm.motivoConsulta,
         examenFisico: consultationForm.examenFisico,
-        indicaciones: consultationForm.indicaciones,
+        indicacionesTratamientos: consultationForm.indicaciones,
         impresionDiagnostica: consultationForm.impresionDiagnostica,
       },
       {

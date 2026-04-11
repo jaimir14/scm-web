@@ -2,7 +2,12 @@ import { Navigate } from "react-router-dom";
 import { useAuth } from "@/contexts/AuthContext";
 import { Skeleton } from "@/components/ui/skeleton";
 
-export default function ProtectedRoute({ children }: { children: React.ReactNode }) {
+interface ProtectedRouteProps {
+  children: React.ReactNode;
+  requiredRole?: string;
+}
+
+export default function ProtectedRoute({ children, requiredRole }: ProtectedRouteProps) {
   const { isAuthenticated, isLoading, user } = useAuth();
 
   if (isLoading) {
@@ -21,7 +26,17 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
     return <Navigate to="/login" replace />;
   }
 
-  if (user?.rol === "MEDICO") {
+  // If a specific role is required, check it
+  if (requiredRole && user?.rol !== requiredRole) {
+    // Redirect to the appropriate dashboard based on actual role
+    if (user?.rol === "MEDICO") {
+      return <Navigate to="/doctor/dashboard" replace />;
+    }
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  // If no requiredRole but user is MEDICO, redirect to doctor dashboard
+  if (!requiredRole && user?.rol === "MEDICO") {
     return <Navigate to="/doctor/dashboard" replace />;
   }
 

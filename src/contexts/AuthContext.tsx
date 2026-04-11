@@ -27,7 +27,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const storedToken = getToken();
       if (!storedToken) {
         setIsLoading(false);
-        if (location.pathname !== "/login" && !location.pathname.startsWith("/doctor")) {
+        if (location.pathname !== "/login") {
           navigate("/login");
         }
         return;
@@ -41,7 +41,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         removeToken();
         setUser(null);
         setTokenState(null);
-        if (location.pathname !== "/login" && !location.pathname.startsWith("/doctor")) {
+        if (location.pathname !== "/login") {
           navigate("/login");
         }
       } finally {
@@ -59,11 +59,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const logout = () => {
-    const isDoctorPortal = location.pathname.startsWith("/doctor");
     removeToken();
     setTokenState(null);
     setUser(null);
-    navigate(isDoctorPortal ? "/doctor" : "/login");
+    navigate("/login");
   };
 
   return (
