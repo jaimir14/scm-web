@@ -16,7 +16,8 @@ import { useConsultationImages, useRequestPresignedUrl, useRegisterImage, useDel
 import { useAppointments, useUpdateAppointmentStatus } from "@/services/appointments.service";
 import type { Consultation, ConsultationImage } from "@/types";
 import { toast } from "sonner";
-import { ArrowLeft, User, Clock, Calendar, Save, Plus, Lock, FileText, ChevronDown, ChevronUp, Stethoscope, Loader2, ImagePlus, Trash2, X } from "lucide-react";
+import { ArrowLeft, User, Clock, Calendar, Save, Plus, Lock, FileText, ChevronDown, ChevronUp, Stethoscope, Loader2, ImagePlus, Trash2, Eye, Upload } from "lucide-react";
+import { MedicalImageViewer } from "@/components/MedicalImageViewer";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
