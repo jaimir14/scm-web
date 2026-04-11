@@ -10,15 +10,17 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { User, Save, Loader2 } from "lucide-react";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { User, Save, Loader2, ChevronDown, Calendar, Stethoscope, Activity, FileText, ImageIcon } from "lucide-react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import { usePatient, useCreatePatient, useUpdatePatient } from "@/services/patients.service";
-import { usePatientConsultations, useCreateConsultation } from "@/services/consultations.service";
+import { usePatientConsultations } from "@/services/consultations.service";
 import { useActiveClinics } from "@/services/clinics.service";
 import { useDoctors } from "@/services/users.service";
 import { ConsultationImages } from "@/components/ConsultationImages";
 import type { Patient, CreatePatientInput } from "@/types";
+import type { Consultation } from "@/types/consultation";
 
 export default function ExpedienteDetalle() {
   const { id } = useParams();
