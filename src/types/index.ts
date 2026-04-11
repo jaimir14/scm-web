@@ -9,5 +9,6 @@ export * from "./user";
 export * from "./treatment";
 export * from "./consultation";
 export * from "./consultation-image";
+export * from "./patient-file";
 export * from "./audit-log";
 export * from "./config";
