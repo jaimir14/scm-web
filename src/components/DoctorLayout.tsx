@@ -77,7 +77,7 @@ export default function DoctorLayout() {
   }
 
   if (!isAuthenticated || user?.rol !== "MEDICO") {
-    return <Navigate to="/doctor" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   const header = (

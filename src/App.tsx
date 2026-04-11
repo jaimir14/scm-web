@@ -10,7 +10,7 @@ import AppLayout from "./components/AppLayout";
 import DoctorLayout from "./components/DoctorLayout";
 
 import Login from "./pages/Login";
-import DoctorLogin from "./pages/doctor/DoctorLogin";
+
 import DoctorDashboard from "./pages/doctor/DoctorDashboard";
 import DoctorAgenda from "./pages/doctor/DoctorAgenda";
 import DoctorPacientes from "./pages/doctor/DoctorPacientes";
@@ -43,8 +43,7 @@ const App = () => (
         <BrowserRouter>
           <AuthProvider>
             <Routes>
-              <Route path="/doctor" element={<DoctorLogin />} />
-              <Route element={<DoctorLayout />}>
+              <Route element={<ProtectedRoute requiredRole="MEDICO"><DoctorLayout /></ProtectedRoute>}>
                 <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
                 <Route path="/doctor/agenda" element={<DoctorAgenda />} />
                 <Route path="/doctor/pacientes" element={<DoctorPacientes />} />
