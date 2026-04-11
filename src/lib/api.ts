@@ -37,6 +37,10 @@ async function handleResponse<T>(response: Response): Promise<T> {
     throw new ApiError("No autorizado", 401);
   }
 
+  if (response.status === 204) {
+    return undefined as T;
+  }
+
   let json: any;
   try {
     json = await response.json();
@@ -61,7 +65,7 @@ async function request<T>(
 ): Promise<T> {
   const token = getToken();
   const headers: Record<string, string> = {
-    "Content-Type": "application/json",
+    ...(options.body != null && { "Content-Type": "application/json" }),
     ...(options.headers as Record<string, string>),
   };
 

@@ -16,7 +16,7 @@ import { toast } from "sonner";
 import { usePatient, useCreatePatient, useUpdatePatient } from "@/services/patients.service";
 import { usePatientConsultations, useCreateConsultation } from "@/services/consultations.service";
 import { useActiveClinics } from "@/services/clinics.service";
-import { useDoctors } from "@/services/users.service";
+import { useActiveProfessionals } from "@/services/professionals.service";
 import type { Patient, CreatePatientInput } from "@/types";
 
 export default function ExpedienteDetalle() {
@@ -27,7 +27,7 @@ export default function ExpedienteDetalle() {
   const { data: patient, isLoading: patientLoading } = usePatient(isNew ? undefined : id);
   const { data: consultations, isLoading: consultationsLoading } = usePatientConsultations(isNew ? undefined : id);
   const { data: clinics } = useActiveClinics();
-  const { data: professionals } = useDoctors();
+  const { data: professionals } = useActiveProfessionals();
 
   const createPatient = useCreatePatient();
   const updatePatient = useUpdatePatient();

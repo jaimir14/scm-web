@@ -1,4 +1,4 @@
-import { useState, useMemo } from "react";
+import { useState, useMemo, useRef } from "react";
 import { useParams, useSearchParams, useNavigate } from "react-router-dom";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -12,10 +12,11 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
 import { usePatient } from "@/services/patients.service";
 import { usePatientConsultations, useCreateConsultation, useUpdateConsultation } from "@/services/consultations.service";
-import { useAppointments } from "@/services/appointments.service";
-import type { Consultation } from "@/types";
+import { useConsultationImages, useRequestPresignedUrl, useRegisterImage, useDeleteConsultationImage, uploadFileToSpaces } from "@/services/consultation-images.service";
+import { useAppointments, useUpdateAppointmentStatus } from "@/services/appointments.service";
+import type { Consultation, ConsultationImage } from "@/types";
 import { toast } from "sonner";
-import { ArrowLeft, User, Clock, Calendar, Save, Plus, Lock, FileText, ChevronDown, ChevronUp, Stethoscope, Loader2 } from "lucide-react";
+import { ArrowLeft, User, Clock, Calendar, Save, Plus, Lock, FileText, ChevronDown, ChevronUp, Stethoscope, Loader2, ImagePlus, Trash2, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
@@ -44,19 +45,190 @@ function VitalField({ label, value, editable, onChange, required, error }: { lab
   );
 }
 
+function ConsultationImages({
+  consultaId,
+  patientId,
+  citaId,
+  editable,
+}: {
+  consultaId: number | undefined;
+  patientId: number;
+  citaId?: number;
+  editable: boolean;
+}) {
+  const { data: images = [], isLoading } = useConsultationImages(consultaId);
+  const requestPresignedUrl = useRequestPresignedUrl();
+  const registerImage = useRegisterImage();
+  const deleteImage = useDeleteConsultationImage();
+  const [uploading, setUploading] = useState(false);
+  const [preview, setPreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const files = e.target.files;
+    if (!files?.length) return;
+    if (!consultaId) {
+      toast.error("Guarde la consulta antes de subir imagenes");
+      return;
+    }
+    if (!citaId) {
+      toast.error("No se encontro la cita asociada");
+      return;
+    }
+
+    setUploading(true);
+    try {
+      for (const file of Array.from(files)) {
+        // 1. Get presigned URL
+        const { uploadUrl, storagePath } = await requestPresignedUrl.mutateAsync({
+          pacienteId: patientId,
+          citaId,
+          fileName: file.name,
+          mimeType: file.type,
+          fileSize: file.size,
+        });
+
+        // 2. Upload directly to Spaces
+        await uploadFileToSpaces(uploadUrl, file);
+
+        // 3. Register in backend
+        await registerImage.mutateAsync({
+          consultaId,
+          fileName: file.name,
+          storagePath,
+          fileSize: file.size,
+          mimeType: file.type,
+        });
+      }
+      toast.success("Imagen(es) subida(s) correctamente");
+    } catch (err: any) {
+      toast.error(err?.message || "Error al subir imagen");
+    } finally {
+      setUploading(false);
+      e.target.value = "";
+    }
+  };
+
+  const handleDelete = async (img: ConsultationImage) => {
+    try {
+      await deleteImage.mutateAsync(img.id);
+      toast.success("Imagen eliminada");
+    } catch (err: any) {
+      toast.error(err?.message || "Error al eliminar imagen");
+    }
+  };
+
+  if (!consultaId) {
+    return (
+      <div className="text-xs text-muted-foreground italic">
+        Guarde la consulta primero para poder adjuntar imagenes.
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-2">
+      <div className="flex items-center justify-between">
+        <Label className="text-xs font-semibold">Imagenes de Consulta</Label>
+        {editable && (
+          <>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={handleUpload}
+              disabled={uploading}
+            />
+            <Button
+              variant="outline"
+              size="sm"
+              disabled={uploading}
+              onClick={() => fileInputRef.current?.click()}
+            >
+              {uploading ? (
+                <Loader2 className="h-3 w-3 mr-1 animate-spin" />
+              ) : (
+                <ImagePlus className="h-3 w-3 mr-1" />
+              )}
+              Subir imagen
+            </Button>
+          </>
+        )}
+      </div>
+
+      {isLoading ? (
+        <div className="flex gap-2">
+          <Skeleton className="h-20 w-20 rounded" />
+          <Skeleton className="h-20 w-20 rounded" />
+        </div>
+      ) : images.length === 0 ? (
+        <p className="text-xs text-muted-foreground">Sin imagenes adjuntas</p>
+      ) : (
+        <div className="flex flex-wrap gap-2">
+          {images.map((img) => (
+            <div key={img.id} className="relative group">
+              <img
+                src={img.viewUrl}
+                alt={img.fileName}
+                className="h-20 w-20 object-cover rounded border cursor-pointer hover:ring-2 ring-primary transition-all"
+                onClick={() => setPreview(img.viewUrl ?? null)}
+              />
+              {editable && (
+                <button
+                  onClick={() => handleDelete(img)}
+                  className="absolute -top-1 -right-1 bg-destructive text-destructive-foreground rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                >
+                  <Trash2 className="h-3 w-3" />
+                </button>
+              )}
+              <p className="text-[9px] text-muted-foreground truncate w-20 mt-0.5">{img.fileName}</p>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Full-size preview modal */}
+      {preview && (
+        <div
+          className="fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4"
+          onClick={() => setPreview(null)}
+        >
+          <button
+            className="absolute top-4 right-4 text-white hover:text-gray-300"
+            onClick={() => setPreview(null)}
+          >
+            <X className="h-6 w-6" />
+          </button>
+          <img
+            src={preview}
+            alt="Preview"
+            className="max-h-[90vh] max-w-[90vw] object-contain rounded"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ConsultationCard({
   consultation,
   isToday,
   patientId,
   profesionalId,
+  citaId,
 }: {
   consultation: Consultation | null;
   isToday: boolean;
   patientId: number;
   profesionalId: number;
+  citaId?: number;
 }) {
   const createConsultation = useCreateConsultation();
   const updateConsultation = useUpdateConsultation();
+  const updateAppointmentStatus = useUpdateAppointmentStatus();
   const [expanded, setExpanded] = useState(isToday);
   const [saving, setSaving] = useState(false);
 
@@ -124,9 +296,16 @@ function ConsultationCard({
         await createConsultation.mutateAsync({
           pacienteId: patientId,
           profesionalId: profesionalId,
+          ...(citaId ? { citaId } : {}),
           fecha: today,
           ...editableFields,
         });
+        if (citaId) {
+          await updateAppointmentStatus.mutateAsync({
+            id: citaId,
+            data: { estado: "ATENDIDA" },
+          });
+        }
       }
       toast.success("Consulta guardada");
     } catch (err: any) {
@@ -234,6 +413,14 @@ function ConsultationCard({
             ))}
           </div>
 
+          {/* Consultation Images */}
+          <ConsultationImages
+            consultaId={consultation?.id}
+            patientId={patientId}
+            citaId={citaId}
+            editable={isToday}
+          />
+
           {isToday && (
             <div className="flex justify-end pt-2">
               <Button size="sm" onClick={handleSave} disabled={saving}>
@@ -274,20 +461,22 @@ export default function DoctorExpediente() {
     ? appointmentsToday.find(a => a.id === Number(appointmentId))
     : null;
 
-  // Check if there's any today appointment for this patient (even without appointmentId)
-  const hasTodayAppointment = appointment
-    || appointmentsToday.some(a => a.pacienteId === Number(patientId));
+  // Find the today appointment for this patient (use the specific one from query param, or the first match)
+  const todayAppointment = appointment
+    ?? appointmentsToday.find(a => a.pacienteId === Number(patientId)) ?? null;
 
   const fullHistory = useMemo(() => {
     const entries = [...consultations];
-    const hasTodayEntry = entries.some(e => normalizeDate(e.fecha) === today);
-    // Show a new consultation card if: today appointment exists (or doctor is viewing patient) and no consultation yet
-    const showNewToday = !hasTodayEntry && hasTodayAppointment && user;
+    // Show a new consultation card if there's a today appointment that has no linked consultation yet
+    const appointmentHasConsultation = todayAppointment
+      ? entries.some(e => e.citaId === todayAppointment.id)
+      : false;
+    const showNewToday = todayAppointment && !appointmentHasConsultation && user;
     return {
       entries: entries.sort((a, b) => normalizeDate(b.fecha).localeCompare(normalizeDate(a.fecha))),
       showNewToday,
     };
-  }, [consultations, hasTodayAppointment, user, today]);
+  }, [consultations, todayAppointment, user]);
 
   if (loadingPatient || loadingConsultations) {
     return (
@@ -358,12 +547,13 @@ export default function DoctorExpediente() {
             </p>
 
             {/* New today consultation card (if no existing one) */}
-            {fullHistory.showNewToday && user && (
+            {fullHistory.showNewToday && user && todayAppointment && (
               <ConsultationCard
                 consultation={null}
                 isToday={true}
                 patientId={patient.id}
                 profesionalId={user.id}
+                citaId={todayAppointment.id}
               />
             )}
 
@@ -382,6 +572,7 @@ export default function DoctorExpediente() {
                   isToday={normalizeDate(entry.fecha) === today}
                   patientId={patient.id}
                   profesionalId={user?.id ?? 0}
+                  citaId={entry.citaId ?? undefined}
                 />
               ))
             )}

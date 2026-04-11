@@ -2,6 +2,7 @@ export interface Consultation {
   id: number;
   pacienteId: number;
   profesionalId: number;
+  citaId?: number | null;
   fecha: string;
   ocultar?: boolean;
   peso?: number | string | null;
@@ -24,6 +25,7 @@ export interface Consultation {
 export interface CreateConsultationInput {
   pacienteId: number;
   profesionalId: number;
+  citaId?: number;
   fecha: string;
   ocultar?: boolean;
   peso: string | number;

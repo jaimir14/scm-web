@@ -16,10 +16,8 @@ export function useCreateConsultation() {
   return useMutation({
     mutationFn: (data: CreateConsultationInput) =>
       api.post<Consultation>("/api/v1/consultations", data),
-    onSuccess: (_data, variables) => {
-      queryClient.invalidateQueries({
-        queryKey: ["consultations", variables.pacienteId],
-      });
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["consultations"] });
     },
   });
 }

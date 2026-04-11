@@ -1,4 +1,4 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -19,7 +19,7 @@ import {
   useUpdateAppointmentStatus,
   useDeleteAppointment,
 } from "@/services/appointments.service";
-import { useDoctors } from "@/services/users.service";
+import { useActiveProfessionals } from "@/services/professionals.service";
 import { useActiveClinics } from "@/services/clinics.service";
 import { useActiveAppointmentTypes } from "@/services/appointment-types.service";
 import { useSearchPatients } from "@/services/patients.service";
@@ -50,7 +50,7 @@ export default function AgendaCitas() {
     profesionalId: filterProfessionalId && filterProfessionalId !== "all" ? filterProfessionalId : undefined,
     clinicaId: filterClinicId && filterClinicId !== "all" ? filterClinicId : undefined,
   });
-  const { data: professionals } = useDoctors();
+  const { data: professionals } = useActiveProfessionals();
   const { data: clinics } = useActiveClinics();
 
   const updateStatus = useUpdateAppointmentStatus();
@@ -96,6 +96,11 @@ export default function AgendaCitas() {
   };
 
   const handleClickAppointment = (appt: Appointment) => {
+    setSelectedAppointment(appt);
+  };
+
+  const handleEditAppointment = (e: React.MouseEvent, appt: Appointment) => {
+    e.stopPropagation();
     setSelectedAppointment(appt);
     setEditingAppointment(appt);
     setEditDialogOpen(true);
@@ -311,10 +316,18 @@ export default function AgendaCitas() {
                                     }`}
                                   onClick={() => handleClickAppointment(appt)}
                                 >
-                                  <p className="font-medium text-foreground text-[10px] md:text-xs truncate">
-                                    {appt.paciente?.nombre} {appt.paciente?.apellido1}
-                                  </p>
-                                  <p className="text-muted-foreground text-[9px] md:text-xs truncate">
+                                  <div className="flex justify-between items-start gap-1">
+                                    <p className="font-medium text-foreground text-[10px] md:text-xs truncate">
+                                      {appt.paciente?.nombre} {appt.paciente?.apellido1}
+                                    </p>
+                                    <span 
+                                      className="text-[10px] text-primary hover:text-primary/80 hover:underline cursor-pointer shrink-0 font-medium"
+                                      onClick={(e) => handleEditAppointment(e, appt)}
+                                    >
+                                      Editar
+                                    </span>
+                                  </div>
+                                  <p className="text-muted-foreground text-[9px] md:text-xs truncate mt-0.5">
                                     {appt.tipoCita?.nombre} - {appt.profesional?.nombre}
                                   </p>
                                 </div>
@@ -351,7 +364,7 @@ function CrearCitaForm({ onClose }: { onClose: () => void }) {
   const [horaFin, setHoraFin] = useState("08:30");
   const [notas, setNotas] = useState("");
 
-  const { data: professionals } = useDoctors();
+  const { data: professionals } = useActiveProfessionals();
   const { data: clinics } = useActiveClinics();
   const { data: appointmentTypes } = useActiveAppointmentTypes();
 
@@ -505,7 +518,7 @@ function EditarCitaForm({ appointment, onClose }: { appointment: Appointment; on
   const [horaFin, setHoraFin] = useState(appointment.horaFin);
   const [notas, setNotas] = useState(appointment.notas || "");
 
-  const { data: professionals } = useDoctors();
+  const { data: professionals } = useActiveProfessionals();
   const { data: clinics } = useActiveClinics();
   const { data: appointmentTypes } = useActiveAppointmentTypes();
 
