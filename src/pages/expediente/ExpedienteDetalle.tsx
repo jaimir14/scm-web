@@ -28,7 +28,7 @@ export default function ExpedienteDetalle() {
   const { data: patient, isLoading: patientLoading } = usePatient(isNew ? undefined : id);
   const { data: consultations, isLoading: consultationsLoading } = usePatientConsultations(isNew ? undefined : id);
   const { data: clinics } = useActiveClinics();
-  const { data: professionals } = useActiveProfessionals();
+  const { data: professionals } = useDoctors();
 
   const createPatient = useCreatePatient();
   const updatePatient = useUpdatePatient();
