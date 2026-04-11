@@ -513,21 +513,13 @@ export default function ExpedienteDetalle() {
                   ))}
                 </div>
 
-                <div className="flex flex-wrap items-center gap-2 bg-warning/10 p-2 rounded">
-                  <Badge variant="outline" className="text-xs">Total Img: 0</Badge>
-                  <span className="text-xs">Gabinete/Lab</span>
-                  <Select defaultValue="lab">
-                    <SelectTrigger className="h-7 text-xs w-full sm:w-48"><SelectValue /></SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="lab">Examen de Laboratorio (0)</SelectItem>
-                      <SelectItem value="rx">Rayos X (0)</SelectItem>
-                    </SelectContent>
-                  </Select>
-                  <div className="flex gap-1 w-full sm:w-auto">
-                    <Button size="sm" variant="secondary" className="h-7 text-xs flex-1 sm:flex-none">Agregar Imagenes</Button>
-                    <Button size="sm" variant="secondary" className="h-7 text-xs flex-1 sm:flex-none">Ver Imagenes</Button>
-                  </div>
-                </div>
+                {/* Consultation Images */}
+                <ConsultationImages
+                  consultaId={undefined}
+                  patientId={Number(id)}
+                  citaId={undefined}
+                  editable={false}
+                />
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="space-y-1">
