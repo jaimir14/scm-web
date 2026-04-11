@@ -11,7 +11,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { User, Save, Loader2, ChevronDown, Calendar, Stethoscope, Activity, FileText, ImageIcon } from "lucide-react";
+import { User, Save, Loader2, ChevronDown, Calendar, Stethoscope, Activity, FileText } from "lucide-react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import { usePatient, useCreatePatient, useUpdatePatient } from "@/services/patients.service";
@@ -35,11 +35,8 @@ export default function ExpedienteDetalle() {
   const createPatient = useCreatePatient();
   const updatePatient = useUpdatePatient();
 
-  // Form state
   const [form, setForm] = useState<Partial<CreatePatientInput>>({});
-  const [consultationForm, setConsultationForm] = useState<Record<string, string>>({});
 
-  // Populate form when patient data loads
   useEffect(() => {
     if (patient) {
       setForm({
@@ -71,8 +68,6 @@ export default function ExpedienteDetalle() {
       });
     }
   }, [patient]);
-
-  const createConsultation = useCreateConsultation();
 
   const updateField = (key: string, value: string | number) => {
     setForm(prev => ({ ...prev, [key]: value }));
@@ -129,39 +124,6 @@ export default function ExpedienteDetalle() {
     }
   };
 
-  const handleSaveConsultation = () => {
-    if (!id) return;
-    createConsultation.mutate(
-      {
-        pacienteId: Number(id),
-        profesionalId: form.profesionalId || 0,
-        fecha: consultationForm.fecha || new Date().toISOString().split("T")[0],
-        
-        peso: consultationForm.peso,
-        talla: consultationForm.talla,
-        imc: consultationForm.imc,
-        temperatura: consultationForm.temperatura,
-        presionArterial: consultationForm.presionArterial,
-        frecuenciaCardiaca: consultationForm.frecuenciaCardiaca,
-        frecuenciaRespiratoria: consultationForm.frecuenciaRespiratoria,
-        satO2: consultationForm.saturacionOxigeno,
-        motivoConsulta: consultationForm.motivoConsulta,
-        examenFisico: consultationForm.examenFisico,
-        indicacionesTratamientos: consultationForm.indicaciones,
-        impresionDiagnostica: consultationForm.impresionDiagnostica,
-      },
-      {
-        onSuccess: () => {
-          toast.success("Consulta registrada exitosamente");
-          setConsultationForm({});
-        },
-        onError: (error) => {
-          toast.error(error instanceof Error ? error.message : "Error al registrar consulta");
-        },
-      }
-    );
-  };
-
   const isSaving = createPatient.isPending || updatePatient.isPending;
 
   if (!isNew && patientLoading) {
@@ -177,9 +139,6 @@ export default function ExpedienteDetalle() {
     <div className="p-4 md:p-6 space-y-4">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
         <h1 className="text-xl md:text-2xl font-bold text-foreground">Expediente</h1>
-        <Button variant="default" className="bg-primary" size="sm">
-          <span className="text-sm">Precio Consulta</span>
-        </Button>
       </div>
 
       <Tabs defaultValue="datos" className="space-y-4">
@@ -226,58 +185,31 @@ export default function ExpedienteDetalle() {
                     </Select>
                   </Field>
                   <Field label="Numero de Identificacion" required>
-                    <Input
-                      value={form.numeroIdentificacion || ""}
-                      onChange={e => updateField("numeroIdentificacion", e.target.value)}
-                    />
+                    <Input value={form.numeroIdentificacion || ""} onChange={e => updateField("numeroIdentificacion", e.target.value)} />
                   </Field>
                   <Field label="Telefono Casa">
-                    <Input
-                      value={form.telefonoCasa || ""}
-                      onChange={e => updateField("telefonoCasa", e.target.value)}
-                    />
+                    <Input value={form.telefonoCasa || ""} onChange={e => updateField("telefonoCasa", e.target.value)} />
                   </Field>
                   <Field label="Nombre" required>
-                    <Input
-                      value={form.nombre || ""}
-                      onChange={e => updateField("nombre", e.target.value)}
-                    />
+                    <Input value={form.nombre || ""} onChange={e => updateField("nombre", e.target.value)} />
                   </Field>
                   <Field label="Telefono Celular">
-                    <Input
-                      value={form.telefonoCelular || ""}
-                      onChange={e => updateField("telefonoCelular", e.target.value)}
-                    />
+                    <Input value={form.telefonoCelular || ""} onChange={e => updateField("telefonoCelular", e.target.value)} />
                   </Field>
                   <Field label="Apellido 1" required>
-                    <Input
-                      value={form.apellido1 || ""}
-                      onChange={e => updateField("apellido1", e.target.value)}
-                    />
+                    <Input value={form.apellido1 || ""} onChange={e => updateField("apellido1", e.target.value)} />
                   </Field>
                   <Field label="Telefono Trabajo">
-                    <Input
-                      value={form.telefonoTrabajo || ""}
-                      onChange={e => updateField("telefonoTrabajo", e.target.value)}
-                    />
+                    <Input value={form.telefonoTrabajo || ""} onChange={e => updateField("telefonoTrabajo", e.target.value)} />
                   </Field>
                   <Field label="Apellido 2">
-                    <Input
-                      value={form.apellido2 || ""}
-                      onChange={e => updateField("apellido2", e.target.value)}
-                    />
+                    <Input value={form.apellido2 || ""} onChange={e => updateField("apellido2", e.target.value)} />
                   </Field>
                   <Field label="Otro Telefono">
-                    <Input
-                      value={form.otroTelefono || ""}
-                      onChange={e => updateField("otroTelefono", e.target.value)}
-                    />
+                    <Input value={form.otroTelefono || ""} onChange={e => updateField("otroTelefono", e.target.value)} />
                   </Field>
                   <Field label="Sexo">
-                    <Select
-                      value={form.sexo || ""}
-                      onValueChange={v => updateField("sexo", v)}
-                    >
+                    <Select value={form.sexo || ""} onValueChange={v => updateField("sexo", v)}>
                       <SelectTrigger><SelectValue placeholder="Seleccione..." /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="MASCULINO">Masculino</SelectItem>
@@ -286,10 +218,7 @@ export default function ExpedienteDetalle() {
                     </Select>
                   </Field>
                   <Field label="Estado Civil">
-                    <Select
-                      value={form.estadoCivil || ""}
-                      onValueChange={v => updateField("estadoCivil", v)}
-                    >
+                    <Select value={form.estadoCivil || ""} onValueChange={v => updateField("estadoCivil", v)}>
                       <SelectTrigger><SelectValue placeholder="Seleccione..." /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="SOLTERO">Soltero</SelectItem>
@@ -300,17 +229,10 @@ export default function ExpedienteDetalle() {
                     </Select>
                   </Field>
                   <Field label="Direccion" full>
-                    <Input
-                      value={form.direccion || ""}
-                      onChange={e => updateField("direccion", e.target.value)}
-                    />
+                    <Input value={form.direccion || ""} onChange={e => updateField("direccion", e.target.value)} />
                   </Field>
                   <Field label="Email" full>
-                    <Input
-                      type="email"
-                      value={form.email || ""}
-                      onChange={e => updateField("email", e.target.value)}
-                    />
+                    <Input type="email" value={form.email || ""} onChange={e => updateField("email", e.target.value)} />
                   </Field>
                   <Field label="Medico" required>
                     <Select
@@ -326,23 +248,13 @@ export default function ExpedienteDetalle() {
                     </Select>
                   </Field>
                   <Field label="Ocupacion">
-                    <Input
-                      value={form.ocupacion || ""}
-                      onChange={e => updateField("ocupacion", e.target.value)}
-                    />
+                    <Input value={form.ocupacion || ""} onChange={e => updateField("ocupacion", e.target.value)} />
                   </Field>
                   <Field label="Fecha Nacimiento">
-                    <Input
-                      type="date"
-                      value={form.fechaNacimiento || ""}
-                      onChange={e => updateField("fechaNacimiento", e.target.value)}
-                    />
+                    <Input type="date" value={form.fechaNacimiento || ""} onChange={e => updateField("fechaNacimiento", e.target.value)} />
                   </Field>
                   <Field label="Tipo de Sangre">
-                    <Select
-                      value={form.tipoSangre || ""}
-                      onValueChange={v => updateField("tipoSangre", v)}
-                    >
+                    <Select value={form.tipoSangre || ""} onValueChange={v => updateField("tipoSangre", v)}>
                       <SelectTrigger><SelectValue placeholder="Seleccione..." /></SelectTrigger>
                       <SelectContent>
                         {["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"].map(t => (
@@ -353,7 +265,6 @@ export default function ExpedienteDetalle() {
                   </Field>
                 </div>
 
-                {/* Photo */}
                 <div className="flex flex-row lg:flex-col items-center gap-3">
                   <div className="w-24 h-28 lg:w-36 lg:h-40 bg-muted rounded-lg flex items-center justify-center border shrink-0">
                     <User className="h-10 w-10 lg:h-16 lg:w-16 text-muted-foreground/40" />
@@ -452,160 +363,41 @@ export default function ExpedienteDetalle() {
           </Card>
         </TabsContent>
 
-        {/* Tab 3: Padecimiento Actual */}
+        {/* Tab 3: Padecimiento Actual - READ ONLY history */}
         <TabsContent value="padecimiento">
           <Card>
             <CardContent className="pt-6 space-y-4">
-              {!isNew && (
-                <div className="flex flex-wrap items-center gap-2 text-sm">
-                  <Checkbox id="ocultos" /><label htmlFor="ocultos" className="mr-4">Mostrar items ocultos</label>
-                  <Button variant="outline" size="sm">Comparar</Button>
-                </div>
-              )}
-
-              {/* New consultation form */}
-              <div className="border rounded-lg p-3 md:p-4 space-y-4 bg-accent/20">
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                  <Field label="Fecha">
-                    <Input
-                      type="date"
-                      value={consultationForm.fecha || new Date().toISOString().split("T")[0]}
-                      onChange={e => setConsultationForm(prev => ({ ...prev, fecha: e.target.value }))}
-                    />
-                  </Field>
-                  <Field label="Medico">
-                    <Select
-                      value={form.profesionalId ? String(form.profesionalId) : ""}
-                      onValueChange={v => updateField("profesionalId", Number(v))}
-                    >
-                      <SelectTrigger><SelectValue placeholder="Seleccione..." /></SelectTrigger>
-                      <SelectContent>
-                        {professionals?.map(p => (
-                          <SelectItem key={p.id} value={String(p.id)}>{p.nombre}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </Field>
-                  <Field label="Hora">
-                    <Input
-                      value={consultationForm.hora || new Date().toLocaleTimeString("es-CR", { hour: "2-digit", minute: "2-digit" })}
-                      readOnly
-                    />
-                  </Field>
-                  <div className="flex items-end">
-                    <Checkbox id="ocultar" /><label htmlFor="ocultar" className="text-xs ml-1">Ocultar</label>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-4 sm:grid-cols-8 gap-2">
-                  {[
-                    { l: "Peso", k: "peso", u: "kg" }, { l: "Talla", k: "talla", u: "mts" },
-                    { l: "IMC", k: "imc", u: "" }, { l: "Temp.", k: "temperatura", u: "" },
-                    { l: "P. Arterial", k: "presionArterial", u: "" }, { l: "FC", k: "frecuenciaCardiaca", u: "" },
-                    { l: "FR", k: "frecuenciaRespiratoria", u: "" }, { l: "SatO2", k: "saturacionOxigeno", u: "%" }
-                  ].map(v => (
-                    <div key={v.l} className="space-y-1">
-                      <label className="text-[10px] text-muted-foreground">{v.l}</label>
-                      <Input
-                        className="h-7 text-xs"
-                        value={consultationForm[v.k] || ""}
-                        onChange={e => setConsultationForm(prev => ({ ...prev, [v.k]: e.target.value }))}
-                      />
-                    </div>
-                  ))}
-                </div>
-
-                {/* Consultation Images */}
-                <ConsultationImages
-                  consultaId={undefined}
-                  patientId={Number(id)}
-                  citaId={undefined}
-                  editable={false}
-                />
-
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-1">
-                    <Label className="text-xs font-semibold">Motivo de Consulta</Label>
-                    <Textarea
-                      className="min-h-[80px] md:min-h-[100px]"
-                      value={consultationForm.motivoConsulta || ""}
-                      onChange={e => setConsultationForm(prev => ({ ...prev, motivoConsulta: e.target.value }))}
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-xs font-semibold">Indicaciones y Tratamientos</Label>
-                    <Textarea
-                      className="min-h-[80px] md:min-h-[100px]"
-                      value={consultationForm.indicaciones || ""}
-                      onChange={e => setConsultationForm(prev => ({ ...prev, indicaciones: e.target.value }))}
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-xs font-semibold">Examen Fisico</Label>
-                    <Textarea
-                      className="min-h-[80px] md:min-h-[100px]"
-                      value={consultationForm.examenFisico || ""}
-                      onChange={e => setConsultationForm(prev => ({ ...prev, examenFisico: e.target.value }))}
-                    />
-                  </div>
-                  <div className="space-y-1">
-                    <Label className="text-xs font-semibold">Impresion Diagnostica</Label>
-                    <Textarea
-                      className="min-h-[80px] md:min-h-[100px]"
-                      value={consultationForm.impresionDiagnostica || ""}
-                      onChange={e => setConsultationForm(prev => ({ ...prev, impresionDiagnostica: e.target.value }))}
-                    />
-                  </div>
-                </div>
-
-                {!isNew && (
-                  <div className="flex justify-end">
-                    <Button
-                      size="sm"
-                      onClick={handleSaveConsultation}
-                      disabled={createConsultation.isPending}
-                    >
-                      {createConsultation.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
-                      Guardar Consulta
-                    </Button>
-                  </div>
+              <div className="flex items-center gap-2 mb-2">
+                <FileText className="h-5 w-5 text-primary" />
+                <h3 className="text-base font-semibold text-foreground">Historial de Consultas</h3>
+                {consultations && consultations.length > 0 && (
+                  <Badge variant="secondary" className="text-xs">
+                    {consultations.length} registro{consultations.length !== 1 ? "s" : ""}
+                  </Badge>
                 )}
               </div>
 
-              {/* Previous consultations */}
-              {!isNew && (
-                <div className="space-y-2">
-                  <h3 className="text-sm font-semibold">Historial de Consultas</h3>
-                  {consultationsLoading ? (
-                    <div className="space-y-2">
-                      {Array.from({ length: 3 }).map((_, i) => (
-                        <Skeleton key={i} className="h-20 w-full" />
-                      ))}
-                    </div>
-                  ) : consultations && consultations.length > 0 ? (
-                    consultations.map(c => (
-                      <div key={c.id} className="border rounded-lg p-3 bg-muted/30 space-y-3">
-                        <div className="flex items-center gap-2">
-                          <Badge variant="outline" className="text-xs">{c.fecha}</Badge>
-                          <span className="text-xs text-muted-foreground">{c.profesional?.nombre}</span>
-                        </div>
-                        {c.motivoConsulta && (
-                          <p className="text-xs"><strong>Motivo:</strong> {c.motivoConsulta}</p>
-                        )}
-                        {c.impresionDiagnostica && (
-                          <p className="text-xs"><strong>Diagnóstico:</strong> {c.impresionDiagnostica}</p>
-                        )}
-                        <ConsultationImages
-                          consultaId={c.id}
-                          patientId={Number(id)}
-                          citaId={c.citaId ?? undefined}
-                          editable={false}
-                        />
-                      </div>
-                    ))
-                  ) : (
-                    <p className="text-xs text-muted-foreground">No hay consultas registradas</p>
-                  )}
+              {consultationsLoading ? (
+                <div className="space-y-3">
+                  {Array.from({ length: 3 }).map((_, i) => (
+                    <Skeleton key={i} className="h-24 w-full rounded-lg" />
+                  ))}
+                </div>
+              ) : consultations && consultations.length > 0 ? (
+                <div className="space-y-3">
+                  {consultations.map((c, idx) => (
+                    <ConsultationHistoryCard
+                      key={c.id}
+                      consultation={c}
+                      patientId={Number(id)}
+                      defaultOpen={idx === 0}
+                    />
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center py-12 text-center">
+                  <FileText className="h-12 w-12 text-muted-foreground/30 mb-3" />
+                  <p className="text-sm text-muted-foreground">No hay consultas registradas para este paciente</p>
                 </div>
               )}
             </CardContent>
@@ -634,6 +426,118 @@ export default function ExpedienteDetalle() {
         </Button>
       </div>
     </div>
+  );
+}
+
+/* ── Consultation History Card ── */
+
+function ConsultationHistoryCard({
+  consultation: c,
+  patientId,
+  defaultOpen = false,
+}: {
+  consultation: Consultation;
+  patientId: number;
+  defaultOpen?: boolean;
+}) {
+  const [open, setOpen] = useState(defaultOpen);
+
+  const vitalSigns = [
+    { label: "Peso", value: c.peso, unit: "kg" },
+    { label: "Talla", value: c.talla, unit: "m" },
+    { label: "IMC", value: c.imc },
+    { label: "Temp.", value: c.temperatura, unit: "°C" },
+    { label: "P. Arterial", value: c.presionArterial },
+    { label: "FC", value: c.frecuenciaCardiaca, unit: "bpm" },
+    { label: "FR", value: c.frecuenciaRespiratoria, unit: "rpm" },
+    { label: "SatO₂", value: c.satO2, unit: "%" },
+  ].filter(v => v.value != null && v.value !== "" && v.value !== 0);
+
+  const textSections = [
+    { label: "Motivo de Consulta", value: c.motivoConsulta, icon: Stethoscope },
+    { label: "Examen Físico", value: c.examenFisico, icon: Activity },
+    { label: "Impresión Diagnóstica", value: c.impresionDiagnostica, icon: FileText },
+    { label: "Indicaciones y Tratamientos", value: c.indicacionesTratamientos, icon: FileText },
+  ].filter(s => s.value);
+
+  return (
+    <Collapsible open={open} onOpenChange={setOpen}>
+      <div className="border rounded-lg bg-card overflow-hidden transition-shadow hover:shadow-sm">
+        <CollapsibleTrigger asChild>
+          <button className="w-full flex items-center gap-3 p-3 md:p-4 text-left hover:bg-accent/50 transition-colors">
+            <div className="flex items-center justify-center h-9 w-9 rounded-full bg-primary/10 shrink-0">
+              <Calendar className="h-4 w-4 text-primary" />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="text-sm font-semibold text-foreground">{c.fecha}</span>
+                {c.profesional?.nombre && (
+                  <Badge variant="outline" className="text-[11px] font-normal">
+                    <Stethoscope className="h-3 w-3 mr-1" />
+                    {c.profesional.nombre}
+                  </Badge>
+                )}
+              </div>
+              {c.motivoConsulta && (
+                <p className="text-xs text-muted-foreground mt-0.5 truncate">
+                  {c.motivoConsulta}
+                </p>
+              )}
+            </div>
+            <ChevronDown className={`h-4 w-4 text-muted-foreground shrink-0 transition-transform duration-200 ${open ? "rotate-180" : ""}`} />
+          </button>
+        </CollapsibleTrigger>
+
+        <CollapsibleContent>
+          <div className="border-t px-3 md:px-4 py-3 md:py-4 space-y-4">
+            {/* Vital Signs */}
+            {vitalSigns.length > 0 && (
+              <div>
+                <div className="flex items-center gap-1.5 mb-2">
+                  <Activity className="h-3.5 w-3.5 text-primary" />
+                  <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">Signos Vitales</span>
+                </div>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                  {vitalSigns.map(v => (
+                    <div key={v.label} className="bg-muted/50 rounded-md px-3 py-2">
+                      <p className="text-[10px] text-muted-foreground">{v.label}</p>
+                      <p className="text-sm font-medium text-foreground">
+                        {v.value}
+                        {v.unit && <span className="text-xs text-muted-foreground ml-0.5">{v.unit}</span>}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Text sections */}
+            {textSections.map(section => {
+              const Icon = section.icon;
+              return (
+                <div key={section.label}>
+                  <div className="flex items-center gap-1.5 mb-1.5">
+                    <Icon className="h-3.5 w-3.5 text-primary" />
+                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">{section.label}</span>
+                  </div>
+                  <p className="text-sm text-foreground whitespace-pre-wrap bg-muted/30 rounded-md px-3 py-2">
+                    {section.value}
+                  </p>
+                </div>
+              );
+            })}
+
+            {/* Images */}
+            <ConsultationImages
+              consultaId={c.id}
+              patientId={patientId}
+              citaId={c.citaId ?? undefined}
+              editable={false}
+            />
+          </div>
+        </CollapsibleContent>
+      </div>
+    </Collapsible>
   );
 }
 
