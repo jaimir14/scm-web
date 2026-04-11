@@ -14,11 +14,11 @@ import { useAuth } from "@/contexts/AuthContext";
 import { usePatient } from "@/services/patients.service";
 import { usePatientConsultations, useCreateConsultation, useUpdateConsultation } from "@/services/consultations.service";
 import { useConsultationImages, useRequestPresignedUrl, useRegisterImage, useDeleteConsultationImage, uploadFileToSpaces } from "@/services/consultation-images.service";
+import { ConsultationImages } from "@/components/ConsultationImages";
 import { useAppointments, useUpdateAppointmentStatus } from "@/services/appointments.service";
 import type { Consultation, ConsultationImage } from "@/types";
 import { toast } from "sonner";
-import { ArrowLeft, User, Clock, Calendar, Save, Plus, Lock, FileText, ChevronDown, ChevronUp, Stethoscope, Loader2, ImagePlus, Trash2, Eye, Upload } from "lucide-react";
-import { MedicalImageViewer } from "@/components/MedicalImageViewer";
+import { ArrowLeft, User, Clock, Calendar, Save, Plus, Lock, FileText, ChevronDown, ChevronUp, Stethoscope, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { format } from "date-fns";
 
