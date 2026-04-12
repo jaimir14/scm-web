@@ -3,15 +3,10 @@ import { useMyPermissions } from "@/services/roles.service";
 import { useAuth } from "@/contexts/AuthContext";
 
 interface PermissionContextType {
-  /** All feature keys the current user has access to */
   permissions: string[];
-  /** Whether permissions are still loading */
   isLoading: boolean;
-  /** Check if user has a specific feature permission */
   hasPermission: (featureKey: string) => boolean;
-  /** Check if user has any of the given permissions */
   hasAnyPermission: (featureKeys: string[]) => boolean;
-  /** Whether the current user is a system administrator */
   isAdmin: boolean;
 }
 
@@ -21,16 +16,16 @@ export function PermissionProvider({ children }: { children: ReactNode }) {
   const { isAuthenticated, user } = useAuth();
   const permissionsQuery = useMyPermissions();
 
-  // Admin is determined by the user's role having esAdmin flag
-  // The backend returns a special "__admin__" permission for admin users
   const permissions = permissionsQuery.data ?? [];
-  const isAdmin = permissions.includes("__admin__");
+  // Admin if backend says so OR if the auth user has esAdmin flag (fallback when backend is unavailable)
+  const isAdmin = permissions.includes("__admin__") || (user?.esAdmin === true);
 
   const value = useMemo<PermissionContextType>(() => ({
     permissions,
-    isLoading: permissionsQuery.isLoading && isAuthenticated,
+    // Not loading if user is admin (they have full access regardless) or if query settled
+    isLoading: !isAdmin && permissionsQuery.isLoading && isAuthenticated,
     hasPermission: (featureKey: string) => {
-      if (isAdmin) return true; // Admin has access to everything
+      if (isAdmin) return true;
       return permissions.includes(featureKey);
     },
     hasAnyPermission: (featureKeys: string[]) => {
