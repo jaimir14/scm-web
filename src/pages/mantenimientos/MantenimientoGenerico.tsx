@@ -117,13 +117,8 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
         formFields: [
           { key: "usuario", label: "Usuario" },
           { key: "nombre", label: "Nombre completo" },
-          { key: "rol", label: "Rol", type: "select", options: [
-            { value: "ADMINISTRADOR", label: "Administrador" },
-            { value: "MEDICO", label: "Medico" },
-            { value: "RECEPCION", label: "Recepcion" },
-            { value: "ENFERMERIA", label: "Enfermeria" },
-          ]},
-          { key: "password", label: "Contrasena", type: "password" },
+          { key: "rol", label: "Rol", type: "select", options: roleOptions },
+          { key: "password", label: "Contraseña", type: "password" },
         ],
         mapToRow: (item) => ({
           usuario: item.usuario || "",
