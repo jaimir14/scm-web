@@ -54,7 +54,7 @@ export default function ExpedienteDetalle() {
         apellido2: patient.apellido2 || "",
         sexo: patient.sexo || "",
         estadoCivil: patient.estadoCivil || "",
-        fechaNacimiento: patient.fechaNacimiento || "",
+        fechaNacimiento: patient.fechaNacimiento ? patient.fechaNacimiento.split('T')[0] : "",
         tipoSangre: patient.tipoSangre || "",
         direccion: patient.direccion || "",
         email: patient.email || "",

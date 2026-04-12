@@ -375,7 +375,7 @@ export default function DoctorExpediente() {
                 <ReadOnlyField label="Identificacion" value={patient.numeroIdentificacion} />
                 <ReadOnlyField label="Telefono" value={patient.telefonoCelular ?? patient.telefonoCasa ?? ""} />
                 <ReadOnlyField label="Email" value={patient.email ?? ""} />
-                <ReadOnlyField label="Fecha de Nacimiento" value={patient.fechaNacimiento ?? ""} />
+                <ReadOnlyField label="Fecha de Nacimiento" value={patient.fechaNacimiento ? patient.fechaNacimiento.split('T')[0] : ""} />
                 <ReadOnlyField label="Sexo" value={patient.sexo ?? ""} />
                 <ReadOnlyField label="Direccion" value={patient.direccion ?? ""} />
                 <ReadOnlyField label="Tipo de Sangre" value={patient.tipoSangre ?? ""} />
