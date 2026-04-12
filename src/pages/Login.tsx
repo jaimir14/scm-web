@@ -31,10 +31,11 @@ export default function Login() {
         onSuccess: (data) => {
           login(data.token, data.user);
           toast.success("Bienvenido, " + data.user.nombre);
-          if (data.user.rol === "MEDICO") {
-            navigate("/doctor/dashboard");
-          } else {
+          // Admin users go to admin dashboard; everyone else to doctor portal
+          if (data.user.esAdmin) {
             navigate("/dashboard");
+          } else {
+            navigate("/doctor/dashboard");
           }
         },
         onError: (error) => {
