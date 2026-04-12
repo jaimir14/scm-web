@@ -24,6 +24,7 @@ type NavItem = {
 
 const navigation: NavItem[] = [
   { label: "Inicio", icon: LayoutDashboard, href: "/dashboard", permission: "dashboard" },
+  { label: "Portal Médico", icon: Stethoscope, href: "/doctor/dashboard", permission: "doctor.dashboard" },
   { label: "Citas", icon: CalendarDays, href: "/citas", permission: "citas" },
   {
     label: "Expediente", icon: FolderOpen, children: [

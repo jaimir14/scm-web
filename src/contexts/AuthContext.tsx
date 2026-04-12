@@ -1,5 +1,6 @@
 import { createContext, useContext, useState, useEffect, type ReactNode } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
+import { useQueryClient } from "@tanstack/react-query";
 import { getToken, removeToken, setToken } from "@/lib/api";
 import { getCurrentUser } from "@/services/auth.service";
 import type { AuthUser } from "@/types";
@@ -21,6 +22,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
   const location = useLocation();
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -62,6 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     removeToken();
     setTokenState(null);
     setUser(null);
+    queryClient.clear();
     navigate("/login");
   };
 
