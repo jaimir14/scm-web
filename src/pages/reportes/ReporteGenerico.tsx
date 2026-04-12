@@ -17,6 +17,7 @@ import {
 } from "@/services/reports.service";
 import { useActiveProfessionals } from "@/services/professionals.service";
 import { useActiveClinics } from "@/services/clinics.service";
+import { useActiveRoles } from "@/services/roles.service";
 
 type FilterDef = {
   key: string;
