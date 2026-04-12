@@ -8,17 +8,20 @@ import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
+import { usePermissions } from "@/contexts/PermissionContext";
 
 function DoctorNav({ onNavigate }: { onNavigate?: () => void }) {
   const location = useLocation();
-  const navigate = useNavigate();
   const { user, logout } = useAuth();
+  const { hasPermission } = usePermissions();
 
-  const links = [
-    { label: "Dashboard", href: "/doctor/dashboard", icon: LayoutDashboard },
-    { label: "Mi Agenda", href: "/doctor/agenda", icon: CalendarDays },
-    { label: "Pacientes", href: "/doctor/pacientes", icon: Users },
+  const allLinks = [
+    { label: "Dashboard", href: "/doctor/dashboard", icon: LayoutDashboard, permission: "doctor.dashboard" },
+    { label: "Mi Agenda", href: "/doctor/agenda", icon: CalendarDays, permission: "doctor.agenda" },
+    { label: "Pacientes", href: "/doctor/pacientes", icon: Users, permission: "doctor.pacientes" },
   ];
+
+  const links = allLinks.filter(l => hasPermission(l.permission));
 
   return (
     <>
@@ -62,9 +65,10 @@ function DoctorNav({ onNavigate }: { onNavigate?: () => void }) {
 export default function DoctorLayout() {
   const isMobile = useIsMobile();
   const [mobileOpen, setMobileOpen] = useState(false);
-  const { isAuthenticated, isLoading, user } = useAuth();
+  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { hasAnyPermission, isLoading: permLoading } = usePermissions();
 
-  if (isLoading) {
+  if (authLoading || permLoading) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="space-y-4 w-64">
@@ -76,7 +80,7 @@ export default function DoctorLayout() {
     );
   }
 
-  if (!isAuthenticated || user?.rol !== "MEDICO") {
+  if (!isAuthenticated || !hasAnyPermission(["doctor.dashboard", "doctor.agenda", "doctor.pacientes"])) {
     return <Navigate to="/login" replace />;
   }
 
@@ -84,8 +88,8 @@ export default function DoctorLayout() {
     <div className="flex items-center gap-2 p-4 border-b border-sidebar-border">
       <Stethoscope className="h-7 w-7 text-sidebar-primary" />
       <div>
-        <h1 className="text-base font-bold text-sidebar-primary-foreground tracking-wide">Portal Medico</h1>
-        <p className="text-[10px] text-sidebar-foreground/60">Sistema Clinico Medico</p>
+        <h1 className="text-base font-bold text-sidebar-primary-foreground tracking-wide">Portal Médico</h1>
+        <p className="text-[10px] text-sidebar-foreground/60">Sistema Clínico Médico</p>
       </div>
     </div>
   );

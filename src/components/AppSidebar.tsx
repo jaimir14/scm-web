@@ -3,57 +3,64 @@ import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, CalendarDays, FolderOpen, Building2, Users, UserCog,
   FileText, BarChart3, Shield, Activity, Settings, LogOut, ChevronDown,
-  Stethoscope, ListChecks, ClipboardList, Menu, X
+  Stethoscope, ListChecks, ClipboardList, Menu, X, KeyRound
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./ThemeToggle";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
+import { useAuth } from "@/contexts/AuthContext";
+import { usePermissions } from "@/contexts/PermissionContext";
 
 type NavItem = {
   label: string;
   icon: React.ElementType;
   href?: string;
-  children?: { label: string; href: string }[];
+  permission?: string; // feature key required
+  adminOnly?: boolean;
+  children?: { label: string; href: string; permission?: string; adminOnly?: boolean }[];
 };
 
 const navigation: NavItem[] = [
-  { label: "Inicio", icon: LayoutDashboard, href: "/dashboard" },
-  { label: "Citas", icon: CalendarDays, href: "/citas" },
+  { label: "Inicio", icon: LayoutDashboard, href: "/dashboard", permission: "dashboard" },
+  { label: "Citas", icon: CalendarDays, href: "/citas", permission: "citas" },
   {
     label: "Expediente", icon: FolderOpen, children: [
-      { label: "Buscar Expediente", href: "/expediente/buscar" },
-      { label: "Nuevo Expediente", href: "/expediente/nuevo" },
+      { label: "Buscar Expediente", href: "/expediente/buscar", permission: "expediente.buscar" },
+      { label: "Nuevo Expediente", href: "/expediente/nuevo", permission: "expediente.crear" },
     ]
   },
   {
     label: "Mantenimientos", icon: Settings, children: [
-      { label: "Clinicas", href: "/mantenimientos/clinicas" },
-      { label: "Usuarios", href: "/mantenimientos/usuarios" },
-      { label: "Tipos de Cita", href: "/mantenimientos/tipos-cita" },
-      { label: "Tratamientos", href: "/mantenimientos/tratamientos" },
+      { label: "Clínicas", href: "/mantenimientos/clinicas", permission: "mantenimientos.clinicas" },
+      { label: "Usuarios", href: "/mantenimientos/usuarios", adminOnly: true },
+      { label: "Tipos de Cita", href: "/mantenimientos/tipos-cita", permission: "mantenimientos.tipos_cita" },
+      { label: "Tratamientos", href: "/mantenimientos/tratamientos", permission: "mantenimientos.tratamientos" },
     ]
   },
   {
     label: "Reportes", icon: BarChart3, children: [
-      { label: "Citas", href: "/reportes/citas" },
-      { label: "Pacientes", href: "/reportes/pacientes" },
-      { label: "Clínicas", href: "/reportes/clinicas" },
-      { label: "Tratamientos", href: "/reportes/tratamientos" },
-      { label: "Usuarios", href: "/reportes/usuarios" },
+      { label: "Citas", href: "/reportes/citas", permission: "reportes.citas" },
+      { label: "Pacientes", href: "/reportes/pacientes", permission: "reportes.pacientes" },
+      { label: "Clínicas", href: "/reportes/clinicas", permission: "reportes.clinicas" },
+      { label: "Tratamientos", href: "/reportes/tratamientos", permission: "reportes.tratamientos" },
+      { label: "Usuarios", href: "/reportes/usuarios", permission: "reportes.usuarios" },
     ]
   },
   {
     label: "Administración", icon: Shield, children: [
-      { label: "Bitácora", href: "/admin/bitacora" },
-      { label: "Configuración", href: "/admin/configuracion" },
+      { label: "Bitácora", href: "/admin/bitacora", permission: "admin.bitacora" },
+      { label: "Configuración", href: "/admin/configuracion", permission: "admin.configuracion" },
+      { label: "Roles y Permisos", href: "/admin/roles", adminOnly: true },
     ]
   },
 ];
 
 function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const location = useLocation();
+  const { user, logout } = useAuth();
+  const { hasPermission, isAdmin } = usePermissions();
   const [openMenus, setOpenMenus] = useState<string[]>(["Expediente"]);
 
   const toggleMenu = (label: string) => {
@@ -66,10 +73,29 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const isChildActive = (item: NavItem) =>
     item.children?.some(c => location.pathname.startsWith(c.href));
 
+  const canAccess = (item: { permission?: string; adminOnly?: boolean }) => {
+    if (item.adminOnly) return isAdmin;
+    if (item.permission) return hasPermission(item.permission);
+    return true;
+  };
+
+  // Filter nav items based on permissions
+  const visibleNavigation = navigation
+    .map(item => {
+      if (item.children) {
+        const visibleChildren = item.children.filter(canAccess);
+        if (visibleChildren.length === 0) return null;
+        return { ...item, children: visibleChildren };
+      }
+      if (!canAccess(item)) return null;
+      return item;
+    })
+    .filter(Boolean) as NavItem[];
+
   return (
     <>
       <nav className="flex-1 overflow-y-auto py-2 px-2 space-y-0.5">
-        {navigation.map(item => (
+        {visibleNavigation.map(item => (
           <div key={item.label}>
             {item.href ? (
               <Link
@@ -131,13 +157,13 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
             <UserCog className="h-4 w-4" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium truncate">Dr. Admin</p>
-            <p className="text-[10px] text-sidebar-foreground/60">Administrador</p>
+            <p className="text-xs font-medium truncate">{user?.nombre ?? "Usuario"}</p>
+            <p className="text-[10px] text-sidebar-foreground/60">{user?.rol ?? ""}</p>
           </div>
           <ThemeToggle />
-          <Link to="/login" className="p-1 hover:bg-sidebar-accent rounded">
+          <button onClick={() => logout()} className="p-1 hover:bg-sidebar-accent rounded">
             <LogOut className="h-4 w-4" />
-          </Link>
+          </button>
         </div>
       </div>
     </>
@@ -148,6 +174,26 @@ export default function AppSidebar() {
   const isMobile = useIsMobile();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { hasPermission, isAdmin } = usePermissions();
+
+  // For collapsed mode, filter navigation items too
+  const canAccess = (item: { permission?: string; adminOnly?: boolean }) => {
+    if (item.adminOnly) return isAdmin;
+    if (item.permission) return hasPermission(item.permission);
+    return true;
+  };
+
+  const visibleNavigation = navigation
+    .map(item => {
+      if (item.children) {
+        const visibleChildren = item.children.filter(canAccess);
+        if (visibleChildren.length === 0) return null;
+        return { ...item, children: visibleChildren };
+      }
+      if (!canAccess(item)) return null;
+      return item;
+    })
+    .filter(Boolean) as NavItem[];
 
   if (isMobile) {
     return (
@@ -201,7 +247,7 @@ export default function AppSidebar() {
 
       {collapsed ? (
         <nav className="flex-1 overflow-y-auto py-2 px-2 space-y-0.5">
-          {navigation.map(item => (
+          {visibleNavigation.map(item => (
             <div key={item.label}>
               {item.href ? (
                 <Link to={item.href} className="flex items-center justify-center p-2 rounded-md hover:bg-sidebar-accent">
