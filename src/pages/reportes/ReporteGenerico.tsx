@@ -35,6 +35,7 @@ type ReporteConfig = {
 export default function ReporteGenerico({ tipo }: { tipo: string }) {
   const { data: professionals } = useActiveProfessionals();
   const { data: clinics } = useActiveClinics();
+  const { data: roles } = useActiveRoles();
   const isMobile = useIsMobile();
 
   const [filters, setFilters] = useState<ReportFilters>({});
