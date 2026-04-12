@@ -1,6 +1,7 @@
 export interface AuditLogEntry {
   id: number;
   fecha: string;
+  fechaFormateada?: string;
   usuarioId: number;
   usuario?: string;
   accion: string;

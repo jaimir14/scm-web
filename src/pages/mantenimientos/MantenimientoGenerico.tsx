@@ -117,7 +117,18 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
         formFields: [
           { key: "usuario", label: "Usuario" },
           { key: "nombre", label: "Nombre completo" },
+          { key: "tipoIdentificacion", label: "Tipo Identificación", type: "select", options: [
+            { value: "CEDULA", label: "Cédula Nacional" },
+            { value: "PASAPORTE", label: "Pasaporte" },
+            { value: "RESIDENCIA", label: "Residencia" },
+          ]},
+          { key: "numeroIdentificacion", label: "Número de Identificación" },
+          { key: "sexo", label: "Sexo", type: "select", options: [
+            { value: "MASCULINO", label: "Masculino" },
+            { value: "FEMENINO", label: "Femenino" },
+          ]},
           { key: "rol", label: "Rol", type: "select", options: roleOptions },
+          { key: "clinicaId", label: "Clínica", type: "select", options: clinicOptions },
           { key: "password", label: "Contraseña", type: "password" },
         ],
         mapToRow: (item) => ({
@@ -242,10 +253,31 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
         fd[f.key] = item[f.key] != null ? String(item[f.key]) : "";
       }
     });
+    // Load doctor-specific fields when editing a user
+    if (tipo === "usuarios") {
+      fd.especialidad = item.especialidad || "";
+      fd.codigoProfesional = item.codigoProfesional || "";
+      fd.duracionCitas = item.duracionCitas != null ? String(item.duracionCitas) : "";
+      fd.color = item.color || "#2563EB";
+      fd.googleCalendarActivo = item.googleCalendarActivo ? "true" : "false";
+      fd.googleCalendarEmail = item.googleCalendarEmail || "";
+      fd.googleClientId = item.googleClientId || "";
+      fd.googleClientSecret = item.googleClientSecret || "";
+    }
     setActive(item.activo !== false && item.estado !== false);
     setFormData(fd);
     setDialogOpen(true);
   };
+
+  // Check if the selected role in the user form is a doctor role
+  const isDoctorRole = useMemo(() => {
+    if (tipo !== "usuarios") return false;
+    const selectedRolId = formData.rol;
+    if (!selectedRolId) return false;
+    const role = (activeRolesQuery.data || []).find(r => r.id === Number(selectedRolId));
+    if (!role?.features) return false;
+    return role.features.some(rf => rf.feature?.clave?.startsWith("doctor."));
+  }, [tipo, formData.rol, activeRolesQuery.data]);
 
   const handleSave = () => {
     const activeKey = tipo === "usuarios" || tipo === "tipos-cita" ? "estado" : "activo";
@@ -259,6 +291,22 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
         payload[f.key] = Number(payload[f.key]);
       }
     });
+
+    // Handle doctor-specific fields for users
+    if (tipo === "usuarios" && isDoctorRole) {
+      if (payload.duracionCitas) payload.duracionCitas = Number(payload.duracionCitas);
+      payload.googleCalendarActivo = payload.googleCalendarActivo === "true";
+    } else if (tipo === "usuarios") {
+      // Clear doctor fields when role is not a doctor
+      delete payload.especialidad;
+      delete payload.codigoProfesional;
+      delete payload.duracionCitas;
+      delete payload.color;
+      delete payload.googleCalendarActivo;
+      delete payload.googleCalendarEmail;
+      delete payload.googleClientId;
+      delete payload.googleClientSecret;
+    }
 
     // Remove empty string values for optional fields when editing
     if (editingItem) {
@@ -363,6 +411,91 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
                   )}
                 </div>
               ))}
+              {/* Doctor-specific fields */}
+              {tipo === "usuarios" && isDoctorRole && (
+                <div className="border rounded-lg p-3 space-y-3 bg-muted/30">
+                  <Label className="text-sm font-semibold">Datos del Médico</Label>
+                  <div className="space-y-1">
+                    <Label className="text-sm">Especialidad</Label>
+                    <Input
+                      value={formData.especialidad || ""}
+                      onChange={e => setFormData(prev => ({ ...prev, especialidad: e.target.value }))}
+                    />
+                  </div>
+                  <div className="space-y-1">
+                    <Label className="text-sm">Código Profesional</Label>
+                    <Input
+                      value={formData.codigoProfesional || ""}
+                      onChange={e => setFormData(prev => ({ ...prev, codigoProfesional: e.target.value }))}
+                    />
+                  </div>
+                  <div className="grid grid-cols-2 gap-3">
+                    <div className="space-y-1">
+                      <Label className="text-sm">Duración de Citas (min)</Label>
+                      <Select
+                        value={formData.duracionCitas || ""}
+                        onValueChange={v => setFormData(prev => ({ ...prev, duracionCitas: v }))}
+                      >
+                        <SelectTrigger><SelectValue placeholder="Seleccione..." /></SelectTrigger>
+                        <SelectContent>
+                          {[15, 20, 30, 45, 60].map(d => (
+                            <SelectItem key={d} value={String(d)}>{d} min</SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div className="space-y-1">
+                      <Label className="text-sm">Color</Label>
+                      <Input
+                        type="color"
+                        value={formData.color || "#2563EB"}
+                        onChange={e => setFormData(prev => ({ ...prev, color: e.target.value }))}
+                        className="h-9 p-1 cursor-pointer"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Google Calendar */}
+                  <div className="border-t pt-3 mt-3 space-y-3">
+                    <div className="flex items-center justify-between">
+                      <Label className="text-sm font-semibold">Sincronización Google Calendar</Label>
+                      <Switch
+                        checked={formData.googleCalendarActivo === "true"}
+                        onCheckedChange={v => setFormData(prev => ({ ...prev, googleCalendarActivo: v ? "true" : "false" }))}
+                      />
+                    </div>
+                    {formData.googleCalendarActivo === "true" && (
+                      <>
+                        <div className="space-y-1">
+                          <Label className="text-sm">Correo electrónico</Label>
+                          <Input
+                            type="email"
+                            value={formData.googleCalendarEmail || ""}
+                            onChange={e => setFormData(prev => ({ ...prev, googleCalendarEmail: e.target.value }))}
+                            placeholder="usuario@gmail.com"
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-sm">Client ID</Label>
+                          <Input
+                            value={formData.googleClientId || ""}
+                            onChange={e => setFormData(prev => ({ ...prev, googleClientId: e.target.value }))}
+                          />
+                        </div>
+                        <div className="space-y-1">
+                          <Label className="text-sm">Client Secret</Label>
+                          <Input
+                            type="password"
+                            value={formData.googleClientSecret || ""}
+                            onChange={e => setFormData(prev => ({ ...prev, googleClientSecret: e.target.value }))}
+                          />
+                        </div>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )}
+
               <div className="flex items-center gap-2">
                 <Switch id="active" checked={active} onCheckedChange={setActive} />
                 <Label htmlFor="active">Activo</Label>

@@ -19,12 +19,13 @@ type NavItem = {
   href?: string;
   permission?: string; // feature key required
   adminOnly?: boolean;
-  children?: { label: string; href: string; permission?: string; adminOnly?: boolean }[];
+  doctorOnly?: boolean;
+  children?: { label: string; href: string; permission?: string; adminOnly?: boolean; doctorOnly?: boolean }[];
 };
 
 const navigation: NavItem[] = [
   { label: "Inicio", icon: LayoutDashboard, href: "/dashboard", permission: "dashboard" },
-  { label: "Portal Médico", icon: Stethoscope, href: "/doctor/dashboard", permission: "doctor.dashboard" },
+  { label: "Portal Médico", icon: Stethoscope, href: "/doctor/dashboard", permission: "doctor.dashboard", doctorOnly: true },
   { label: "Citas", icon: CalendarDays, href: "/citas", permission: "citas" },
   {
     label: "Expediente", icon: FolderOpen, children: [
@@ -74,7 +75,8 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
   const isChildActive = (item: NavItem) =>
     item.children?.some(c => location.pathname.startsWith(c.href));
 
-  const canAccess = (item: { permission?: string; adminOnly?: boolean }) => {
+  const canAccess = (item: { permission?: string; adminOnly?: boolean; doctorOnly?: boolean }) => {
+    if (item.doctorOnly && user?.rol !== "Médico") return false;
     if (item.adminOnly) return isAdmin;
     if (item.permission) return hasPermission(item.permission);
     return true;
@@ -176,9 +178,11 @@ export default function AppSidebar() {
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const { hasPermission, isAdmin } = usePermissions();
+  const { user } = useAuth();
 
   // For collapsed mode, filter navigation items too
-  const canAccess = (item: { permission?: string; adminOnly?: boolean }) => {
+  const canAccess = (item: { permission?: string; adminOnly?: boolean; doctorOnly?: boolean }) => {
+    if (item.doctorOnly && user?.rol !== "Médico") return false;
     if (item.adminOnly) return isAdmin;
     if (item.permission) return hasPermission(item.permission);
     return true;

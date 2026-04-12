@@ -3,7 +3,8 @@ export interface Role {
   nombre: string;
   descripcion?: string;
   activo: boolean;
-  esAdmin?: boolean; // Only the system admin role
+  esAdmin?: boolean;
+  features?: RoleFeature[];
   createdAt?: string;
   updatedAt?: string;
 }

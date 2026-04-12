@@ -48,7 +48,7 @@ const App = () => (
               <Routes>
                 {/* Doctor Portal - permission-based */}
                 <Route element={
-                  <ProtectedRoute requiredPermissions={["doctor.dashboard", "doctor.agenda", "doctor.pacientes"]}>
+                  <ProtectedRoute doctorOnly requiredPermissions={["doctor.dashboard", "doctor.agenda", "doctor.pacientes"]}>
                     <DoctorLayout />
                   </ProtectedRoute>
                 }>

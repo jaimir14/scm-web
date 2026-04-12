@@ -8,6 +8,7 @@ interface ProtectedRouteProps {
   requiredPermission?: string;
   requiredPermissions?: string[];
   adminOnly?: boolean;
+  doctorOnly?: boolean;
 }
 
 export default function ProtectedRoute({
@@ -15,8 +16,9 @@ export default function ProtectedRoute({
   requiredPermission,
   requiredPermissions,
   adminOnly,
+  doctorOnly,
 }: ProtectedRouteProps) {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { user, isAuthenticated, isLoading: authLoading } = useAuth();
   const { hasPermission, hasAnyPermission, isAdmin, isLoading: permLoading } = usePermissions();
 
   if (authLoading || permLoading) {
@@ -37,6 +39,11 @@ export default function ProtectedRoute({
 
   // Admin-only routes (user management, roles)
   if (adminOnly && !isAdmin) {
+    return <Navigate to="/dashboard" replace />;
+  }
+
+  // Doctor-only routes
+  if (doctorOnly && user?.rol !== "Médico") {
     return <Navigate to="/dashboard" replace />;
   }
 

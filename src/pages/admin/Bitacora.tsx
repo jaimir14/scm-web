@@ -167,7 +167,7 @@ export default function Bitacora() {
                     <p className="text-xs text-muted-foreground">{log.detalle}</p>
                     <div className="flex justify-between text-[10px] text-muted-foreground">
                       <span>{log.modulo}</span>
-                      <span className="font-mono">{log.fecha}</span>
+                      <span className="font-mono">{log.fechaFormateada ?? log.fecha}</span>
                     </div>
                   </div>
                 ))
@@ -205,7 +205,7 @@ export default function Bitacora() {
                   ) : logs && logs.length > 0 ? (
                     logs.map((log, i) => (
                       <TableRow key={log.id || i}>
-                        <TableCell className="font-mono text-xs">{log.fecha}</TableCell>
+                        <TableCell className="font-mono text-xs">{log.fechaFormateada ?? log.fecha}</TableCell>
                         <TableCell className="font-medium">{log.usuario}</TableCell>
                         <TableCell>
                           <Badge variant="secondary" className={actionColor[log.accion] || ""}>

@@ -26,6 +26,20 @@ import { useSearchPatients } from "@/services/patients.service";
 import { useDebounce } from "@/hooks/use-debounce";
 import type { Appointment } from "@/types";
 
+function getContrastColor(hexColor: string): "white" | "black" {
+  const hex = hexColor.replace("#", "");
+  const r = parseInt(hex.substring(0, 2), 16);
+  const g = parseInt(hex.substring(2, 4), 16);
+  const b = parseInt(hex.substring(4, 6), 16);
+  // WCAG relative luminance
+  const toLinear = (c: number) => {
+    const s = c / 255;
+    return s <= 0.04045 ? s / 12.92 : Math.pow((s + 0.055) / 1.055, 2.4);
+  };
+  const L = 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
+  return L > 0.179 ? "black" : "white";
+}
+
 const hours = Array.from({ length: 15 }, (_, i) => {
   const h = i + 8;
   return { label: `${h > 12 ? h - 12 : h}:00 ${h >= 12 ? "PM" : "AM"}`, hour: h };
@@ -307,31 +321,47 @@ export default function AgendaCitas() {
                           <td className="p-1 md:p-2 text-right text-muted-foreground font-mono border-r whitespace-nowrap text-[10px] md:text-xs">{label}</td>
                           <td className="p-0.5 md:p-1 h-10">
                             <div className="flex gap-1">
-                              {appts.map(appt => (
-                                <div
-                                  key={appt.id}
-                                  className={`border rounded p-1 flex-1 cursor-pointer hover:bg-accent/30 transition-colors ${selectedAppointment?.id === appt.id
-                                      ? "bg-primary/20 border-primary"
-                                      : "bg-primary/10 border-primary/20"
+                              {appts.map(appt => {
+                                const bg = appt.profesional?.color;
+                                const textColor = bg ? getContrastColor(bg) : undefined;
+                                const isSelected = selectedAppointment?.id === appt.id;
+                                return (
+                                  <div
+                                    key={appt.id}
+                                    className={`border rounded p-1 flex-1 cursor-pointer transition-colors ${
+                                      !bg ? (isSelected ? "bg-primary/20 border-primary" : "bg-primary/10 border-primary/20") : ""
                                     }`}
-                                  onClick={() => handleClickAppointment(appt)}
-                                >
-                                  <div className="flex justify-between items-start gap-1">
-                                    <p className="font-medium text-foreground text-[10px] md:text-xs truncate">
-                                      {appt.paciente?.nombre} {appt.paciente?.apellido1}
-                                    </p>
-                                    <span 
-                                      className="text-[10px] text-primary hover:text-primary/80 hover:underline cursor-pointer shrink-0 font-medium"
-                                      onClick={(e) => handleEditAppointment(e, appt)}
+                                    style={bg ? {
+                                      backgroundColor: bg,
+                                      borderColor: isSelected ? textColor === "white" ? "rgba(255,255,255,0.8)" : "rgba(0,0,0,0.5)" : "transparent",
+                                      outline: isSelected ? `2px solid ${textColor === "white" ? "rgba(255,255,255,0.8)" : "rgba(0,0,0,0.5)"}` : undefined,
+                                    } : undefined}
+                                    onClick={() => handleClickAppointment(appt)}
+                                  >
+                                    <div className="flex justify-between items-start gap-1">
+                                      <p
+                                        className="font-medium text-[10px] md:text-xs truncate"
+                                        style={textColor ? { color: textColor } : undefined}
+                                      >
+                                        {appt.paciente?.nombre} {appt.paciente?.apellido1}
+                                      </p>
+                                      <span
+                                        className="text-[10px] hover:underline cursor-pointer shrink-0 font-medium opacity-80"
+                                        style={textColor ? { color: textColor } : { color: "var(--primary)" }}
+                                        onClick={(e) => handleEditAppointment(e, appt)}
+                                      >
+                                        Editar
+                                      </span>
+                                    </div>
+                                    <p
+                                      className="text-[9px] md:text-xs truncate mt-0.5 opacity-80"
+                                      style={textColor ? { color: textColor } : undefined}
                                     >
-                                      Editar
-                                    </span>
+                                      {appt.tipoCita?.nombre} - {appt.profesional?.nombre}
+                                    </p>
                                   </div>
-                                  <p className="text-muted-foreground text-[9px] md:text-xs truncate mt-0.5">
-                                    {appt.tipoCita?.nombre} - {appt.profesional?.nombre}
-                                  </p>
-                                </div>
-                              ))}
+                                );
+                              })}
                             </div>
                           </td>
                         </tr>
@@ -513,7 +543,7 @@ function EditarCitaForm({ appointment, onClose }: { appointment: Appointment; on
   const [profesionalId, setProfesionalId] = useState(String(appointment.profesionalId));
   const [clinicaId, setClinicaId] = useState(String(appointment.profesional?.clinicaId ?? ""));
   const [tipoCitaId, setTipoCitaId] = useState(String(appointment.tipoCitaId));
-  const [fecha, setFecha] = useState(appointment.fecha);
+  const [fecha, setFecha] = useState(appointment.fecha ? appointment.fecha.split("T")[0] : "");
   const [horaInicio, setHoraInicio] = useState(appointment.horaInicio);
   const [horaFin, setHoraFin] = useState(appointment.horaFin);
   const [notas, setNotas] = useState(appointment.notas || "");
