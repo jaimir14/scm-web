@@ -12,3 +12,4 @@ export * from "./consultation-image";
 export * from "./patient-file";
 export * from "./audit-log";
 export * from "./config";
+export * from "./role";
