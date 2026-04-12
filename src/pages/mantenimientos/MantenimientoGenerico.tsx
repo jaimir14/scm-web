@@ -17,6 +17,7 @@ import { useClinics, useCreateClinic, useUpdateClinic, useDeleteClinic, useActiv
 import { useUsers, useCreateUser, useUpdateUser, useDeleteUser } from "@/services/users.service";
 import { useAppointmentTypes, useCreateAppointmentType, useUpdateAppointmentType, useDeleteAppointmentType } from "@/services/appointment-types.service";
 import { useTreatments, useCreateTreatment, useUpdateTreatment, useDeleteTreatment } from "@/services/treatments.service";
+import { useActiveRoles } from "@/services/roles.service";
 
 type ColumnDef = { key: string; label: string };
 type FormFieldDef = {

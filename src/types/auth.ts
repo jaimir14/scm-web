@@ -7,7 +7,9 @@ export interface AuthUser {
   id: number;
   usuario: string;
   nombre: string;
-  rol: string;
+  rol: string; // role name from DB
+  rolId: number; // role ID from DB
+  esAdmin: boolean;
   especialidad?: string;
   clinicaId?: number;
 }
