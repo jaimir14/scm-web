@@ -172,7 +172,7 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
       },
     };
     return configs[tipo] || null;
-  }, [tipo, clinicOptions]);
+  }, [tipo, clinicOptions, roleOptions]);
 
   // Resolve data/mutations based on tipo
   const dataQuery = tipo === "clinicas" ? clinicsQuery
