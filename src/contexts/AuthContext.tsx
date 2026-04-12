@@ -55,6 +55,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   const login = (newToken: string, newUser: AuthUser) => {
+    // Clear stale queries from previous session before setting new user
+    queryClient.clear();
     setToken(newToken);
     setTokenState(newToken);
     setUser(newUser);

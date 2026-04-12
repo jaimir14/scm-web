@@ -14,16 +14,18 @@ const PermissionContext = createContext<PermissionContextType | undefined>(undef
 
 export function PermissionProvider({ children }: { children: ReactNode }) {
   const { isAuthenticated, user } = useAuth();
-  const permissionsQuery = useMyPermissions();
+  const permissionsQuery = useMyPermissions(isAuthenticated);
 
   const permissions = permissionsQuery.data ?? [];
   // Admin if backend says so OR if the auth user has esAdmin flag (fallback when backend is unavailable)
   const isAdmin = permissions.includes("__admin__") || (user?.esAdmin === true);
 
+  // Not loading if: not authenticated, user is admin, query settled, or query errored (backend not ready)
+  const isPermLoading = isAuthenticated && !isAdmin && permissionsQuery.isLoading && !permissionsQuery.isError;
+
   const value = useMemo<PermissionContextType>(() => ({
     permissions,
-    // Not loading if user is admin (they have full access regardless) or if query settled
-    isLoading: !isAdmin && permissionsQuery.isLoading && isAuthenticated,
+    isLoading: isPermLoading,
     hasPermission: (featureKey: string) => {
       if (isAdmin) return true;
       return permissions.includes(featureKey);
@@ -33,7 +35,7 @@ export function PermissionProvider({ children }: { children: ReactNode }) {
       return featureKeys.some(key => permissions.includes(key));
     },
     isAdmin,
-  }), [permissions, permissionsQuery.isLoading, isAuthenticated, isAdmin]);
+  }), [permissions, isPermLoading, isAuthenticated, isAdmin]);
 
   return (
     <PermissionContext.Provider value={value}>

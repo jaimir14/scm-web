@@ -88,9 +88,11 @@ export function useAssignRoleFeatures() {
 
 // --- Current user permissions ---
 
-export function useMyPermissions() {
+export function useMyPermissions(enabled = true) {
   return useQuery({
     queryKey: ["my-permissions"],
     queryFn: () => api.get<string[]>("/api/v1/auth/my-permissions"),
+    enabled,
+    retry: 1,
   });
 }
