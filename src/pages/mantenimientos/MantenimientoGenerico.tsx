@@ -72,6 +72,11 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
     [activeClinicsQuery.data]
   );
 
+  const roleOptions = useMemo(() =>
+    (activeRolesQuery.data || []).map(r => ({ value: String(r.id), label: r.nombre })),
+    [activeRolesQuery.data]
+  );
+
   // Resolve the active config based on tipo
   const config = useMemo(() => {
     const configs: Record<string, {
