@@ -234,7 +234,13 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
     setEditingItem(item);
     const fd: Record<string, any> = {};
     config.formFields.forEach(f => {
-      fd[f.key] = item[f.key] != null ? String(item[f.key]) : "";
+      if (f.type === "select" && f.key === "rol" && tipo === "usuarios") {
+        // Match role name to role ID for the select
+        const matchedRole = (activeRolesQuery.data || []).find(r => r.nombre === item.rol);
+        fd[f.key] = matchedRole ? String(matchedRole.id) : "";
+      } else {
+        fd[f.key] = item[f.key] != null ? String(item[f.key]) : "";
+      }
     });
     setActive(item.activo !== false && item.estado !== false);
     setFormData(fd);
