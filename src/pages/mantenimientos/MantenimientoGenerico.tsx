@@ -35,6 +35,7 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
   const appointmentTypesQuery = useAppointmentTypes();
   const treatmentsQuery = useTreatments();
   const activeClinicsQuery = useActiveClinics();
+  const activeRolesQuery = useActiveRoles();
 
   const createClinic = useCreateClinic();
   const updateClinic = useUpdateClinic();
