@@ -70,6 +70,11 @@ export default function ReporteGenerico({ tipo }: { tipo: string }) {
     ...(clinics || []).map(c => ({ value: String(c.id), label: c.nombre })),
   ];
 
+  const roleOptions = [
+    { value: "all", label: "Todos" },
+    ...(roles || []).map(r => ({ value: r.nombre, label: r.nombre })),
+  ];
+
   const configs: Record<string, ReporteConfig> = {
     citas: {
       title: "Reporte de Citas",
@@ -145,13 +150,7 @@ export default function ReporteGenerico({ tipo }: { tipo: string }) {
     usuarios: {
       title: "Reporte de Usuarios",
       filters: [
-        { key: "rol", label: "Rol", type: "select", options: [
-          { value: "all", label: "Todos" },
-          { value: "ADMINISTRADOR", label: "Administrador" },
-          { value: "MEDICO", label: "Medico" },
-          { value: "RECEPCION", label: "Recepcion" },
-          { value: "ENFERMERIA", label: "Enfermeria" },
-        ]},
+        { key: "rol", label: "Rol", type: "select", options: roleOptions },
         { key: "estado", label: "Estado", type: "select", options: [
           { value: "all", label: "Todos" },
           { value: "true", label: "Activo" },
