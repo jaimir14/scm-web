@@ -19,8 +19,9 @@ jobs:
           port: ${{ secrets.DO_PORT }}
           script: |
             cd /srv/scmweb-stg/scm-web
+            git fetch origin
             git checkout staging
-            git pull origin staging
+            git reset --hard origin/staging
             npm install
             npm run build:stg
             sudo systemctl restart nginx
