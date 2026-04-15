@@ -21,7 +21,7 @@ import type { Consultation, ConsultationImage } from "@/types";
 import { toast } from "sonner";
 import { ArrowLeft, User, Clock, Calendar, Save, Plus, Lock, FileText, ChevronDown, ChevronUp, Stethoscope, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
+import { todayStr, currentTimeStr, datePart, formatTimeFromDate } from "@/lib/formatters";
 
 function ReadOnlyField({ label, value }: { label: string; value: string }) {
   return (
@@ -87,19 +87,19 @@ function ConsultationCard({
   const [editableFields, setEditableFields] = useState(
     consultation
       ? {
-          peso: String(consultation.peso ?? ""),
-          talla: String(consultation.talla ?? ""),
-          imc: String(consultation.imc ?? ""),
-          temperatura: String(consultation.temperatura ?? ""),
-          presionArterial: consultation.presionArterial ?? "",
-          frecuenciaCardiaca: String(consultation.frecuenciaCardiaca ?? ""),
-          frecuenciaRespiratoria: String(consultation.frecuenciaRespiratoria ?? ""),
-          satO2: String(consultation.satO2 ?? ""),
-          motivoConsulta: consultation.motivoConsulta ?? "",
-          examenFisico: consultation.examenFisico ?? "",
-          impresionDiagnostica: consultation.impresionDiagnostica ?? "",
-          indicacionesTratamientos: consultation.indicacionesTratamientos ?? "",
-        }
+        peso: String(consultation.peso ?? ""),
+        talla: String(consultation.talla ?? ""),
+        imc: String(consultation.imc ?? ""),
+        temperatura: String(consultation.temperatura ?? ""),
+        presionArterial: consultation.presionArterial ?? "",
+        frecuenciaCardiaca: String(consultation.frecuenciaCardiaca ?? ""),
+        frecuenciaRespiratoria: String(consultation.frecuenciaRespiratoria ?? ""),
+        satO2: String(consultation.satO2 ?? ""),
+        motivoConsulta: consultation.motivoConsulta ?? "",
+        examenFisico: consultation.examenFisico ?? "",
+        impresionDiagnostica: consultation.impresionDiagnostica ?? "",
+        indicacionesTratamientos: consultation.indicacionesTratamientos ?? "",
+      }
       : emptyFields
   );
 
@@ -123,7 +123,7 @@ function ConsultationCard({
 
     setSaving(true);
     try {
-      const today = format(new Date(), "yyyy-MM-dd");
+      const today = todayStr();
       if (consultation?.id) {
         await updateConsultation.mutateAsync({
           id: consultation.id,
@@ -167,8 +167,8 @@ function ConsultationCard({
     indicacionesTratamientos: consultation?.indicacionesTratamientos ?? "",
   };
 
-  const fecha = consultation?.fecha ? consultation.fecha.substring(0, 10) : format(new Date(), "yyyy-MM-dd");
-  const hora = consultation?.createdAt ? new Date(consultation.createdAt).toLocaleTimeString("es", { hour: "2-digit", minute: "2-digit" }) : format(new Date(), "HH:mm");
+  const fecha = consultation?.fecha ? datePart(consultation.fecha) : todayStr();
+  const hora = consultation?.createdAt ? formatTimeFromDate(consultation.createdAt) : currentTimeStr();
   const medico = consultation?.profesional?.nombre ?? "";
 
   return (
@@ -235,7 +235,7 @@ function ConsultationCard({
                 {isToday ? (
                   <>
                     <Textarea
-                      className={cn("min-h-[80px]", errors[f.k] && "border-destructive")}
+                      className={cn("min-h-[160px]", errors[f.k] && "border-destructive")}
                       value={(displayFields as any)[f.k]}
                       onChange={e => updateField(f.k, e.target.value)}
                     />

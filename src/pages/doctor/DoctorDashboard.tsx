@@ -8,19 +8,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import { useAppointments } from "@/services/appointments.service";
 import { CalendarDays, Clock, MapPin, User, ChevronRight, Stethoscope, CalendarCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
-import { format } from "date-fns";
-
-function formatTime(hora: string) {
-  const [h, m] = hora.slice(0, 5).split(":");
-  const hour = parseInt(h, 10);
-  const ampm = hour >= 12 ? "PM" : "AM";
-  const h12 = hour % 12 || 12;
-  return `${String(h12).padStart(2, "0")}:${m} ${ampm}`;
-}
-
-function formatDateTime(fecha: string, hora: string) {
-  return `${fecha.substring(0, 10)} - ${formatTime(hora)}`;
-}
+import { todayStr, formatTime, formatDateTime } from "@/lib/formatters";
 
 const statusColors: Record<string, string> = {
   PENDIENTE: "bg-warning text-warning-foreground",
@@ -38,7 +26,7 @@ export default function DoctorDashboard() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const today = format(new Date(), "yyyy-MM-dd");
+  const today = todayStr();
 
   const { data: todayAppointments = [], isLoading: loadingToday } = useAppointments({
     fecha: today,

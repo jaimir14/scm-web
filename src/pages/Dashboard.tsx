@@ -3,6 +3,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "react-router-dom";
 import { useDashboardStats, useUpcomingAppointments, useRecentActivity } from "@/services/dashboard.service";
+import { formatNumber } from "@/lib/formatters";
 
 const statConfig = [
   { key: "citasHoy" as const, label: "Citas Hoy", icon: CalendarDays, color: "text-primary", href: "/citas" },
@@ -41,7 +42,7 @@ export default function Dashboard() {
                   ) : (
                     <>
                       <p className="text-lg md:text-2xl font-bold text-foreground">
-                        {stats ? stats[s.key]?.toLocaleString() : "0"}
+                        {stats ? formatNumber(stats[s.key] ?? 0) : "0"}
                       </p>
                       <p className="text-[10px] md:text-xs text-muted-foreground truncate">{s.label}</p>
                     </>

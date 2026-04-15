@@ -12,6 +12,7 @@ import { UserPhotoUpload } from "@/components/UserPhotoUpload";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
+import { formatNumber } from "@/lib/formatters";
 import { useClinics, useCreateClinic, useUpdateClinic, useDeleteClinic, useActiveClinics } from "@/services/clinics.service";
 
 import { useUsers, useCreateUser, useUpdateUser, useDeleteUser } from "@/services/users.service";
@@ -103,7 +104,7 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
           nombre: item.nombre || "",
           direccion: item.direccion || "",
           telefono: item.telefono || "",
-          estado: item.activo ? "Activa" : "Inactiva",
+          estado: item.estado ? "Activa" : "Inactiva",
         }),
       },
       usuarios: {
@@ -127,7 +128,7 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
             { value: "MASCULINO", label: "Masculino" },
             { value: "FEMENINO", label: "Femenino" },
           ]},
-          { key: "rol", label: "Rol", type: "select", options: roleOptions },
+          { key: "rolId", label: "Rol", type: "select", options: roleOptions },
           { key: "clinicaId", label: "Clínica", type: "select", options: clinicOptions },
           { key: "password", label: "Contraseña", type: "password" },
         ],
@@ -135,7 +136,7 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
           usuario: item.usuario || "",
           nombre: item.nombre || "",
           rol: item.rol || "",
-          estado: (item.activo ?? item.estado) ? "Activo" : "Inactivo",
+          estado: item.estado ? "Activo" : "Inactivo",
         }),
       },
       "tipos-cita": {
@@ -152,7 +153,7 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
         mapToRow: (item) => ({
           nombre: item.nombre || "",
           duracion: String(item.duracion || ""),
-          estado: item.activo ? "Activo" : "Inactivo",
+          estado: item.estado ? "Activo" : "Inactivo",
         }),
       },
       tratamientos: {
@@ -178,7 +179,7 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
           codigo: item.codigo || "",
           nombre: item.nombre || "",
           categoria: item.categoria || "",
-          precio: item.precio != null ? `${item.precio.toLocaleString()}` : "",
+          precio: item.precio != null ? formatNumber(item.precio) : "",
         }),
       },
     };
@@ -245,10 +246,10 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
     setEditingItem(item);
     const fd: Record<string, any> = {};
     config.formFields.forEach(f => {
-      if (f.type === "select" && f.key === "rol" && tipo === "usuarios") {
+      if (f.type === "select" && f.key === "rolId" && tipo === "usuarios") {
         // Match role name to role ID for the select
         const matchedRole = (activeRolesQuery.data || []).find(r => r.nombre === item.rol);
-        fd[f.key] = matchedRole ? String(matchedRole.id) : "";
+        fd[f.key] = item.rolId ? String(item.rolId) : (matchedRole ? String(matchedRole.id) : "");
       } else {
         fd[f.key] = item[f.key] != null ? String(item[f.key]) : "";
       }
@@ -264,7 +265,7 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
       fd.googleClientId = item.googleClientId || "";
       fd.googleClientSecret = item.googleClientSecret || "";
     }
-    setActive(item.activo !== false && item.estado !== false);
+    setActive(item.estado === true);
     setFormData(fd);
     setDialogOpen(true);
   };
@@ -272,7 +273,7 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
   // Check if the selected role in the user form is a doctor role
   const isDoctorRole = useMemo(() => {
     if (tipo !== "usuarios") return false;
-    const selectedRolId = formData.rol;
+    const selectedRolId = formData.rolId;
     if (!selectedRolId) return false;
     const role = (activeRolesQuery.data || []).find(r => r.id === Number(selectedRolId));
     if (!role?.features) return false;
@@ -280,7 +281,7 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
   }, [tipo, formData.rol, activeRolesQuery.data]);
 
   const handleSave = () => {
-    const activeKey = tipo === "usuarios" || tipo === "tipos-cita" ? "estado" : "activo";
+    const activeKey = "estado";
     const payload: Record<string, any> = { ...formData, [activeKey]: active };
     config.formFields.forEach(f => {
       if (f.type === "number" && payload[f.key]) {

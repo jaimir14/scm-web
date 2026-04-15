@@ -116,7 +116,7 @@ export default function Index() {
         <div className="mx-auto flex h-16 max-w-6xl items-center justify-between px-4">
           <div className="flex items-center gap-2">
             <Stethoscope className="h-7 w-7 text-primary" />
-            <span className="text-xl font-bold tracking-tight">ClínicaPro</span>
+            <span className="text-xl font-bold tracking-tight">Medikal</span>
           </div>
           <div className="hidden items-center gap-6 text-sm font-medium text-muted-foreground md:flex">
             <a href="#funcionalidades" className="transition-colors hover:text-foreground">Funcionalidades</a>
@@ -216,7 +216,7 @@ export default function Index() {
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div>
               <h2 className="mb-4 text-3xl font-bold tracking-tight md:text-4xl">
-                ¿Por qué elegir <span className="text-primary">ClínicaPro</span>?
+                ¿Por qué elegir <span className="text-primary">Medikal</span>?
               </h2>
               <p className="mb-8 text-muted-foreground">
                 Desarrollado pensando en las necesidades reales de clínicas costarricenses.
@@ -263,7 +263,7 @@ export default function Index() {
               Lo que dicen nuestros clientes
             </h2>
             <p className="text-muted-foreground">
-              Profesionales de la salud en Costa Rica ya confían en ClínicaPro.
+              Profesionales de la salud en Costa Rica ya confían en Medikal.
             </p>
           </div>
           <div className="grid gap-6 md:grid-cols-3">
@@ -307,7 +307,7 @@ export default function Index() {
                 Solicite su demostración gratuita
               </h2>
               <p className="text-muted-foreground">
-                Contáctenos y le mostraremos cómo ClínicaPro puede transformar la gestión de su clínica.
+                Contáctenos y le mostraremos cómo Medikal puede transformar la gestión de su clínica.
               </p>
             </div>
             <Card>
@@ -394,10 +394,10 @@ export default function Index() {
           <div className="flex flex-col items-center justify-between gap-4 md:flex-row">
             <div className="flex items-center gap-2">
               <Stethoscope className="h-5 w-5 text-primary" />
-              <span className="font-bold">ClínicaPro</span>
+              <span className="font-bold">Medikal</span>
             </div>
             <p className="text-xs text-muted-foreground">
-              © {new Date().getFullYear()} ClínicaPro. Todos los derechos reservados. Hecho en Costa Rica 🇨🇷
+              © {new Date().getFullYear()} Medikal. Todos los derechos reservados. Hecho en Costa Rica 🇨🇷
             </p>
           </div>
         </div>

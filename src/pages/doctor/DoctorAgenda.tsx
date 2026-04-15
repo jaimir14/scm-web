@@ -7,8 +7,7 @@ import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { useAuth } from "@/contexts/AuthContext";
 import { useAppointments } from "@/services/appointments.service";
-import { format } from "date-fns";
-import { es } from "date-fns/locale";
+import { formatDateToApi, formatDateLong, formatDateMedium } from "@/lib/formatters";
 import { CalendarDays, Clock, MapPin, User, ChevronRight } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -34,7 +33,7 @@ export default function DoctorAgenda() {
   const [selectedDate, setSelectedDate] = useState<Date>(new Date());
   const [calendarOpen, setCalendarOpen] = useState(!isMobile);
 
-  const dateStr = format(selectedDate, "yyyy-MM-dd");
+  const dateStr = formatDateToApi(selectedDate);
 
   // Fetch appointments for the selected date
   const { data: dayAppointments = [], isLoading: loadingDay } = useAppointments({
@@ -86,7 +85,7 @@ export default function DoctorAgenda() {
           <Collapsible open={calendarOpen} onOpenChange={setCalendarOpen}>
             <CollapsibleTrigger asChild>
               <Button variant="outline" className="w-full justify-between mb-2">
-                <span>{format(selectedDate, "EEEE d 'de' MMMM, yyyy", { locale: es })}</span>
+                <span>{formatDateLong(selectedDate)}</span>
                 <CalendarDays className="h-4 w-4" />
               </Button>
             </CollapsibleTrigger>
@@ -123,7 +122,7 @@ export default function DoctorAgenda() {
         <Card>
           <CardHeader className="pb-3">
             <CardTitle className="text-base flex items-center gap-2">
-              Citas — {format(selectedDate, "EEEE d 'de' MMMM", { locale: es })}
+              Citas — {formatDateMedium(selectedDate)}
               <Badge variant="secondary" className="ml-auto">{sortedDay.length} citas</Badge>
             </CardTitle>
           </CardHeader>

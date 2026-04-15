@@ -4,7 +4,7 @@ export interface Clinic {
   direccion?: string;
   telefono?: string;
   email?: string;
-  activo: boolean;
+  estado: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -14,7 +14,7 @@ export interface CreateClinicInput {
   direccion?: string;
   telefono?: string;
   email?: string;
-  activo?: boolean;
+  estado?: boolean;
 }
 
 export type UpdateClinicInput = Partial<CreateClinicInput>;

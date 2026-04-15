@@ -13,6 +13,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Loader2, FileText, Trash2, Eye, Upload, Download, File } from "lucide-react";
+import { formatFileSize, formatLocalDate } from "@/lib/formatters";
 import { cn } from "@/lib/utils";
 import { toast } from "sonner";
 import {
@@ -28,12 +29,6 @@ interface ConsultationFilesProps {
   consultaId: number | undefined;
   patientId: number;
   editable: boolean;
-}
-
-function formatFileSize(bytes: number): string {
-  if (bytes < 1024) return `${bytes} B`;
-  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
-  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
 }
 
 export function ConsultationFiles({
@@ -212,7 +207,7 @@ export function ConsultationFiles({
                   {f.createdAt && (
                     <>
                       <span className="text-muted-foreground/40">•</span>
-                      <span>{new Date(f.createdAt).toLocaleDateString("es")}</span>
+                      <span>{formatLocalDate(f.createdAt)}</span>
                     </>
                   )}
                 </div>

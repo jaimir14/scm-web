@@ -20,7 +20,6 @@ export interface User {
   googleCalendarEmail?: string | null;
   googleClientId?: string | null;
   googleClientSecret?: string | null;
-  activo?: boolean;
   estado?: boolean;
   ultimoAcceso?: string;
   createdAt?: string;
@@ -44,7 +43,7 @@ export interface CreateUserInput {
   googleCalendarEmail?: string;
   googleClientId?: string;
   googleClientSecret?: string;
-  activo?: boolean;
+  estado?: boolean;
 }
 
 export interface UpdateUserInput {
@@ -63,5 +62,5 @@ export interface UpdateUserInput {
   googleCalendarEmail?: string | null;
   googleClientId?: string | null;
   googleClientSecret?: string | null;
-  activo?: boolean;
+  estado?: boolean;
 }

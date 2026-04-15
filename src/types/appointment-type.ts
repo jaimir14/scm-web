@@ -2,7 +2,7 @@ export interface AppointmentType {
   id: number;
   nombre: string;
   duracion: number;
-  activo: boolean;
+  estado: boolean;
   createdAt?: string;
   updatedAt?: string;
 }
@@ -10,7 +10,7 @@ export interface AppointmentType {
 export interface CreateAppointmentTypeInput {
   nombre: string;
   duracion: number;
-  activo?: boolean;
+  estado?: boolean;
 }
 
 export type UpdateAppointmentTypeInput = Partial<CreateAppointmentTypeInput>;

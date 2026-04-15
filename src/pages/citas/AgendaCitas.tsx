@@ -11,7 +11,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Plus, Search, Loader2, ChevronDown, ChevronUp } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { toast } from "sonner";
-import { format } from "date-fns";
+import { todayStr, formatDateToApi, formatDateDisplay } from "@/lib/formatters";
 import {
   useAppointments,
   useCreateAppointment,
@@ -57,7 +57,7 @@ export default function AgendaCitas() {
   const [showSidePanel, setShowSidePanel] = useState(false);
   const isMobile = useIsMobile();
 
-  const dateStr = date ? format(date, "yyyy-MM-dd") : "";
+  const dateStr = date ? formatDateToApi(date) : "";
 
   const { data: appointments, isLoading } = useAppointments({
     fecha: dateStr,
@@ -301,7 +301,7 @@ export default function AgendaCitas() {
                   <tr>
                     <th className="w-14 md:w-16 bg-muted p-1.5 md:p-2 border-b text-xs">Hora</th>
                     <th className="p-1.5 md:p-2 border-b bg-warning/20 font-bold text-left text-xs">
-                      {date ? format(date, "dd/MM/yyyy") : ""}
+                      {date ? formatDateDisplay(date) : ""}
                     </th>
                   </tr>
                 </thead>
@@ -389,7 +389,7 @@ function CrearCitaForm({ onClose }: { onClose: () => void }) {
   const [profesionalId, setProfesionalId] = useState("");
   const [clinicaId, setClinicaId] = useState("");
   const [tipoCitaId, setTipoCitaId] = useState("");
-  const [fecha, setFecha] = useState(format(new Date(), "yyyy-MM-dd"));
+  const [fecha, setFecha] = useState(todayStr());
   const [horaInicio, setHoraInicio] = useState("08:00");
   const [horaFin, setHoraFin] = useState("08:30");
   const [notas, setNotas] = useState("");

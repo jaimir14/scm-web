@@ -18,6 +18,7 @@ import {
 import { useActiveProfessionals } from "@/services/professionals.service";
 import { useActiveClinics } from "@/services/clinics.service";
 import { useActiveRoles } from "@/services/roles.service";
+import { formatLocalDate, formatLocalDateTime, formatCurrency } from "@/lib/formatters";
 
 type FilterDef = {
   key: string;
@@ -184,7 +185,7 @@ export default function ReporteGenerico({ tipo }: { tipo: string }) {
     switch (tipo) {
       case "citas":
         return raw.map((r: any) => ({
-          fecha: r.fecha ? new Date(r.fecha).toLocaleDateString() : "",
+          fecha: r.fecha ? formatLocalDate(r.fecha) : "",
           hora: r.horaInicio || "",
           paciente: r.paciente
             ? `${r.paciente.nombre} ${r.paciente.apellido1 || ""}`.trim()
@@ -201,9 +202,7 @@ export default function ReporteGenerico({ tipo }: { tipo: string }) {
           telefono: r.telefonoCelular || r.telefonoCasa || "",
           clinica: r.clinica?.nombre || "",
           medico: r.profesional?.nombre || "",
-          ultimaVisita: r.updatedAt
-            ? new Date(r.updatedAt).toLocaleDateString()
-            : "",
+          ultimaVisita: r.updatedAt ? formatLocalDate(r.updatedAt) : "",
         }));
 
       case "clinicas":
@@ -222,7 +221,7 @@ export default function ReporteGenerico({ tipo }: { tipo: string }) {
           tratamiento: r.nombre || "",
           categoria: r.categoria || "",
           cantidad: "-",
-          ingresos: r.precio != null ? `₡${Number(r.precio).toLocaleString()}` : "-",
+          ingresos: r.precio != null ? formatCurrency(Number(r.precio)) : "-",
         }));
 
       case "usuarios":
@@ -230,9 +229,7 @@ export default function ReporteGenerico({ tipo }: { tipo: string }) {
           usuario: r.usuario || "",
           nombre: r.nombre || "",
           rol: r.rol || "",
-          ultimoAcceso: r.ultimoAcceso
-            ? new Date(r.ultimoAcceso).toLocaleString()
-            : "Nunca",
+          ultimoAcceso: r.ultimoAcceso ? formatLocalDateTime(r.ultimoAcceso) : "Nunca",
           estado: r.estado ? "Activo" : "Inactivo",
         }));
 
