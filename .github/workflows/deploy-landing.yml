@@ -1,0 +1,40 @@
+name: Deploy Landing Page
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: 'Branch to deploy from'
+        required: true
+        type: choice
+        options:
+          - staging
+          - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check branch
+        if: ${{ github.event.inputs.branch == 'main' }}
+        run: |
+          echo "Deployment from 'main' is not configured yet. Skipping."
+          exit 0
+
+      - name: Deploy Landing via SSH
+        if: ${{ github.event.inputs.branch == 'staging' }}
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.DO_HOST }}
+          username: ${{ secrets.DO_USERNAME }}
+          key: ${{ secrets.DO_SSH_KEY }}
+          port: ${{ secrets.DO_PORT }}
+          script: |
+            cd /srv/scmweb-stg/scm-web
+            git fetch origin
+            git checkout staging
+            git reset --hard origin/staging
+            npm install
+            npm run build:landing
+            sudo systemctl restart nginx
