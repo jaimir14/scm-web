@@ -469,11 +469,11 @@ export default function Index() {
             <div className="mt-10 grid gap-6 text-center sm:grid-cols-3">
               <div className="flex flex-col items-center gap-2">
                 <Mail className="h-5 w-5 text-primary" />
-                <span className="text-sm text-muted-foreground">info@clinicapro.cr</span>
+                <span className="text-sm text-muted-foreground">randall.zamora@luzmax.com</span>
               </div>
               <div className="flex flex-col items-center gap-2">
                 <Phone className="h-5 w-5 text-primary" />
-                <span className="text-sm text-muted-foreground">+506 2222-3333</span>
+                <span className="text-sm text-muted-foreground">+506 8738-7020</span>
               </div>
               <div className="flex flex-col items-center gap-2">
                 <MapPin className="h-5 w-5 text-primary" />
