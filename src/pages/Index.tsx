@@ -384,9 +384,9 @@ export default function Index() {
                 { val: "3 min", label: "Tiempo promedio de registro" },
                 { val: "24/7", label: "Acceso desde cualquier lugar" },
               ].map((s) => (
-                <Card key={s.label} className="text-center">
+                <Card key={s.label} className="text-center border-border/60 bg-gradient-to-br from-card to-accent/30 hover:shadow-[var(--shadow-elegant)] transition-shadow">
                   <CardContent className="p-6">
-                    <div className="text-3xl font-bold text-primary">{s.val}</div>
+                    <div className="bg-gradient-to-r from-primary to-[hsl(188_80%_52%)] bg-clip-text text-3xl font-bold text-transparent">{s.val}</div>
                     <div className="mt-1 text-xs text-muted-foreground">{s.label}</div>
                   </CardContent>
                 </Card>
