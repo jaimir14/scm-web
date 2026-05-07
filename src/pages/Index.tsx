@@ -24,6 +24,10 @@ import {
   MessageSquareText,
 } from "lucide-react";
 
+import heroDashboard from "@/assets/landing-hero-dashboard.jpg";
+import doctorAi from "@/assets/landing-doctor-ai.jpg";
+import benefitsBg from "@/assets/landing-benefits-bg.jpg";
+
 const fadeUp = {
   hidden: { opacity: 0, y: 30 },
   visible: (i: number) => ({
