@@ -253,7 +253,19 @@ export default function Index() {
       <section id="ia" className="border-t py-20 md:py-32 relative overflow-hidden">
 
         <div className="absolute inset-0 bg-gradient-to-br from-primary/8 via-transparent to-primary/5 pointer-events-none" />
+        <div
+          aria-hidden
+          className="absolute right-0 top-0 -z-0 h-full w-1/2 opacity-20 dark:opacity-10"
+          style={{
+            backgroundImage: `url(${doctorAi})`,
+            backgroundSize: "cover",
+            backgroundPosition: "center",
+            maskImage: "linear-gradient(to left, black, transparent)",
+            WebkitMaskImage: "linear-gradient(to left, black, transparent)",
+          }}
+        />
         <div className="relative mx-auto max-w-6xl px-4">
+
           <motion.div
             className="mx-auto mb-16 max-w-3xl text-center"
             initial="hidden"
