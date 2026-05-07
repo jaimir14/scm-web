@@ -18,6 +18,7 @@ import { ConsultationImages } from "@/components/ConsultationImages";
 import { ConsultationFiles } from "@/components/ConsultationFiles";
 import { useAppointments, useUpdateAppointmentStatus } from "@/services/appointments.service";
 import type { Consultation, ConsultationImage } from "@/types";
+import { format } from "date-fns";
 import { toast } from "sonner";
 import { ArrowLeft, User, Clock, Calendar, Save, Plus, Lock, FileText, ChevronDown, ChevronUp, Stethoscope, Loader2 } from "lucide-react";
 import { cn } from "@/lib/utils";

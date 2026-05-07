@@ -148,23 +148,53 @@ export default function Index() {
 
       {/* Hero */}
       <section className="relative overflow-hidden py-20 md:py-32">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/10" />
+        {/* Layered background */}
+        <div className="absolute inset-0 -z-10" style={{ background: "var(--gradient-hero)" }} />
+        <div
+          className="absolute inset-0 -z-10 opacity-[0.35] dark:opacity-[0.18]"
+          style={{
+            backgroundImage:
+              "linear-gradient(hsl(var(--primary)/0.08) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--primary)/0.08) 1px, transparent 1px)",
+            backgroundSize: "44px 44px",
+            maskImage: "radial-gradient(ellipse at center, black 40%, transparent 75%)",
+            WebkitMaskImage: "radial-gradient(ellipse at center, black 40%, transparent 75%)",
+          }}
+        />
+        {/* Floating blurred shapes */}
+        <motion.div
+          aria-hidden
+          className="absolute -top-20 -left-20 -z-10 h-[420px] w-[420px] rounded-full blur-3xl"
+          style={{ background: "radial-gradient(circle, hsl(var(--primary)/0.25), transparent 70%)" }}
+          animate={{ x: [0, 30, 0], y: [0, 20, 0] }}
+          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          aria-hidden
+          className="absolute -bottom-32 -right-20 -z-10 h-[460px] w-[460px] rounded-full blur-3xl"
+          style={{ background: "radial-gradient(circle, hsl(188 80% 60% / 0.25), transparent 70%)" }}
+          animate={{ x: [0, -25, 0], y: [0, -15, 0] }}
+          transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
+        />
+
         <div className="relative mx-auto max-w-6xl px-4">
           <div className="mx-auto max-w-3xl text-center">
             <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0}>
-              <Badge variant="secondary" className="mb-6 px-4 py-1.5 text-sm">
-                🇨🇷 Diseñado para clínicas en Costa Rica
+              <Badge variant="secondary" className="mb-6 px-4 py-1.5 text-sm border border-primary/20 bg-primary/5 text-primary backdrop-blur-sm">
+                <ShieldCheck className="mr-1.5 h-3.5 w-3.5" />
+                Plataforma segura · Diseñada para Costa Rica
               </Badge>
             </motion.div>
             <motion.h1
-              className="mb-6 text-4xl font-bold leading-tight tracking-tight md:text-6xl"
+              className="mb-6 text-4xl font-bold leading-[1.05] tracking-tight md:text-6xl lg:text-7xl"
               initial="hidden" animate="visible" variants={fadeUp} custom={1}
             >
               Gestione su clínica{" "}
-              <span className="text-primary">de forma inteligente</span>
+              <span className="bg-gradient-to-r from-primary to-[hsl(188_80%_52%)] bg-clip-text text-transparent">
+                de forma inteligente
+              </span>
             </motion.h1>
             <motion.p
-              className="mb-8 text-lg text-muted-foreground md:text-xl"
+              className="mb-10 text-lg text-muted-foreground md:text-xl"
               initial="hidden" animate="visible" variants={fadeUp} custom={2}
             >
               Expedientes digitales, agenda de citas, portal médico y reportes.
@@ -174,14 +204,25 @@ export default function Index() {
               className="flex flex-col items-center justify-center gap-3 sm:flex-row"
               initial="hidden" animate="visible" variants={fadeUp} custom={3}
             >
-              <Button size="lg" className="gap-2 text-base" asChild>
+              <Button size="lg" className="gap-2 text-base shadow-[var(--shadow-elegant)] hover:shadow-[var(--shadow-glow)] transition-shadow" asChild>
                 <a href="#contacto">
                   Solicitar Demo Gratuita <ArrowRight className="h-4 w-4" />
                 </a>
               </Button>
-              <Button size="lg" variant="outline" className="text-base" asChild>
+              <Button size="lg" variant="outline" className="text-base backdrop-blur-sm bg-background/60" asChild>
                 <a href="#funcionalidades">Conocer Funcionalidades</a>
               </Button>
+            </motion.div>
+
+            {/* Trust strip */}
+            <motion.div
+              className="mt-14 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs font-medium text-muted-foreground"
+              initial="hidden" animate="visible" variants={fadeUp} custom={4}
+            >
+              <span className="flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-primary" /> Datos cifrados</span>
+              <span className="flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-primary" /> 99.9% disponibilidad</span>
+              <span className="flex items-center gap-1.5"><Smartphone className="h-4 w-4 text-primary" /> Acceso multi-dispositivo</span>
+              <span className="flex items-center gap-1.5"><Zap className="h-4 w-4 text-primary" /> Implementación en días</span>
             </motion.div>
           </div>
         </div>
@@ -274,7 +315,8 @@ export default function Index() {
       </section>
 
       {/* Features */}
-      <section id="funcionalidades" className="border-t bg-muted/30 py-20 md:py-28">
+      <section id="funcionalidades" className="relative border-t bg-gradient-to-b from-background to-muted/40 py-20 md:py-28">
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
         <div className="mx-auto max-w-6xl px-4">
           <div className="mx-auto mb-14 max-w-2xl text-center">
             <h2 className="mb-4 text-3xl font-bold tracking-tight md:text-4xl">
@@ -294,12 +336,12 @@ export default function Index() {
                 variants={fadeUp}
                 custom={i}
               >
-                <Card className="h-full transition-shadow hover:shadow-md">
+                <Card className="group h-full border-border/60 bg-card/80 backdrop-blur-sm transition-all hover:-translate-y-1 hover:shadow-[var(--shadow-elegant)] hover:border-primary/30">
                   <CardContent className="p-6">
-                    <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-primary/10">
+                    <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary/15 to-primary/5 ring-1 ring-primary/15 group-hover:ring-primary/30 transition">
                       <f.icon className="h-5 w-5 text-primary" />
                     </div>
-                    <h3 className="mb-2 text-lg font-semibold">{f.title}</h3>
+                    <h3 className="mb-2 text-lg font-semibold tracking-tight">{f.title}</h3>
                     <p className="text-sm leading-relaxed text-muted-foreground">{f.desc}</p>
                   </CardContent>
                 </Card>
@@ -342,9 +384,9 @@ export default function Index() {
                 { val: "3 min", label: "Tiempo promedio de registro" },
                 { val: "24/7", label: "Acceso desde cualquier lugar" },
               ].map((s) => (
-                <Card key={s.label} className="text-center">
+                <Card key={s.label} className="text-center border-border/60 bg-gradient-to-br from-card to-accent/30 hover:shadow-[var(--shadow-elegant)] transition-shadow">
                   <CardContent className="p-6">
-                    <div className="text-3xl font-bold text-primary">{s.val}</div>
+                    <div className="bg-gradient-to-r from-primary to-[hsl(188_80%_52%)] bg-clip-text text-3xl font-bold text-transparent">{s.val}</div>
                     <div className="mt-1 text-xs text-muted-foreground">{s.label}</div>
                   </CardContent>
                 </Card>
