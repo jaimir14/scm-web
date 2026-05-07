@@ -181,52 +181,69 @@ export default function Index() {
         />
 
         <div className="relative mx-auto max-w-6xl px-4">
-          <div className="mx-auto max-w-3xl text-center">
-            <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0}>
-              <Badge variant="secondary" className="mb-6 px-4 py-1.5 text-sm border border-primary/20 bg-primary/5 text-primary backdrop-blur-sm">
-                <ShieldCheck className="mr-1.5 h-3.5 w-3.5" />
-                Plataforma segura · Diseñada para Costa Rica
-              </Badge>
-            </motion.div>
-            <motion.h1
-              className="mb-6 text-4xl font-bold leading-[1.05] tracking-tight md:text-6xl lg:text-7xl"
-              initial="hidden" animate="visible" variants={fadeUp} custom={1}
-            >
-              Gestione su clínica{" "}
-              <span className="bg-gradient-to-r from-primary to-[hsl(188_80%_52%)] bg-clip-text text-transparent">
-                de forma inteligente
-              </span>
-            </motion.h1>
-            <motion.p
-              className="mb-10 text-lg text-muted-foreground md:text-xl"
-              initial="hidden" animate="visible" variants={fadeUp} custom={2}
-            >
-              Expedientes digitales, agenda de citas, portal médico y reportes.
-              Todo lo que su consultorio necesita en una plataforma web moderna, segura y fácil de usar.
-            </motion.p>
-            <motion.div
-              className="flex flex-col items-center justify-center gap-3 sm:flex-row"
-              initial="hidden" animate="visible" variants={fadeUp} custom={3}
-            >
-              <Button size="lg" className="gap-2 text-base shadow-[var(--shadow-elegant)] hover:shadow-[var(--shadow-glow)] transition-shadow" asChild>
-                <a href="#contacto">
-                  Solicitar Demo Gratuita <ArrowRight className="h-4 w-4" />
-                </a>
-              </Button>
-              <Button size="lg" variant="outline" className="text-base backdrop-blur-sm bg-background/60" asChild>
-                <a href="#funcionalidades">Conocer Funcionalidades</a>
-              </Button>
-            </motion.div>
+          <div className="grid items-center gap-12 lg:grid-cols-2">
+            <div className="text-center lg:text-left">
+              <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0}>
+                <Badge variant="secondary" className="mb-6 px-4 py-1.5 text-sm border border-primary/20 bg-primary/5 text-primary backdrop-blur-sm">
+                  <ShieldCheck className="mr-1.5 h-3.5 w-3.5" />
+                  Plataforma segura · Diseñada para Costa Rica
+                </Badge>
+              </motion.div>
+              <motion.h1
+                className="mb-6 text-4xl font-bold leading-[1.05] tracking-tight md:text-6xl"
+                initial="hidden" animate="visible" variants={fadeUp} custom={1}
+              >
+                Gestione su clínica{" "}
+                <span className="bg-gradient-to-r from-primary to-[hsl(188_80%_52%)] bg-clip-text text-transparent">
+                  de forma inteligente
+                </span>
+              </motion.h1>
+              <motion.p
+                className="mb-10 text-lg text-muted-foreground md:text-xl"
+                initial="hidden" animate="visible" variants={fadeUp} custom={2}
+              >
+                Expedientes digitales, agenda de citas, portal médico y reportes.
+                Todo lo que su consultorio necesita en una plataforma web moderna, segura y fácil de usar.
+              </motion.p>
+              <motion.div
+                className="flex flex-col items-center justify-center gap-3 sm:flex-row lg:justify-start"
+                initial="hidden" animate="visible" variants={fadeUp} custom={3}
+              >
+                <Button size="lg" className="gap-2 text-base shadow-[var(--shadow-elegant)] hover:shadow-[var(--shadow-glow)] transition-shadow" asChild>
+                  <a href="#contacto">
+                    Solicitar Demo Gratuita <ArrowRight className="h-4 w-4" />
+                  </a>
+                </Button>
+                <Button size="lg" variant="outline" className="text-base backdrop-blur-sm bg-background/60" asChild>
+                  <a href="#funcionalidades">Conocer Funcionalidades</a>
+                </Button>
+              </motion.div>
 
-            {/* Trust strip */}
+              <motion.div
+                className="mt-14 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs font-medium text-muted-foreground lg:justify-start"
+                initial="hidden" animate="visible" variants={fadeUp} custom={4}
+              >
+                <span className="flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-primary" /> Datos cifrados</span>
+                <span className="flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-primary" /> 99.9% disponibilidad</span>
+                <span className="flex items-center gap-1.5"><Smartphone className="h-4 w-4 text-primary" /> Multi-dispositivo</span>
+                <span className="flex items-center gap-1.5"><Zap className="h-4 w-4 text-primary" /> Implementación rápida</span>
+              </motion.div>
+            </div>
+
             <motion.div
-              className="mt-14 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs font-medium text-muted-foreground"
-              initial="hidden" animate="visible" variants={fadeUp} custom={4}
+              className="relative"
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              transition={{ duration: 0.7, ease: "easeOut", delay: 0.2 }}
             >
-              <span className="flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-primary" /> Datos cifrados</span>
-              <span className="flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-primary" /> 99.9% disponibilidad</span>
-              <span className="flex items-center gap-1.5"><Smartphone className="h-4 w-4 text-primary" /> Acceso multi-dispositivo</span>
-              <span className="flex items-center gap-1.5"><Zap className="h-4 w-4 text-primary" /> Implementación en días</span>
+              <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-primary/20 to-[hsl(188_80%_52%)]/20 blur-2xl" />
+              <img
+                src={heroDashboard}
+                alt="Vista previa del panel de gestión de Medikal"
+                width={1280}
+                height={960}
+                className="relative w-full rounded-2xl border border-primary/10 shadow-[var(--shadow-elegant)]"
+              />
             </motion.div>
           </div>
         </div>
@@ -234,6 +251,7 @@ export default function Index() {
 
       {/* AI Spotlight */}
       <section id="ia" className="border-t py-20 md:py-32 relative overflow-hidden">
+
         <div className="absolute inset-0 bg-gradient-to-br from-primary/8 via-transparent to-primary/5 pointer-events-none" />
         <div className="relative mx-auto max-w-6xl px-4">
           <motion.div
