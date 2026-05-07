@@ -13,6 +13,7 @@ import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
 import type { Appointment } from "@/types";
+import { es } from "date-fns/locale";
 
 const statusColors: Record<string, string> = {
   PENDIENTE: "bg-warning text-warning-foreground",
