@@ -175,7 +175,7 @@ export default function Index() {
         <motion.div
           aria-hidden
           className="absolute -bottom-32 -right-20 -z-10 h-[460px] w-[460px] rounded-full blur-3xl"
-          style={{ background: "radial-gradient(circle, hsl(188 80% 60% / 0.25), transparent 70%)" }}
+          style={{ background: "radial-gradient(circle, hsl(var(--primary-glow) / 0.25), transparent 70%)" }}
           animate={{ x: [0, -25, 0], y: [0, -15, 0] }}
           transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
         />
@@ -194,7 +194,7 @@ export default function Index() {
                 initial="hidden" animate="visible" variants={fadeUp} custom={1}
               >
                 Gestione su clínica{" "}
-                <span className="bg-gradient-to-r from-primary to-[hsl(188_80%_52%)] bg-clip-text text-transparent">
+                <span className="bg-gradient-to-r from-primary to-[hsl(var(--primary-glow))] bg-clip-text text-transparent">
                   de forma inteligente
                 </span>
               </motion.h1>
@@ -236,7 +236,7 @@ export default function Index() {
               animate={{ opacity: 1, scale: 1, y: 0 }}
               transition={{ duration: 0.7, ease: "easeOut", delay: 0.2 }}
             >
-              <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-primary/20 to-[hsl(188_80%_52%)]/20 blur-2xl" />
+              <div className="absolute -inset-4 rounded-3xl bg-gradient-to-br from-primary/20 to-[hsl(var(--primary-glow))]/20 blur-2xl" />
               <img
                 src={heroDashboard}
                 alt="Vista previa del panel de gestión de Medikal"
@@ -426,7 +426,7 @@ export default function Index() {
               ].map((s) => (
                 <Card key={s.label} className="text-center border-border/60 bg-gradient-to-br from-card to-accent/30 hover:shadow-[var(--shadow-elegant)] transition-shadow">
                   <CardContent className="p-6">
-                    <div className="bg-gradient-to-r from-primary to-[hsl(188_80%_52%)] bg-clip-text text-3xl font-bold text-transparent">{s.val}</div>
+                    <div className="bg-gradient-to-r from-primary to-[hsl(var(--primary-glow))] bg-clip-text text-3xl font-bold text-transparent">{s.val}</div>
                     <div className="mt-1 text-xs text-muted-foreground">{s.label}</div>
                   </CardContent>
                 </Card>
