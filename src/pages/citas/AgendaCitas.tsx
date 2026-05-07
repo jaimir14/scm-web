@@ -22,7 +22,7 @@ import {
 import { useActiveProfessionals } from "@/services/professionals.service";
 import { useActiveClinics } from "@/services/clinics.service";
 import { useActiveAppointmentTypes } from "@/services/appointment-types.service";
-import { useSearchPatients } from "@/services/patients.service";
+import { useSearchPatients, useCreatePatient } from "@/services/patients.service";
 import { useDebounce } from "@/hooks/use-debounce";
 import type { Appointment } from "@/types";
 
@@ -137,7 +137,7 @@ export default function AgendaCitas() {
               <Plus className="h-4 w-4 mr-1" /> {isMobile ? "Nueva" : "Nueva Cita"}
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-[95vw] md:max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-[95vw] md:max-w-lg max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Crear Cita</DialogTitle>
             </DialogHeader>
@@ -145,7 +145,7 @@ export default function AgendaCitas() {
           </DialogContent>
         </Dialog>
         <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
-          <DialogContent className="max-w-[95vw] md:max-w-md max-h-[90vh] overflow-y-auto">
+          <DialogContent className="max-w-[95vw] md:max-w-lg max-h-[90vh] overflow-y-auto">
             <DialogHeader>
               <DialogTitle>Editar Cita</DialogTitle>
             </DialogHeader>
@@ -328,9 +328,8 @@ export default function AgendaCitas() {
                                 return (
                                   <div
                                     key={appt.id}
-                                    className={`border rounded p-1 flex-1 cursor-pointer transition-colors ${
-                                      !bg ? (isSelected ? "bg-primary/20 border-primary" : "bg-primary/10 border-primary/20") : ""
-                                    }`}
+                                    className={`border rounded p-1 flex-1 cursor-pointer transition-colors ${!bg ? (isSelected ? "bg-primary/20 border-primary" : "bg-primary/10 border-primary/20") : ""
+                                      }`}
                                     style={bg ? {
                                       backgroundColor: bg,
                                       borderColor: isSelected ? textColor === "white" ? "rgba(255,255,255,0.8)" : "rgba(0,0,0,0.5)" : "transparent",
@@ -393,15 +392,87 @@ function CrearCitaForm({ onClose }: { onClose: () => void }) {
   const [horaInicio, setHoraInicio] = useState("08:00");
   const [horaFin, setHoraFin] = useState("08:30");
   const [notas, setNotas] = useState("");
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [showExpressForm, setShowExpressForm] = useState(false);
+  const [expressNombre, setExpressNombre] = useState("");
+  const [expressTelefono, setExpressTelefono] = useState("");
+  const [expressSexo, setExpressSexo] = useState<"MASCULINO" | "FEMENINO" | "">("");
 
   const { data: professionals } = useActiveProfessionals();
   const { data: clinics } = useActiveClinics();
   const { data: appointmentTypes } = useActiveAppointmentTypes();
 
   const createAppointment = useCreateAppointment();
+  const createPatient = useCreatePatient();
+
+  const handleExpressCreate = () => {
+    if (!clinicaId) {
+      toast.error("Seleccione una clínica antes de crear el paciente");
+      return;
+    }
+    if (!profesionalId) {
+      toast.error("Seleccione un médico antes de crear el paciente");
+      return;
+    }
+    if (!expressTelefono.trim()) {
+      toast.error("El teléfono es requerido");
+      return;
+    }
+    if (!expressSexo) {
+      toast.error("El sexo es requerido");
+      return;
+    }
+    const parts = expressNombre.trim().split(/\s+/);
+    const nombre = parts[0];
+    const apellido1 = parts.length > 1 ? parts.slice(1).join(" ") : "Por definir";
+    createPatient.mutate(
+      {
+        clinicaId: Number(clinicaId),
+        profesionalId: Number(profesionalId),
+        tipoIdentificacion: "CEDULA",
+        numeroIdentificacion: `TEMP-${Date.now()}`,
+        nombre,
+        apellido1,
+        telefonoCelular: expressTelefono.trim(),
+        sexo: expressSexo,
+        estadoCivil: "SOLTERO",
+        direccion: "Por definir",
+        fechaNacimiento: "2000-01-01",
+      },
+      {
+        onSuccess: (newPatient) => {
+          setSelectedPatientId(newPatient.id);
+          setSelectedPatientName(`${newPatient.nombre} ${newPatient.apellido1}`);
+          setShowExpressForm(false);
+          setExpressNombre("");
+          setExpressTelefono("");
+          setExpressSexo("");
+          setSearchQuery("");
+          clearError("paciente");
+          toast.success("Expediente básico creado exitosamente. Puede completar los datos más tarde.");
+        },
+        onError: (err) => {
+          toast.error(err instanceof Error ? err.message : "Error al crear paciente");
+        },
+      }
+    );
+  };
+
+  const clearError = (field: string) => {
+    if (errors[field]) setErrors(prev => { const n = { ...prev }; delete n[field]; return n; });
+  };
 
   const handleCreate = () => {
-    if (!selectedPatientId || !profesionalId || !clinicaId || !tipoCitaId) {
+    const newErrors: Record<string, string> = {};
+    if (!selectedPatientId) newErrors.paciente = "Paciente es requerido";
+    if (!profesionalId) newErrors.profesionalId = "Médico es requerido";
+    if (!clinicaId) newErrors.clinicaId = "Clínica es requerida";
+    if (!tipoCitaId) newErrors.tipoCitaId = "Tipo de cita es requerido";
+    if (!fecha) newErrors.fecha = "Fecha es requerida";
+    if (!horaInicio) newErrors.horaInicio = "Hora inicio es requerida";
+    if (!horaFin) newErrors.horaFin = "Hora fin es requerida";
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       toast.error("Por favor complete los campos requeridos");
       return;
     }
@@ -443,12 +514,15 @@ function CrearCitaForm({ onClose }: { onClose: () => void }) {
           placeholder="Buscar paciente..."
           className="flex-1"
           value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
+          onChange={e => {
+            setSearchQuery(e.target.value);
+            if (showExpressForm) { setShowExpressForm(false); setExpressSexo(""); }
+          }}
         />
         {searching && <Loader2 className="h-4 w-4 animate-spin" />}
       </div>
 
-      <div className="border rounded-md p-3 bg-accent/20 min-h-[80px] max-h-[120px] overflow-y-auto">
+      <div className={`border rounded-md p-3 bg-accent/20 min-h-[80px] ${showExpressForm ? "max-h-[280px]" : "max-h-[120px]"} overflow-y-auto ${errors.paciente ? "border-destructive" : ""}`}>
         {selectedPatientName ? (
           <div className="flex items-center justify-between">
             <p className="text-sm font-medium">{selectedPatientName}</p>
@@ -466,23 +540,91 @@ function CrearCitaForm({ onClose }: { onClose: () => void }) {
                   setSelectedPatientId(p.id);
                   setSelectedPatientName(`${p.nombre} ${p.apellido1} ${p.apellido2 || ""}`);
                   setSearchQuery("");
+                  clearError("paciente");
                 }}
               >
                 {p.nombre} {p.apellido1} {p.apellido2 || ""} - {p.numeroIdentificacion}
               </div>
             ))}
           </div>
+        ) : debouncedSearch && !searching && searchResults !== undefined && searchResults.length === 0 ? (
+          <div className="space-y-2">
+            <p className="text-xs text-muted-foreground">No se encontraron resultados para "{searchQuery}"</p>
+            {!showExpressForm ? (
+              <button
+                type="button"
+                className="w-full text-xs border border-dashed border-primary/50 rounded-md p-2 text-primary hover:bg-primary/5 transition-colors flex items-center justify-center gap-1"
+                onClick={() => {
+                  setShowExpressForm(true);
+                  setExpressNombre(searchQuery);
+                }}
+              >
+                <Plus className="h-3 w-3" />
+                Crear paciente rápido con el nombre "{searchQuery}"
+              </button>
+            ) : (
+              <div className="space-y-2 pt-2 border-t">
+                <AgendaField label="Nombre Completo">
+                  <Input
+                    placeholder="Nombre completo del paciente"
+                    value={expressNombre}
+                    onChange={e => setExpressNombre(e.target.value)}
+                  />
+                </AgendaField>
+                <div className="grid grid-cols-2 gap-2">
+                  <AgendaField label="Teléfono Celular">
+                    <Input
+                      placeholder="Teléfono"
+                      value={expressTelefono}
+                      onChange={e => setExpressTelefono(e.target.value)}
+                    />
+                  </AgendaField>
+                  <AgendaField label="Sexo">
+                    <Select value={expressSexo} onValueChange={v => setExpressSexo(v as "MASCULINO" | "FEMENINO")}>
+                      <SelectTrigger><SelectValue placeholder="Seleccione..." /></SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="MASCULINO">Masculino</SelectItem>
+                        <SelectItem value="FEMENINO">Femenino</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </AgendaField>
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    type="button"
+                    size="sm"
+                    className="flex-1"
+                    onClick={handleExpressCreate}
+                    disabled={!expressNombre.trim() || !expressTelefono.trim() || !expressSexo || createPatient.isPending}
+                  >
+                    {createPatient.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
+                    Guardar Paciente y Continuar
+                  </Button>
+                  <Button
+                    type="button"
+                    size="sm"
+                    variant="ghost"
+                    onClick={() => { setShowExpressForm(false); setExpressSexo(""); }}
+                    disabled={createPatient.isPending}
+                  >
+                    Cancelar
+                  </Button>
+                </div>
+              </div>
+            )}
+          </div>
         ) : (
           <p className="text-xs text-muted-foreground">
-            {searchQuery ? "No se encontraron resultados" : "Busque un paciente para crear la cita"}
+            {searching ? "Buscando..." : "Busque un paciente para crear la cita"}
           </p>
         )}
       </div>
+      {errors.paciente && <p className="text-xs text-destructive">{errors.paciente}</p>}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <AgendaField label="Medico">
-          <Select value={profesionalId} onValueChange={setProfesionalId}>
-            <SelectTrigger><SelectValue placeholder="Seleccione..." /></SelectTrigger>
+        <AgendaField label="Medico" required error={errors.profesionalId}>
+          <Select value={profesionalId} onValueChange={v => { setProfesionalId(v); clearError("profesionalId"); }}>
+            <SelectTrigger className={errors.profesionalId ? "border-destructive" : ""}><SelectValue placeholder="Seleccione..." /></SelectTrigger>
             <SelectContent>
               {professionals?.map(p => (
                 <SelectItem key={p.id} value={String(p.id)}>{p.nombre}</SelectItem>
@@ -490,9 +632,9 @@ function CrearCitaForm({ onClose }: { onClose: () => void }) {
             </SelectContent>
           </Select>
         </AgendaField>
-        <AgendaField label="Clinica">
-          <Select value={clinicaId} onValueChange={setClinicaId}>
-            <SelectTrigger><SelectValue placeholder="Seleccione..." /></SelectTrigger>
+        <AgendaField label="Clinica" required error={errors.clinicaId}>
+          <Select value={clinicaId} onValueChange={v => { setClinicaId(v); clearError("clinicaId"); }}>
+            <SelectTrigger className={errors.clinicaId ? "border-destructive" : ""}><SelectValue placeholder="Seleccione..." /></SelectTrigger>
             <SelectContent>
               {clinics?.map(c => (
                 <SelectItem key={c.id} value={String(c.id)}>{c.nombre}</SelectItem>
@@ -500,9 +642,9 @@ function CrearCitaForm({ onClose }: { onClose: () => void }) {
             </SelectContent>
           </Select>
         </AgendaField>
-        <AgendaField label="Tipo de Cita">
-          <Select value={tipoCitaId} onValueChange={setTipoCitaId}>
-            <SelectTrigger><SelectValue placeholder="Seleccione..." /></SelectTrigger>
+        <AgendaField label="Tipo de Cita" required error={errors.tipoCitaId}>
+          <Select value={tipoCitaId} onValueChange={v => { setTipoCitaId(v); clearError("tipoCitaId"); }}>
+            <SelectTrigger className={errors.tipoCitaId ? "border-destructive" : ""}><SelectValue placeholder="Seleccione..." /></SelectTrigger>
             <SelectContent>
               {appointmentTypes?.map(t => (
                 <SelectItem key={t.id} value={String(t.id)}>{t.nombre}</SelectItem>
@@ -513,14 +655,14 @@ function CrearCitaForm({ onClose }: { onClose: () => void }) {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <AgendaField label="Fecha">
-          <Input type="date" value={fecha} onChange={e => setFecha(e.target.value)} />
+        <AgendaField label="Fecha" required error={errors.fecha}>
+          <Input type="date" value={fecha} onChange={e => { setFecha(e.target.value); clearError("fecha"); }} className={errors.fecha ? "border-destructive" : ""} />
         </AgendaField>
-        <AgendaField label="Hora Inicio">
-          <Input type="time" value={horaInicio} onChange={e => setHoraInicio(e.target.value)} />
+        <AgendaField label="Hora Inicio" required error={errors.horaInicio}>
+          <Input type="time" value={horaInicio} onChange={e => { setHoraInicio(e.target.value); clearError("horaInicio"); }} className={errors.horaInicio ? "border-destructive" : ""} />
         </AgendaField>
-        <AgendaField label="Hora Fin">
-          <Input type="time" value={horaFin} onChange={e => setHoraFin(e.target.value)} />
+        <AgendaField label="Hora Fin" required error={errors.horaFin}>
+          <Input type="time" value={horaFin} onChange={e => { setHoraFin(e.target.value); clearError("horaFin"); }} className={errors.horaFin ? "border-destructive" : ""} />
         </AgendaField>
       </div>
 
@@ -547,6 +689,7 @@ function EditarCitaForm({ appointment, onClose }: { appointment: Appointment; on
   const [horaInicio, setHoraInicio] = useState(appointment.horaInicio);
   const [horaFin, setHoraFin] = useState(appointment.horaFin);
   const [notas, setNotas] = useState(appointment.notas || "");
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const { data: professionals } = useActiveProfessionals();
   const { data: clinics } = useActiveClinics();
@@ -554,8 +697,20 @@ function EditarCitaForm({ appointment, onClose }: { appointment: Appointment; on
 
   const updateAppointment = useUpdateAppointment();
 
+  const clearError = (field: string) => {
+    if (errors[field]) setErrors(prev => { const n = { ...prev }; delete n[field]; return n; });
+  };
+
   const handleUpdate = () => {
-    if (!profesionalId || !clinicaId || !tipoCitaId) {
+    const newErrors: Record<string, string> = {};
+    if (!profesionalId) newErrors.profesionalId = "Médico es requerido";
+    if (!clinicaId) newErrors.clinicaId = "Clínica es requerida";
+    if (!tipoCitaId) newErrors.tipoCitaId = "Tipo de cita es requerido";
+    if (!fecha) newErrors.fecha = "Fecha es requerida";
+    if (!horaInicio) newErrors.horaInicio = "Hora inicio es requerida";
+    if (!horaFin) newErrors.horaFin = "Hora fin es requerida";
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
       toast.error("Por favor complete los campos requeridos");
       return;
     }
@@ -594,9 +749,9 @@ function EditarCitaForm({ appointment, onClose }: { appointment: Appointment; on
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <AgendaField label="Medico">
-          <Select value={profesionalId} onValueChange={setProfesionalId}>
-            <SelectTrigger><SelectValue placeholder="Seleccione..." /></SelectTrigger>
+        <AgendaField label="Medico" required error={errors.profesionalId}>
+          <Select value={profesionalId} onValueChange={v => { setProfesionalId(v); clearError("profesionalId"); }}>
+            <SelectTrigger className={errors.profesionalId ? "border-destructive" : ""}><SelectValue placeholder="Seleccione..." /></SelectTrigger>
             <SelectContent>
               {professionals?.map(p => (
                 <SelectItem key={p.id} value={String(p.id)}>{p.nombre}</SelectItem>
@@ -604,9 +759,9 @@ function EditarCitaForm({ appointment, onClose }: { appointment: Appointment; on
             </SelectContent>
           </Select>
         </AgendaField>
-        <AgendaField label="Clinica">
-          <Select value={clinicaId} onValueChange={setClinicaId}>
-            <SelectTrigger><SelectValue placeholder="Seleccione..." /></SelectTrigger>
+        <AgendaField label="Clinica" required error={errors.clinicaId}>
+          <Select value={clinicaId} onValueChange={v => { setClinicaId(v); clearError("clinicaId"); }}>
+            <SelectTrigger className={errors.clinicaId ? "border-destructive" : ""}><SelectValue placeholder="Seleccione..." /></SelectTrigger>
             <SelectContent>
               {clinics?.map(c => (
                 <SelectItem key={c.id} value={String(c.id)}>{c.nombre}</SelectItem>
@@ -614,9 +769,9 @@ function EditarCitaForm({ appointment, onClose }: { appointment: Appointment; on
             </SelectContent>
           </Select>
         </AgendaField>
-        <AgendaField label="Tipo de Cita">
-          <Select value={tipoCitaId} onValueChange={setTipoCitaId}>
-            <SelectTrigger><SelectValue placeholder="Seleccione..." /></SelectTrigger>
+        <AgendaField label="Tipo de Cita" required error={errors.tipoCitaId}>
+          <Select value={tipoCitaId} onValueChange={v => { setTipoCitaId(v); clearError("tipoCitaId"); }}>
+            <SelectTrigger className={errors.tipoCitaId ? "border-destructive" : ""}><SelectValue placeholder="Seleccione..." /></SelectTrigger>
             <SelectContent>
               {appointmentTypes?.map(t => (
                 <SelectItem key={t.id} value={String(t.id)}>{t.nombre}</SelectItem>
@@ -627,14 +782,14 @@ function EditarCitaForm({ appointment, onClose }: { appointment: Appointment; on
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <AgendaField label="Fecha">
-          <Input type="date" value={fecha} onChange={e => setFecha(e.target.value)} />
+        <AgendaField label="Fecha" required error={errors.fecha}>
+          <Input type="date" value={fecha} onChange={e => { setFecha(e.target.value); clearError("fecha"); }} className={errors.fecha ? "border-destructive" : ""} />
         </AgendaField>
-        <AgendaField label="Hora Inicio">
-          <Input type="time" value={horaInicio} onChange={e => setHoraInicio(e.target.value)} />
+        <AgendaField label="Hora Inicio" required error={errors.horaInicio}>
+          <Input type="time" value={horaInicio} onChange={e => { setHoraInicio(e.target.value); clearError("horaInicio"); }} className={errors.horaInicio ? "border-destructive" : ""} />
         </AgendaField>
-        <AgendaField label="Hora Fin">
-          <Input type="time" value={horaFin} onChange={e => setHoraFin(e.target.value)} />
+        <AgendaField label="Hora Fin" required error={errors.horaFin}>
+          <Input type="time" value={horaFin} onChange={e => { setHoraFin(e.target.value); clearError("horaFin"); }} className={errors.horaFin ? "border-destructive" : ""} />
         </AgendaField>
       </div>
 
@@ -653,11 +808,14 @@ function EditarCitaForm({ appointment, onClose }: { appointment: Appointment; on
   );
 }
 
-function AgendaField({ label, children }: { label: string; children: React.ReactNode }) {
+function AgendaField({ label, children, required, error }: { label: string; children: React.ReactNode; required?: boolean; error?: string }) {
   return (
     <div className="space-y-1">
-      <label className="text-xs font-medium text-muted-foreground">{label}</label>
+      <label className="text-xs font-medium text-muted-foreground">
+        {label}{required && <span className="text-destructive ml-0.5">*</span>}
+      </label>
       {children}
+      {error && <p className="text-xs text-destructive">{error}</p>}
     </div>
   );
 }

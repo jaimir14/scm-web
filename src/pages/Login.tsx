@@ -16,11 +16,16 @@ export default function Login() {
   const [user, setUser] = useState("");
   const [pass, setPass] = useState("");
   const [showPass, setShowPass] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (!user || !pass) {
+      const newErrors: Record<string, string> = {};
+      if (!user) newErrors.user = "Usuario es requerido";
+      if (!pass) newErrors.pass = "Contraseña es requerida";
+      setErrors(newErrors);
       toast.error("Por favor ingrese usuario y contrasena");
       return;
     }
@@ -69,10 +74,12 @@ export default function Login() {
               <Input
                 id="user"
                 value={user}
-                onChange={e => setUser(e.target.value)}
+                onChange={e => { setUser(e.target.value); if (errors.user) setErrors(prev => { const n = { ...prev }; delete n.user; return n; }); }}
                 placeholder="Ingrese su usuario"
                 disabled={loginMutation.isPending}
+                className={errors.user ? "border-destructive" : ""}
               />
+              {errors.user && <p className="text-xs text-destructive">{errors.user}</p>}
             </div>
             <div className="space-y-2">
               <Label htmlFor="pass">Contraseña</Label>
@@ -81,10 +88,10 @@ export default function Login() {
                   id="pass"
                   type={showPass ? "text" : "password"}
                   value={pass}
-                  onChange={e => setPass(e.target.value)}
+                  onChange={e => { setPass(e.target.value); if (errors.pass) setErrors(prev => { const n = { ...prev }; delete n.pass; return n; }); }}
                   placeholder="Ingrese su contraseña"
                   disabled={loginMutation.isPending}
-                  className="pr-10"
+                  className={`pr-10 ${errors.pass ? "border-destructive" : ""}`}
                 />
                 <button
                   type="button"
@@ -95,6 +102,7 @@ export default function Login() {
                   {showPass ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
               </div>
+              {errors.pass && <p className="text-xs text-destructive">{errors.pass}</p>}
             </div>
             <div className="flex gap-3 pt-2">
               <Button type="submit" className="flex-1" disabled={loginMutation.isPending}>

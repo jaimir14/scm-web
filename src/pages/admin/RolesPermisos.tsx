@@ -38,6 +38,7 @@ export default function RolesPermisos() {
   const [roleName, setRoleName] = useState("");
   const [roleDesc, setRoleDesc] = useState("");
   const [roleActive, setRoleActive] = useState(true);
+  const [roleErrors, setRoleErrors] = useState<Record<string, string>>({});
 
   const roles = (rolesQuery.data ?? []) as Role[];
   const selectedRole = roles.find(r => r.id === selectedRoleId) ?? null;
@@ -54,6 +55,7 @@ export default function RolesPermisos() {
     setRoleName("");
     setRoleDesc("");
     setRoleActive(true);
+    setRoleErrors({});
     setRoleDialogOpen(true);
   };
 
@@ -62,11 +64,13 @@ export default function RolesPermisos() {
     setRoleName(role.nombre);
     setRoleDesc(role.descripcion ?? "");
     setRoleActive(role.activo);
+    setRoleErrors({});
     setRoleDialogOpen(true);
   };
 
   const handleSaveRole = () => {
     if (!roleName.trim()) {
+      setRoleErrors({ nombre: "El nombre del rol es requerido" });
       toast.error("El nombre del rol es requerido");
       return;
     }
@@ -142,9 +146,11 @@ export default function RolesPermisos() {
                       <Label>Nombre</Label>
                       <Input
                         value={roleName}
-                        onChange={e => setRoleName(e.target.value)}
+                        onChange={e => { setRoleName(e.target.value); if (roleErrors.nombre) setRoleErrors({}); }}
                         placeholder="Ej: Recepcionista"
+                        className={roleErrors.nombre ? "border-destructive" : ""}
                       />
+                      {roleErrors.nombre && <p className="text-xs text-destructive">{roleErrors.nombre}</p>}
                     </div>
                     <div className="space-y-1">
                       <Label>Descripción</Label>

@@ -6,7 +6,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Plus, Pencil, Trash2, Search, Loader2, Eye, EyeOff } from "lucide-react";
+import { Plus, Pencil, Trash2, Search, Loader2, Eye, EyeOff, KeyRound } from "lucide-react";
 import { Switch } from "@/components/ui/switch";
 import { UserPhotoUpload } from "@/components/UserPhotoUpload";
 import { useIsMobile } from "@/hooks/use-mobile";
@@ -25,6 +25,7 @@ type FormFieldDef = {
   key: string;
   label: string;
   type?: string;
+  optional?: boolean;
   options?: { value: string; label: string }[];
 };
 
@@ -62,6 +63,12 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
   const [formData, setFormData] = useState<Record<string, any>>({});
   const [active, setActive] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [changePasswordOpen, setChangePasswordOpen] = useState(false);
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [passwordErrors, setPasswordErrors] = useState<Record<string, string>>({});
   useEffect(() => {
     setSearch("");
     setEditingItem(null);
@@ -130,6 +137,8 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
           ]},
           { key: "rolId", label: "Rol", type: "select", options: roleOptions },
           { key: "clinicaId", label: "Clínica", type: "select", options: clinicOptions },
+          { key: "email", label: "Correo Electrónico", type: "email", optional: true },
+          { key: "telefono", label: "Teléfono", optional: true },
           { key: "password", label: "Contraseña", type: "password" },
         ],
         mapToRow: (item) => ({
@@ -239,6 +248,7 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
     setEditingItem(null);
     setFormData({});
     setActive(true);
+    setErrors({});
     setDialogOpen(true);
   };
 
@@ -267,6 +277,7 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
     }
     setActive(item.estado === true);
     setFormData(fd);
+    setErrors({});
     setDialogOpen(true);
   };
 
@@ -280,7 +291,65 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
     return role.features.some(rf => rf.feature?.clave?.startsWith("doctor."));
   }, [tipo, formData.rol, activeRolesQuery.data]);
 
+  const openChangePassword = () => {
+    setNewPassword("");
+    setConfirmPassword("");
+    setShowNewPassword(false);
+    setPasswordErrors({});
+    setChangePasswordOpen(true);
+  };
+
+  const handleChangePassword = () => {
+    const errs: Record<string, string> = {};
+    if (!newPassword.trim()) errs.newPassword = "La contraseña es requerida";
+    else if (newPassword.length < 6) errs.newPassword = "Mínimo 6 caracteres";
+    if (!confirmPassword.trim()) errs.confirmPassword = "Confirme la contraseña";
+    else if (newPassword !== confirmPassword) errs.confirmPassword = "Las contraseñas no coinciden";
+    if (Object.keys(errs).length > 0) {
+      setPasswordErrors(errs);
+      return;
+    }
+    uMutation?.mutate(
+      { id: editingItem.id, data: { password: newPassword } },
+      {
+        onSuccess: () => {
+          toast.success("Contraseña actualizada");
+          setChangePasswordOpen(false);
+        },
+        onError: (err: Error) => toast.error(err.message || "Error al cambiar contraseña"),
+      }
+    );
+  };
+
   const handleSave = () => {
+    // Validate required fields for new records
+    const newErrors: Record<string, string> = {};
+    if (!editingItem) {
+      config.formFields.forEach(f => {
+        if (f.optional) return;
+        if (!formData[f.key] || !String(formData[f.key]).trim()) {
+          newErrors[f.key] = `${f.label} es requerido`;
+        }
+      });
+    }
+    // For users, always require usuario and nombre
+    if (tipo === "usuarios") {
+      if (!formData.usuario?.trim()) newErrors.usuario = "Usuario es requerido";
+      if (!formData.nombre?.trim()) newErrors.nombre = "Nombre es requerido";
+      if (!editingItem && !formData.password?.trim()) newErrors.password = "Contraseña es requerida";
+      // Format validation for optional fields
+      if (formData.email?.trim() && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email.trim())) {
+        newErrors.email = "Correo electrónico inválido";
+      }
+      if (formData.telefono?.trim() && !/^[2678]\d{3}-?\d{4}$/.test(formData.telefono.trim())) {
+        newErrors.telefono = "Teléfono costarricense inválido (ej: 8888-8888)";
+      }
+    }
+    if (Object.keys(newErrors).length > 0) {
+      setErrors(newErrors);
+      toast.error("Por favor complete los campos requeridos");
+      return;
+    }
     const activeKey = "estado";
     const payload: Record<string, any> = { ...formData, [activeKey]: active };
     config.formFields.forEach(f => {
@@ -371,15 +440,20 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
                   <UserPhotoUpload userId={editingItem.id} hasPhoto={!!editingItem.fotografia} />
                 </div>
               )}
-              {config.formFields.map(f => (
+              {config.formFields.map(f => {
+                // Password is handled via the dedicated change-password dialog when editing
+                if (f.type === "password" && editingItem) return null;
+                return (
                 <div key={f.key} className="space-y-1">
-                  <Label className="text-sm">{f.label}</Label>
+                  <Label className="text-sm">
+                    {f.label}{!editingItem && !f.optional && <span className="text-destructive ml-0.5">*</span>}
+                  </Label>
                   {f.type === "select" ? (
                     <Select
                       value={formData[f.key] || ""}
-                      onValueChange={v => setFormData(prev => ({ ...prev, [f.key]: v }))}
+                      onValueChange={v => { setFormData(prev => ({ ...prev, [f.key]: v })); if (errors[f.key]) setErrors(prev => { const n = { ...prev }; delete n[f.key]; return n; }); }}
                     >
-                      <SelectTrigger><SelectValue placeholder="Seleccione..." /></SelectTrigger>
+                      <SelectTrigger className={errors[f.key] ? "border-destructive" : ""}><SelectValue placeholder="Seleccione..." /></SelectTrigger>
                       <SelectContent>
                         {f.options?.map(o => (
                           <SelectItem key={o.value} value={o.value}>{o.label}</SelectItem>
@@ -390,9 +464,10 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
                     <div className="relative">
                       <Input
                         type={showPassword ? "text" : "password"}
+                        autoComplete="new-password"
                         value={formData[f.key] || ""}
-                        onChange={e => setFormData(prev => ({ ...prev, [f.key]: e.target.value }))}
-                        className="pr-10"
+                        onChange={e => { setFormData(prev => ({ ...prev, [f.key]: e.target.value })); if (errors[f.key]) setErrors(prev => { const n = { ...prev }; delete n[f.key]; return n; }); }}
+                        className={`pr-10 ${errors[f.key] ? "border-destructive" : ""}`}
                       />
                       <button
                         type="button"
@@ -407,11 +482,14 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
                     <Input
                       type={f.type || "text"}
                       value={formData[f.key] || ""}
-                      onChange={e => setFormData(prev => ({ ...prev, [f.key]: e.target.value }))}
+                      onChange={e => { setFormData(prev => ({ ...prev, [f.key]: e.target.value })); if (errors[f.key]) setErrors(prev => { const n = { ...prev }; delete n[f.key]; return n; }); }}
+                      className={errors[f.key] ? "border-destructive" : ""}
                     />
                   )}
+                  {errors[f.key] && <p className="text-xs text-destructive">{errors[f.key]}</p>}
                 </div>
-              ))}
+                );
+              })}
               {/* Doctor-specific fields */}
               {tipo === "usuarios" && isDoctorRole && (
                 <div className="border rounded-lg p-3 space-y-3 bg-muted/30">
@@ -497,6 +575,11 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
                 </div>
               )}
 
+              {tipo === "usuarios" && editingItem && (
+                <Button variant="outline" size="sm" className="w-full" onClick={openChangePassword}>
+                  <KeyRound className="h-4 w-4 mr-2" /> Cambiar Contraseña
+                </Button>
+              )}
               <div className="flex items-center gap-2">
                 <Switch id="active" checked={active} onCheckedChange={setActive} />
                 <Label htmlFor="active">Activo</Label>
@@ -507,6 +590,56 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
                   Guardar
                 </Button>
                 <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Change password dialog — separate from main edit dialog */}
+        <Dialog open={changePasswordOpen} onOpenChange={v => { setChangePasswordOpen(v); if (!v) { setNewPassword(""); setConfirmPassword(""); setPasswordErrors({}); setShowNewPassword(false); } }}>
+          <DialogContent className="max-w-sm">
+            <DialogHeader>
+              <DialogTitle>Cambiar Contraseña</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <Label className="text-sm">Nueva contraseña <span className="text-destructive">*</span></Label>
+                <div className="relative">
+                  <Input
+                    type={showNewPassword ? "text" : "password"}
+                    autoComplete="new-password"
+                    value={newPassword}
+                    onChange={e => { setNewPassword(e.target.value); if (passwordErrors.newPassword) setPasswordErrors(prev => { const n = { ...prev }; delete n.newPassword; return n; }); }}
+                    className={`pr-10 ${passwordErrors.newPassword ? "border-destructive" : ""}`}
+                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    onClick={() => setShowNewPassword(v => !v)}
+                    tabIndex={-1}
+                  >
+                    {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                  </button>
+                </div>
+                {passwordErrors.newPassword && <p className="text-xs text-destructive">{passwordErrors.newPassword}</p>}
+              </div>
+              <div className="space-y-1">
+                <Label className="text-sm">Confirmar contraseña <span className="text-destructive">*</span></Label>
+                <Input
+                  type="password"
+                  autoComplete="new-password"
+                  value={confirmPassword}
+                  onChange={e => { setConfirmPassword(e.target.value); if (passwordErrors.confirmPassword) setPasswordErrors(prev => { const n = { ...prev }; delete n.confirmPassword; return n; }); }}
+                  className={passwordErrors.confirmPassword ? "border-destructive" : ""}
+                />
+                {passwordErrors.confirmPassword && <p className="text-xs text-destructive">{passwordErrors.confirmPassword}</p>}
+              </div>
+              <div className="flex gap-3 justify-end">
+                <Button onClick={handleChangePassword} disabled={!!uMutation?.isPending}>
+                  {uMutation?.isPending && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}
+                  Guardar
+                </Button>
+                <Button variant="outline" onClick={() => setChangePasswordOpen(false)}>Cancelar</Button>
               </div>
             </div>
           </DialogContent>

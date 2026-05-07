@@ -34,19 +34,19 @@ export interface Patient {
 export interface CreatePatientInput {
   clinicaId: number;
   profesionalId: number;
-  tipoIdentificacion: string;
+  tipoIdentificacion: "CEDULA" | "PASAPORTE" | "RESIDENCIA";
   numeroIdentificacion: string;
   nombre: string;
   apellido1: string;
   apellido2?: string;
-  sexo?: string;
-  estadoCivil?: string;
-  fechaNacimiento?: string;
+  sexo: "MASCULINO" | "FEMENINO";
+  estadoCivil: "SOLTERO" | "CASADO" | "DIVORCIADO" | "VIUDO";
+  fechaNacimiento: string;
+  direccion: string;
   tipoSangre?: string;
-  direccion?: string;
   email?: string;
   telefonoCasa?: string;
-  telefonoCelular?: string;
+  telefonoCelular: string;
   telefonoTrabajo?: string;
   otroTelefono?: string;
   ocupacion?: string;

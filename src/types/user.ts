@@ -11,6 +11,8 @@ export interface User {
   especialidad?: string | null;
   clinicaId: number;
   fotografia?: string | null;
+  email?: string | null;
+  telefono?: string | null;
   // Doctor-specific
   codigoProfesional?: string | null;
   duracionCitas?: number | null;
@@ -35,6 +37,8 @@ export interface CreateUserInput {
   sexo: string;
   password: string;
   clinicaId: number;
+  email?: string;
+  telefono?: string;
   especialidad?: string;
   codigoProfesional?: string;
   duracionCitas?: number;
@@ -54,6 +58,8 @@ export interface UpdateUserInput {
   sexo?: string;
   password?: string;
   clinicaId?: number;
+  email?: string | null;
+  telefono?: string | null;
   especialidad?: string;
   codigoProfesional?: string | null;
   duracionCitas?: number | null;
