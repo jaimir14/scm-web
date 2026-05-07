@@ -148,23 +148,53 @@ export default function Index() {
 
       {/* Hero */}
       <section className="relative overflow-hidden py-20 md:py-32">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-accent/10" />
+        {/* Layered background */}
+        <div className="absolute inset-0 -z-10" style={{ background: "var(--gradient-hero)" }} />
+        <div
+          className="absolute inset-0 -z-10 opacity-[0.35] dark:opacity-[0.18]"
+          style={{
+            backgroundImage:
+              "linear-gradient(hsl(var(--primary)/0.08) 1px, transparent 1px), linear-gradient(90deg, hsl(var(--primary)/0.08) 1px, transparent 1px)",
+            backgroundSize: "44px 44px",
+            maskImage: "radial-gradient(ellipse at center, black 40%, transparent 75%)",
+            WebkitMaskImage: "radial-gradient(ellipse at center, black 40%, transparent 75%)",
+          }}
+        />
+        {/* Floating blurred shapes */}
+        <motion.div
+          aria-hidden
+          className="absolute -top-20 -left-20 -z-10 h-[420px] w-[420px] rounded-full blur-3xl"
+          style={{ background: "radial-gradient(circle, hsl(var(--primary)/0.25), transparent 70%)" }}
+          animate={{ x: [0, 30, 0], y: [0, 20, 0] }}
+          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          aria-hidden
+          className="absolute -bottom-32 -right-20 -z-10 h-[460px] w-[460px] rounded-full blur-3xl"
+          style={{ background: "radial-gradient(circle, hsl(188 80% 60% / 0.25), transparent 70%)" }}
+          animate={{ x: [0, -25, 0], y: [0, -15, 0] }}
+          transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
+        />
+
         <div className="relative mx-auto max-w-6xl px-4">
           <div className="mx-auto max-w-3xl text-center">
             <motion.div initial="hidden" animate="visible" variants={fadeUp} custom={0}>
-              <Badge variant="secondary" className="mb-6 px-4 py-1.5 text-sm">
-                🇨🇷 Diseñado para clínicas en Costa Rica
+              <Badge variant="secondary" className="mb-6 px-4 py-1.5 text-sm border border-primary/20 bg-primary/5 text-primary backdrop-blur-sm">
+                <ShieldCheck className="mr-1.5 h-3.5 w-3.5" />
+                Plataforma segura · Diseñada para Costa Rica
               </Badge>
             </motion.div>
             <motion.h1
-              className="mb-6 text-4xl font-bold leading-tight tracking-tight md:text-6xl"
+              className="mb-6 text-4xl font-bold leading-[1.05] tracking-tight md:text-6xl lg:text-7xl"
               initial="hidden" animate="visible" variants={fadeUp} custom={1}
             >
               Gestione su clínica{" "}
-              <span className="text-primary">de forma inteligente</span>
+              <span className="bg-gradient-to-r from-primary to-[hsl(188_80%_52%)] bg-clip-text text-transparent">
+                de forma inteligente
+              </span>
             </motion.h1>
             <motion.p
-              className="mb-8 text-lg text-muted-foreground md:text-xl"
+              className="mb-10 text-lg text-muted-foreground md:text-xl"
               initial="hidden" animate="visible" variants={fadeUp} custom={2}
             >
               Expedientes digitales, agenda de citas, portal médico y reportes.
@@ -174,14 +204,25 @@ export default function Index() {
               className="flex flex-col items-center justify-center gap-3 sm:flex-row"
               initial="hidden" animate="visible" variants={fadeUp} custom={3}
             >
-              <Button size="lg" className="gap-2 text-base" asChild>
+              <Button size="lg" className="gap-2 text-base shadow-[var(--shadow-elegant)] hover:shadow-[var(--shadow-glow)] transition-shadow" asChild>
                 <a href="#contacto">
                   Solicitar Demo Gratuita <ArrowRight className="h-4 w-4" />
                 </a>
               </Button>
-              <Button size="lg" variant="outline" className="text-base" asChild>
+              <Button size="lg" variant="outline" className="text-base backdrop-blur-sm bg-background/60" asChild>
                 <a href="#funcionalidades">Conocer Funcionalidades</a>
               </Button>
+            </motion.div>
+
+            {/* Trust strip */}
+            <motion.div
+              className="mt-14 flex flex-wrap items-center justify-center gap-x-8 gap-y-3 text-xs font-medium text-muted-foreground"
+              initial="hidden" animate="visible" variants={fadeUp} custom={4}
+            >
+              <span className="flex items-center gap-1.5"><ShieldCheck className="h-4 w-4 text-primary" /> Datos cifrados</span>
+              <span className="flex items-center gap-1.5"><CheckCircle2 className="h-4 w-4 text-primary" /> 99.9% disponibilidad</span>
+              <span className="flex items-center gap-1.5"><Smartphone className="h-4 w-4 text-primary" /> Acceso multi-dispositivo</span>
+              <span className="flex items-center gap-1.5"><Zap className="h-4 w-4 text-primary" /> Implementación en días</span>
             </motion.div>
           </div>
         </div>
