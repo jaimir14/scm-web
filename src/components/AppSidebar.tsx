@@ -217,7 +217,7 @@ export default function AppSidebar() {
             <div className="flex items-center gap-2 p-4 border-b border-sidebar-border">
               <Stethoscope className="h-7 w-7 text-sidebar-primary" />
               <div>
-                <h1 className="text-base font-bold text-sidebar-primary-foreground tracking-wide">SCM</h1>
+                <h1 className="text-base font-bold text-sidebar-primary tracking-wide">SCM</h1>
                 <p className="text-[10px] text-sidebar-foreground/60">Sistema Clínico Médico</p>
               </div>
             </div>
