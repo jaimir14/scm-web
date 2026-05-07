@@ -315,7 +315,8 @@ export default function Index() {
       </section>
 
       {/* Features */}
-      <section id="funcionalidades" className="border-t bg-muted/30 py-20 md:py-28">
+      <section id="funcionalidades" className="relative border-t bg-gradient-to-b from-background to-muted/40 py-20 md:py-28">
+        <div className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
         <div className="mx-auto max-w-6xl px-4">
           <div className="mx-auto mb-14 max-w-2xl text-center">
             <h2 className="mb-4 text-3xl font-bold tracking-tight md:text-4xl">
