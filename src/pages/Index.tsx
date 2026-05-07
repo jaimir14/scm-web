@@ -386,8 +386,14 @@ export default function Index() {
       </section>
 
       {/* Benefits */}
-      <section id="beneficios" className="border-t py-20 md:py-28">
+      <section id="beneficios" className="border-t py-20 md:py-28 relative overflow-hidden">
+        <div
+          aria-hidden
+          className="absolute inset-0 -z-10 opacity-[0.06] dark:opacity-[0.15]"
+          style={{ backgroundImage: `url(${benefitsBg})`, backgroundSize: "cover", backgroundPosition: "center" }}
+        />
         <div className="mx-auto max-w-6xl px-4">
+
           <div className="grid items-center gap-12 lg:grid-cols-2">
             <div>
               <h2 className="mb-4 text-3xl font-bold tracking-tight md:text-4xl">
