@@ -335,12 +335,12 @@ export default function Index() {
                 variants={fadeUp}
                 custom={i}
               >
-                <Card className="h-full transition-shadow hover:shadow-md">
+                <Card className="group h-full border-border/60 bg-card/80 backdrop-blur-sm transition-all hover:-translate-y-1 hover:shadow-[var(--shadow-elegant)] hover:border-primary/30">
                   <CardContent className="p-6">
-                    <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg bg-primary/10">
+                    <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-to-br from-primary/15 to-primary/5 ring-1 ring-primary/15 group-hover:ring-primary/30 transition">
                       <f.icon className="h-5 w-5 text-primary" />
                     </div>
-                    <h3 className="mb-2 text-lg font-semibold">{f.title}</h3>
+                    <h3 className="mb-2 text-lg font-semibold tracking-tight">{f.title}</h3>
                     <p className="text-sm leading-relaxed text-muted-foreground">{f.desc}</p>
                   </CardContent>
                 </Card>
