@@ -47,7 +47,16 @@ const hours = Array.from({ length: 15 }, (_, i) => {
 });
 
 export default function AgendaCitas() {
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialDate = (() => {
+    const d = searchParams.get("date");
+    if (d) {
+      const [y, m, day] = d.split("-").map(Number);
+      if (y && m && day) return new Date(y, m - 1, day);
+    }
+    return new Date();
+  })();
+  const [date, setDate] = useState<Date | undefined>(initialDate);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
