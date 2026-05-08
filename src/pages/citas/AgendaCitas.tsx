@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
@@ -46,7 +47,16 @@ const hours = Array.from({ length: 15 }, (_, i) => {
 });
 
 export default function AgendaCitas() {
-  const [date, setDate] = useState<Date | undefined>(new Date());
+  const [searchParams, setSearchParams] = useSearchParams();
+  const initialDate = (() => {
+    const d = searchParams.get("date");
+    if (d) {
+      const [y, m, day] = d.split("-").map(Number);
+      if (y && m && day) return new Date(y, m - 1, day);
+    }
+    return new Date();
+  })();
+  const [date, setDate] = useState<Date | undefined>(initialDate);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [selectedAppointment, setSelectedAppointment] = useState<Appointment | null>(null);
@@ -69,6 +79,33 @@ export default function AgendaCitas() {
 
   const updateStatus = useUpdateAppointmentStatus();
   const deleteAppointment = useDeleteAppointment();
+
+  // Open appointment from query param when appointments load
+  useEffect(() => {
+    const apptIdParam = searchParams.get("appointmentId");
+    if (!apptIdParam || !appointments) return;
+    const found = appointments.find(a => String(a.id) === apptIdParam);
+    if (found) {
+      setSelectedAppointment(found);
+      setEditingAppointment(found);
+      setEditDialogOpen(true);
+      const next = new URLSearchParams(searchParams);
+      next.delete("appointmentId");
+      setSearchParams(next, { replace: true });
+    }
+  }, [appointments, searchParams, setSearchParams]);
+
+  // Keep date in URL
+  useEffect(() => {
+    if (!date) return;
+    const dStr = formatDateToApi(date);
+    if (searchParams.get("date") !== dStr) {
+      const next = new URLSearchParams(searchParams);
+      next.set("date", dStr);
+      setSearchParams(next, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [date]);
 
   const handleMarkAttended = () => {
     if (!selectedAppointment) return;
