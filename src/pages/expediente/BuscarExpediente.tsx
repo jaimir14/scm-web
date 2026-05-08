@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { Search, Loader2, CalendarClock, ExternalLink } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -24,10 +24,37 @@ import type { Patient, Appointment } from "@/types";
 
 export default function BuscarExpediente() {
   const navigate = useNavigate();
-  const [searchType, setSearchType] = useState("nombre");
-  const [query, setQuery] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const [searchType, setSearchType] = useState(() => searchParams.get("type") ?? "nombre");
+  const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
   const debouncedQuery = useDebounce(query, 300);
   const [appointmentsPatient, setAppointmentsPatient] = useState<Patient | null>(null);
+
+  const handleQueryChange = (value: string) => {
+    setQuery(value);
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (value) next.set("q", value);
+        else next.delete("q");
+        return next;
+      },
+      { replace: true },
+    );
+  };
+
+  const handleTypeChange = (value: string) => {
+    setSearchType(value);
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        next.set("type", value);
+        return next;
+      },
+      { replace: true },
+    );
+  };
 
   const { data: results, isLoading } = useSearchPatients(debouncedQuery, searchType);
   const isMobile = useIsMobile();
@@ -46,7 +73,7 @@ export default function BuscarExpediente() {
           <div className="flex flex-col sm:flex-row flex-wrap items-stretch sm:items-end gap-3">
             <div className="space-y-1">
               <label className="text-xs font-medium text-muted-foreground">Buscar por</label>
-              <Select value={searchType} onValueChange={setSearchType}>
+              <Select value={searchType} onValueChange={handleTypeChange}>
                 <SelectTrigger className="w-full sm:w-44"><SelectValue /></SelectTrigger>
                 <SelectContent>
                   <SelectItem value="nombre">Nombre</SelectItem>
@@ -59,7 +86,7 @@ export default function BuscarExpediente() {
               <Input
                 placeholder="Digite un texto para buscar..."
                 value={query}
-                onChange={e => setQuery(e.target.value)}
+                onChange={e => handleQueryChange(e.target.value)}
               />
             </div>
             {isLoading && <Loader2 className="h-5 w-5 animate-spin text-primary" />}

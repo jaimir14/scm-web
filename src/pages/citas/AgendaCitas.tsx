@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Plus, Search, Loader2, ChevronDown, ChevronUp } from "lucide-react";
+import { Plus, Search, Loader2, ChevronDown, ChevronUp, Lock } from "lucide-react";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { toast } from "sonner";
 import { todayStr, formatDateToApi, formatDateDisplay } from "@/lib/formatters";
@@ -184,7 +184,9 @@ export default function AgendaCitas() {
         <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
           <DialogContent className="max-w-[95vw] md:max-w-lg max-h-[90vh] overflow-y-auto">
             <DialogHeader>
-              <DialogTitle>Editar Cita</DialogTitle>
+              <DialogTitle>
+                {editingAppointment?.estado === "ATENDIDA" ? "Detalle de Cita" : "Editar Cita"}
+              </DialogTitle>
             </DialogHeader>
             {editingAppointment && (
               <EditarCitaForm
@@ -719,6 +721,7 @@ function CrearCitaForm({ onClose }: { onClose: () => void }) {
 }
 
 function EditarCitaForm({ appointment, onClose }: { appointment: Appointment; onClose: () => void }) {
+  const isReadOnly = appointment.estado === "ATENDIDA";
   const [profesionalId, setProfesionalId] = useState(String(appointment.profesionalId));
   const [clinicaId, setClinicaId] = useState(String(appointment.profesional?.clinicaId ?? ""));
   const [tipoCitaId, setTipoCitaId] = useState(String(appointment.tipoCitaId));
@@ -779,6 +782,13 @@ function EditarCitaForm({ appointment, onClose }: { appointment: Appointment; on
 
   return (
     <div className="space-y-4">
+      {isReadOnly && (
+        <div className="flex items-center gap-2 rounded-md border border-muted bg-muted/40 px-3 py-2 text-sm text-muted-foreground">
+          <Lock className="h-4 w-4 shrink-0" />
+          Esta cita ya fue atendida y no puede ser modificada.
+        </div>
+      )}
+
       <div className="border rounded-md p-3 bg-accent/20">
         <p className="text-sm font-medium">
           {appointment.paciente?.nombre} {appointment.paciente?.apellido1} {appointment.paciente?.apellido2 || ""}
@@ -786,8 +796,8 @@ function EditarCitaForm({ appointment, onClose }: { appointment: Appointment; on
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        <AgendaField label="Medico" required error={errors.profesionalId}>
-          <Select value={profesionalId} onValueChange={v => { setProfesionalId(v); clearError("profesionalId"); }}>
+        <AgendaField label="Medico" required={!isReadOnly} error={errors.profesionalId}>
+          <Select value={profesionalId} onValueChange={v => { if (!isReadOnly) { setProfesionalId(v); clearError("profesionalId"); } }} disabled={isReadOnly}>
             <SelectTrigger className={errors.profesionalId ? "border-destructive" : ""}><SelectValue placeholder="Seleccione..." /></SelectTrigger>
             <SelectContent>
               {professionals?.map(p => (
@@ -796,8 +806,8 @@ function EditarCitaForm({ appointment, onClose }: { appointment: Appointment; on
             </SelectContent>
           </Select>
         </AgendaField>
-        <AgendaField label="Clinica" required error={errors.clinicaId}>
-          <Select value={clinicaId} onValueChange={v => { setClinicaId(v); clearError("clinicaId"); }}>
+        <AgendaField label="Clinica" required={!isReadOnly} error={errors.clinicaId}>
+          <Select value={clinicaId} onValueChange={v => { if (!isReadOnly) { setClinicaId(v); clearError("clinicaId"); } }} disabled={isReadOnly}>
             <SelectTrigger className={errors.clinicaId ? "border-destructive" : ""}><SelectValue placeholder="Seleccione..." /></SelectTrigger>
             <SelectContent>
               {clinics?.map(c => (
@@ -806,8 +816,8 @@ function EditarCitaForm({ appointment, onClose }: { appointment: Appointment; on
             </SelectContent>
           </Select>
         </AgendaField>
-        <AgendaField label="Tipo de Cita" required error={errors.tipoCitaId}>
-          <Select value={tipoCitaId} onValueChange={v => { setTipoCitaId(v); clearError("tipoCitaId"); }}>
+        <AgendaField label="Tipo de Cita" required={!isReadOnly} error={errors.tipoCitaId}>
+          <Select value={tipoCitaId} onValueChange={v => { if (!isReadOnly) { setTipoCitaId(v); clearError("tipoCitaId"); } }} disabled={isReadOnly}>
             <SelectTrigger className={errors.tipoCitaId ? "border-destructive" : ""}><SelectValue placeholder="Seleccione..." /></SelectTrigger>
             <SelectContent>
               {appointmentTypes?.map(t => (
@@ -819,27 +829,29 @@ function EditarCitaForm({ appointment, onClose }: { appointment: Appointment; on
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-        <AgendaField label="Fecha" required error={errors.fecha}>
-          <Input type="date" value={fecha} onChange={e => { setFecha(e.target.value); clearError("fecha"); }} className={errors.fecha ? "border-destructive" : ""} />
+        <AgendaField label="Fecha" required={!isReadOnly} error={errors.fecha}>
+          <Input type="date" value={fecha} onChange={e => { if (!isReadOnly) { setFecha(e.target.value); clearError("fecha"); } }} className={errors.fecha ? "border-destructive" : ""} disabled={isReadOnly} />
         </AgendaField>
-        <AgendaField label="Hora Inicio" required error={errors.horaInicio}>
-          <Input type="time" value={horaInicio} onChange={e => { setHoraInicio(e.target.value); clearError("horaInicio"); }} className={errors.horaInicio ? "border-destructive" : ""} />
+        <AgendaField label="Hora Inicio" required={!isReadOnly} error={errors.horaInicio}>
+          <Input type="time" value={horaInicio} onChange={e => { if (!isReadOnly) { setHoraInicio(e.target.value); clearError("horaInicio"); } }} className={errors.horaInicio ? "border-destructive" : ""} disabled={isReadOnly} />
         </AgendaField>
-        <AgendaField label="Hora Fin" required error={errors.horaFin}>
-          <Input type="time" value={horaFin} onChange={e => { setHoraFin(e.target.value); clearError("horaFin"); }} className={errors.horaFin ? "border-destructive" : ""} />
+        <AgendaField label="Hora Fin" required={!isReadOnly} error={errors.horaFin}>
+          <Input type="time" value={horaFin} onChange={e => { if (!isReadOnly) { setHoraFin(e.target.value); clearError("horaFin"); } }} className={errors.horaFin ? "border-destructive" : ""} disabled={isReadOnly} />
         </AgendaField>
       </div>
 
       <AgendaField label="Notas">
-        <Textarea placeholder="Notas de la cita..." value={notas} onChange={e => setNotas(e.target.value)} />
+        <Textarea placeholder="Notas de la cita..." value={notas} onChange={e => { if (!isReadOnly) setNotas(e.target.value); }} disabled={isReadOnly} />
       </AgendaField>
 
       <div className="flex gap-3 justify-end">
-        <Button onClick={handleUpdate} disabled={updateAppointment.isPending}>
-          {updateAppointment.isPending && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}
-          Guardar Cambios
-        </Button>
-        <Button variant="outline" onClick={onClose}>Cancelar</Button>
+        {!isReadOnly && (
+          <Button onClick={handleUpdate} disabled={updateAppointment.isPending}>
+            {updateAppointment.isPending && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}
+            Guardar Cambios
+          </Button>
+        )}
+        <Button variant="outline" onClick={onClose}>Cerrar</Button>
       </div>
     </div>
   );
