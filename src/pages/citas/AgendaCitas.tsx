@@ -80,6 +80,33 @@ export default function AgendaCitas() {
   const updateStatus = useUpdateAppointmentStatus();
   const deleteAppointment = useDeleteAppointment();
 
+  // Open appointment from query param when appointments load
+  useEffect(() => {
+    const apptIdParam = searchParams.get("appointmentId");
+    if (!apptIdParam || !appointments) return;
+    const found = appointments.find(a => String(a.id) === apptIdParam);
+    if (found) {
+      setSelectedAppointment(found);
+      setEditingAppointment(found);
+      setEditDialogOpen(true);
+      const next = new URLSearchParams(searchParams);
+      next.delete("appointmentId");
+      setSearchParams(next, { replace: true });
+    }
+  }, [appointments, searchParams, setSearchParams]);
+
+  // Keep date in URL
+  useEffect(() => {
+    if (!date) return;
+    const dStr = formatDateToApi(date);
+    if (searchParams.get("date") !== dStr) {
+      const next = new URLSearchParams(searchParams);
+      next.set("date", dStr);
+      setSearchParams(next, { replace: true });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [date]);
+
   const handleMarkAttended = () => {
     if (!selectedAppointment) return;
     updateStatus.mutate(
