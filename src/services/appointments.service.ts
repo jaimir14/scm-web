@@ -11,6 +11,7 @@ export interface AppointmentFilters {
   fecha?: string;
   profesionalId?: string;
   clinicaId?: string;
+  pacienteId?: string | number;
 }
 
 export function useAppointments(filters: AppointmentFilters) {
@@ -21,8 +22,18 @@ export function useAppointments(filters: AppointmentFilters) {
       if (filters.fecha) params.set("fecha", filters.fecha);
       if (filters.profesionalId) params.set("profesionalId", filters.profesionalId);
       if (filters.clinicaId) params.set("clinicaId", filters.clinicaId);
+      if (filters.pacienteId) params.set("pacienteId", String(filters.pacienteId));
       return api.get<Appointment[]>(`/api/v1/appointments?${params.toString()}`);
     },
+  });
+}
+
+export function usePatientAppointments(patientId: number | string | undefined) {
+  return useQuery({
+    queryKey: ["appointments", "by-patient", patientId],
+    queryFn: () =>
+      api.get<Appointment[]>(`/api/v1/appointments?pacienteId=${patientId}`),
+    enabled: !!patientId,
   });
 }
 
