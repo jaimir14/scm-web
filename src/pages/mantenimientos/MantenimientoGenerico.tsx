@@ -593,12 +593,12 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
                 <Switch id="active" checked={active} onCheckedChange={setActive} />
                 <Label htmlFor="active">Activo</Label>
               </div>
-              <div className="flex gap-3 justify-end">
+              <div className="flex gap-2 justify-end pt-2 border-t -mx-6 px-6 pt-4">
+                <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
                 <Button onClick={handleSave} disabled={!!isSaving}>
-                  {isSaving && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}
+                  {isSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : null}
                   Guardar
                 </Button>
-                <Button variant="outline" onClick={() => setDialogOpen(false)}>Cancelar</Button>
               </div>
             </div>
           </DialogContent>
