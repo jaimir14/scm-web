@@ -20,6 +20,7 @@ import { useActiveClinics } from "@/services/clinics.service";
 import { useDoctors } from "@/services/users.service";
 import { ConsultationImages } from "@/components/ConsultationImages";
 import { ConsultationFiles } from "@/components/ConsultationFiles";
+import { PageHeader, FormSection, FormField as Field, FormGrid, FormPage, StickyFormActions } from "@/components/ui/form-section";
 import type { Patient, CreatePatientInput } from "@/types";
 import type { Consultation } from "@/types/consultation";
 
