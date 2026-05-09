@@ -11,7 +11,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { User, Save, Loader2, ChevronDown, Calendar, Stethoscope, Activity, FileText } from "lucide-react";
+import { User, Save, Loader2, ChevronDown, Calendar, Stethoscope, Activity, FileText, IdCard, Phone, MapPin, Building2, HeartPulse, ClipboardList, NotebookPen } from "lucide-react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import { toast } from "sonner";
 import { usePatient, useCreatePatient, useUpdatePatient } from "@/services/patients.service";
