@@ -10,6 +10,7 @@ import { Shield, Filter, Download, Loader2, ChevronDown, ChevronUp } from "lucid
 import { useIsMobile } from "@/hooks/use-mobile";
 import { useAuditLog } from "@/services/audit-log.service";
 import { useUsers } from "@/services/users.service";
+import { ExpedientesPaginator } from "@/components/ExpedientesPaginator";
 import type { AuditLogFilters } from "@/types";
 
 const actionColor: Record<string, string> = {
@@ -35,12 +36,18 @@ export default function Bitacora() {
   const [showFilters, setShowFilters] = useState(!isMobile);
   const [filters, setFilters] = useState<AuditLogFilters>({});
   const [appliedFilters, setAppliedFilters] = useState<AuditLogFilters>({});
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(25);
 
-  const { data: logs, isLoading } = useAuditLog(appliedFilters);
+  const { data: result, isLoading } = useAuditLog(appliedFilters, page, limit);
   const { data: users } = useUsers();
+
+  const logs = result?.data ?? [];
+  const meta = result?.meta;
 
   const handleFilter = () => {
     setAppliedFilters({ ...filters });
+    setPage(1);
   };
 
   return (
@@ -155,7 +162,7 @@ export default function Bitacora() {
                     <Skeleton className="h-3 w-1/2" />
                   </div>
                 ))
-              ) : logs && logs.length > 0 ? (
+              ) : logs.length > 0 ? (
                 logs.map((log, i) => (
                   <div key={log.id || i} className="p-3 space-y-1.5">
                     <div className="flex items-center justify-between">
@@ -202,7 +209,7 @@ export default function Bitacora() {
                         <TableCell><Skeleton className="h-4 w-40" /></TableCell>
                       </TableRow>
                     ))
-                  ) : logs && logs.length > 0 ? (
+                  ) : logs.length > 0 ? (
                     logs.map((log, i) => (
                       <TableRow key={log.id || i}>
                         <TableCell className="font-mono text-xs">{log.fechaFormateada ?? log.fecha}</TableCell>
@@ -228,9 +235,18 @@ export default function Bitacora() {
               </Table>
             </div>
           )}
-          <div className="p-3 border-t text-xs text-muted-foreground">
-            Mostrando {logs?.length || 0} registros
-          </div>
+          {meta && (
+            <div className="border-t px-4 py-2">
+              <ExpedientesPaginator
+                page={page}
+                totalPages={meta.totalPages}
+                total={meta.total}
+                limit={limit}
+                onPageChange={setPage}
+                onLimitChange={(newLimit) => { setLimit(newLimit); setPage(1); }}
+              />
+            </div>
+          )}
         </CardContent>
       </Card>
     </div>

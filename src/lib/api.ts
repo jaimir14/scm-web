@@ -81,8 +81,46 @@ async function request<T>(
   return handleResponse<T>(response);
 }
 
+async function handlePaginatedResponse<T>(response: Response): Promise<{ data: T[]; meta: PaginationMeta }> {
+  if (response.status === 401) {
+    removeToken();
+    if (window.location.pathname !== "/login") {
+      window.location.href = "/login";
+    }
+    throw new ApiError("No autorizado", 401);
+  }
+
+  let json: any;
+  try {
+    json = await response.json();
+  } catch {
+    throw new ApiError(`Error ${response.status}: respuesta no valida`, response.status);
+  }
+
+  if (!response.ok || json.success === false) {
+    throw new ApiError(json.error || `Error ${response.status}`, response.status, json.details);
+  }
+
+  return { data: json.data as T[], meta: json.meta as PaginationMeta };
+}
+
+interface PaginationMeta {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
+
 export const api = {
   get: <T>(endpoint: string) => request<T>(endpoint),
+  getPaginated: <T>(endpoint: string): Promise<{ data: T[]; meta: PaginationMeta }> => {
+    const token = getToken();
+    const headers: Record<string, string> = {};
+    if (token) headers["Authorization"] = `Bearer ${token}`;
+    return fetch(`${API_BASE_URL}${endpoint}`, { headers }).then((r) =>
+      handlePaginatedResponse<T>(r)
+    );
+  },
   post: <T>(endpoint: string, body: unknown) =>
     request<T>(endpoint, { method: "POST", body: JSON.stringify(body) }),
   put: <T>(endpoint: string, body: unknown) =>

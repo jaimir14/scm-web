@@ -16,11 +16,14 @@ import {
   DialogDescription,
 } from "@/components/ui/dialog";
 import { useIsMobile } from "@/hooks/use-mobile";
-import { useSearchPatients } from "@/services/patients.service";
+import { usePatients } from "@/services/patients.service";
 import { usePatientAppointments } from "@/services/appointments.service";
 import { useDebounce } from "@/hooks/use-debounce";
 import { formatDateDisplay } from "@/lib/formatters";
+import { ExpedientesPaginator } from "@/components/ExpedientesPaginator";
 import type { Patient, Appointment } from "@/types";
+
+const DEFAULT_LIMIT = 25;
 
 export default function BuscarExpediente() {
   const navigate = useNavigate();
@@ -28,36 +31,52 @@ export default function BuscarExpediente() {
 
   const [searchType, setSearchType] = useState(() => searchParams.get("type") ?? "nombre");
   const [query, setQuery] = useState(() => searchParams.get("q") ?? "");
+  const [page, setPage] = useState(() => Number(searchParams.get("page") ?? 1));
+  const [limit, setLimit] = useState(() => Number(searchParams.get("limit") ?? DEFAULT_LIMIT));
   const debouncedQuery = useDebounce(query, 300);
+
   const [appointmentsPatient, setAppointmentsPatient] = useState<Patient | null>(null);
+
+  const { data: result, isLoading } = usePatients(page, limit, debouncedQuery, searchType);
+
+  const patients = result?.data ?? [];
+  const meta = result?.meta;
+
+  const isMobile = useIsMobile();
+
+  const updateParam = (updates: Record<string, string | null>) => {
+    setSearchParams((prev) => {
+      const next = new URLSearchParams(prev);
+      for (const [k, v] of Object.entries(updates)) {
+        if (v == null || v === "") next.delete(k);
+        else next.set(k, v);
+      }
+      return next;
+    }, { replace: true });
+  };
 
   const handleQueryChange = (value: string) => {
     setQuery(value);
-    setSearchParams(
-      (prev) => {
-        const next = new URLSearchParams(prev);
-        if (value) next.set("q", value);
-        else next.delete("q");
-        return next;
-      },
-      { replace: true },
-    );
+    setPage(1);
+    updateParam({ q: value || null, page: null });
   };
 
   const handleTypeChange = (value: string) => {
     setSearchType(value);
-    setSearchParams(
-      (prev) => {
-        const next = new URLSearchParams(prev);
-        next.set("type", value);
-        return next;
-      },
-      { replace: true },
-    );
+    setPage(1);
+    updateParam({ type: value, page: null });
   };
 
-  const { data: results, isLoading } = useSearchPatients(debouncedQuery, searchType);
-  const isMobile = useIsMobile();
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+    updateParam({ page: String(newPage) });
+  };
+
+  const handleLimitChange = (newLimit: number) => {
+    setLimit(newLimit);
+    setPage(1);
+    updateParam({ limit: String(newLimit), page: null });
+  };
 
   const openAppointments = (e: React.MouseEvent, p: Patient) => {
     e.stopPropagation();
@@ -83,13 +102,17 @@ export default function BuscarExpediente() {
             </div>
             <div className="flex-1 min-w-0 space-y-1">
               <label className="text-xs font-medium text-muted-foreground">Paciente</label>
-              <Input
-                placeholder="Digite un texto para buscar..."
-                value={query}
-                onChange={e => handleQueryChange(e.target.value)}
-              />
+              <div className="relative">
+                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground pointer-events-none" />
+                <Input
+                  className="pl-8"
+                  placeholder="Digite un texto para buscar, o deje en blanco para ver todos..."
+                  value={query}
+                  onChange={(e) => handleQueryChange(e.target.value)}
+                />
+              </div>
             </div>
-            {isLoading && <Loader2 className="h-5 w-5 animate-spin text-primary" />}
+            {isLoading && <Loader2 className="h-5 w-5 animate-spin text-primary self-end mb-2" />}
           </div>
         </CardContent>
       </Card>
@@ -106,8 +129,8 @@ export default function BuscarExpediente() {
                     <Skeleton className="h-3 w-24" />
                   </div>
                 ))
-              ) : results && results.length > 0 ? (
-                results.map(p => (
+              ) : patients.length > 0 ? (
+                patients.map((p) => (
                   <div
                     key={p.id}
                     className="p-3 hover:bg-accent/50 cursor-pointer active:bg-accent/70"
@@ -137,7 +160,7 @@ export default function BuscarExpediente() {
                 ))
               ) : (
                 <div className="p-6 text-center text-muted-foreground text-sm">
-                  {query ? "No se encontraron resultados" : "Ingrese un termino de busqueda"}
+                  No se encontraron expedientes
                 </div>
               )}
             </div>
@@ -154,7 +177,7 @@ export default function BuscarExpediente() {
               </TableHeader>
               <TableBody>
                 {isLoading ? (
-                  Array.from({ length: 5 }).map((_, i) => (
+                  Array.from({ length: limit }).map((_, i) => (
                     <TableRow key={i}>
                       <TableCell><Skeleton className="h-4 w-40" /></TableCell>
                       <TableCell><Skeleton className="h-4 w-28" /></TableCell>
@@ -163,8 +186,8 @@ export default function BuscarExpediente() {
                       <TableCell><Skeleton className="h-8 w-20 ml-auto" /></TableCell>
                     </TableRow>
                   ))
-                ) : results && results.length > 0 ? (
-                  results.map(p => (
+                ) : patients.length > 0 ? (
+                  patients.map((p) => (
                     <TableRow
                       key={p.id}
                       className="cursor-pointer hover:bg-accent/50"
@@ -191,7 +214,7 @@ export default function BuscarExpediente() {
                 ) : (
                   <TableRow>
                     <TableCell colSpan={5} className="text-center py-8 text-muted-foreground">
-                      {query ? "No se encontraron resultados" : "Ingrese un termino de busqueda"}
+                      No se encontraron expedientes
                     </TableCell>
                   </TableRow>
                 )}
@@ -199,6 +222,39 @@ export default function BuscarExpediente() {
             </Table>
           )}
         </CardContent>
+
+        {meta && meta.totalPages > 1 && (
+          <div className="border-t px-4 py-2">
+            <ExpedientesPaginator
+              page={page}
+              totalPages={meta.totalPages}
+              total={meta.total}
+              limit={limit}
+              onPageChange={handlePageChange}
+              onLimitChange={handleLimitChange}
+            />
+          </div>
+        )}
+
+        {/* Page size selector shown even on single page */}
+        {meta && meta.totalPages <= 1 && (
+          <div className="border-t px-4 py-2 flex items-center justify-between text-sm text-muted-foreground">
+            <span>{meta.total} expediente{meta.total !== 1 ? "s" : ""}</span>
+            <div className="flex items-center gap-1.5">
+              <span className="hidden sm:inline">Por página:</span>
+              <Select value={String(limit)} onValueChange={(v) => handleLimitChange(Number(v))}>
+                <SelectTrigger className="h-8 w-[70px]">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  {[10, 24, 50, 100].map((s) => (
+                    <SelectItem key={s} value={String(s)}>{s}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        )}
       </Card>
 
       <PatientAppointmentsDialog
@@ -224,7 +280,6 @@ function PatientAppointmentsDialog({
 }) {
   const { data: appointments, isLoading } = usePatientAppointments(patient?.id);
 
-  // Sort: most-future-first then descending into past
   const sorted = (appointments ?? []).slice().sort((a, b) => {
     const aKey = `${(a.fecha || "").split("T")[0]} ${a.horaInicio || ""}`;
     const bKey = `${(b.fecha || "").split("T")[0]} ${b.horaInicio || ""}`;

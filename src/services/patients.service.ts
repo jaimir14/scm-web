@@ -1,28 +1,33 @@
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/lib/api";
-import type { Patient, CreatePatientInput, UpdatePatientInput, PaginationMeta } from "@/types";
+import type { Patient, CreatePatientInput, UpdatePatientInput } from "@/types";
 
-export function usePatients(page = 1, limit = 20) {
+export function usePatients(page = 1, limit = 25, q = "", type = "nombre") {
   return useQuery({
-    queryKey: ["patients", page, limit],
-    queryFn: async () => {
-      const result = await api.get<{ data: Patient[]; meta: PaginationMeta }>(
-        `/api/v1/patients?page=${page}&limit=${limit}`
-      );
-      // The endpoint may return data directly as array or wrapped
-      return result;
+    queryKey: ["patients", page, limit, q, type],
+    queryFn: () => {
+      const params = new URLSearchParams({
+        page: String(page),
+        limit: String(limit),
+        ...(q ? { q, type } : {}),
+      });
+      return api.getPaginated<Patient>(`/api/v1/patients?${params}`);
     },
   });
 }
 
-export function useSearchPatients(q: string, type: string = "nombre") {
+export function useSearchPatients(q: string, type: string = "nombre", page = 1, limit = 25) {
   return useQuery({
-    queryKey: ["patients", "search", q, type],
-    queryFn: () =>
-      api.get<Patient[]>(
-        `/api/v1/patients/search?q=${encodeURIComponent(q)}&type=${type}`
-      ),
-    enabled: q.length > 0,
+    queryKey: ["patients", "search", q, type, page, limit],
+    queryFn: () => {
+      const params = new URLSearchParams({
+        q: q || "",
+        type,
+        page: String(page),
+        limit: String(limit),
+      });
+      return api.getPaginated<Patient>(`/api/v1/patients/search?${params}`);
+    },
   });
 }
 
