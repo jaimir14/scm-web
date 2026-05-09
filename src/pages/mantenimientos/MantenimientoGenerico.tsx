@@ -421,14 +421,21 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
   const isSaving = cMutation?.isPending || uMutation?.isPending;
 
   return (
-    <div className="p-4 md:p-6 space-y-4">
-      <div className="flex items-center justify-between gap-2">
-        <h1 className="text-xl md:text-2xl font-bold text-foreground">{config.title}</h1>
-        <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-          <DialogTrigger asChild>
-            <Button size={isMobile ? "sm" : "default"} onClick={openCreate}><Plus className="h-4 w-4 mr-1" /> Nuevo</Button>
-          </DialogTrigger>
-          <DialogContent className="max-w-[95vw] sm:max-w-md max-h-[90vh] overflow-y-auto">
+    <div className="p-4 md:p-8 space-y-6">
+      <PageHeader
+        icon={Database}
+        eyebrow="Mantenimientos"
+        title={config.title}
+        description="Gestione los registros del catálogo"
+        actions={
+          <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+            <DialogTrigger asChild>
+              <Button size={isMobile ? "sm" : "default"} onClick={openCreate}>
+                <Plus className="h-4 w-4 mr-1" /> Nuevo
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-[95vw] sm:max-w-md max-h-[90vh] overflow-y-auto">
+
             <DialogHeader>
               <DialogTitle>
                 {editingItem ? "Editar" : "Nuevo"} registro - {config.title}
