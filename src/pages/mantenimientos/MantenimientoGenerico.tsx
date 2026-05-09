@@ -602,57 +602,54 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
             </div>
           </DialogContent>
         </Dialog>
+        }
+      />
 
-        {/* Change password dialog — separate from main edit dialog */}
-        <Dialog open={changePasswordOpen} onOpenChange={v => { setChangePasswordOpen(v); if (!v) { setNewPassword(""); setConfirmPassword(""); setPasswordErrors({}); setShowNewPassword(false); } }}>
-          <DialogContent className="max-w-sm">
-            <DialogHeader>
-              <DialogTitle>Cambiar Contraseña</DialogTitle>
-            </DialogHeader>
-            <div className="space-y-4">
-              <div className="space-y-1">
-                <Label className="text-sm">Nueva contraseña <span className="text-destructive">*</span></Label>
-                <div className="relative">
-                  <Input
-                    type={showNewPassword ? "text" : "password"}
-                    autoComplete="new-password"
-                    value={newPassword}
-                    onChange={e => { setNewPassword(e.target.value); if (passwordErrors.newPassword) setPasswordErrors(prev => { const n = { ...prev }; delete n.newPassword; return n; }); }}
-                    className={`pr-10 ${passwordErrors.newPassword ? "border-destructive" : ""}`}
-                  />
-                  <button
-                    type="button"
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-                    onClick={() => setShowNewPassword(v => !v)}
-                    tabIndex={-1}
-                  >
-                    {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
-                  </button>
-                </div>
-                {passwordErrors.newPassword && <p className="text-xs text-destructive">{passwordErrors.newPassword}</p>}
-              </div>
-              <div className="space-y-1">
-                <Label className="text-sm">Confirmar contraseña <span className="text-destructive">*</span></Label>
+      {/* Change password dialog — separate from main edit dialog */}
+      <Dialog open={changePasswordOpen} onOpenChange={v => { setChangePasswordOpen(v); if (!v) { setNewPassword(""); setConfirmPassword(""); setPasswordErrors({}); setShowNewPassword(false); } }}>
+        <DialogContent className="max-w-sm">
+          <DialogHeader>
+            <DialogTitle>Cambiar Contraseña</DialogTitle>
+          </DialogHeader>
+          <div className="space-y-4">
+            <FormField label="Nueva contraseña" required error={passwordErrors.newPassword}>
+              <div className="relative">
                 <Input
-                  type="password"
+                  type={showNewPassword ? "text" : "password"}
                   autoComplete="new-password"
-                  value={confirmPassword}
-                  onChange={e => { setConfirmPassword(e.target.value); if (passwordErrors.confirmPassword) setPasswordErrors(prev => { const n = { ...prev }; delete n.confirmPassword; return n; }); }}
-                  className={passwordErrors.confirmPassword ? "border-destructive" : ""}
+                  value={newPassword}
+                  onChange={e => { setNewPassword(e.target.value); if (passwordErrors.newPassword) setPasswordErrors(prev => { const n = { ...prev }; delete n.newPassword; return n; }); }}
+                  className={`pr-10 ${passwordErrors.newPassword ? "border-destructive" : ""}`}
                 />
-                {passwordErrors.confirmPassword && <p className="text-xs text-destructive">{passwordErrors.confirmPassword}</p>}
+                <button
+                  type="button"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  onClick={() => setShowNewPassword(v => !v)}
+                  tabIndex={-1}
+                >
+                  {showNewPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                </button>
               </div>
-              <div className="flex gap-3 justify-end">
-                <Button onClick={handleChangePassword} disabled={!!uMutation?.isPending}>
-                  {uMutation?.isPending && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}
-                  Guardar
-                </Button>
-                <Button variant="outline" onClick={() => setChangePasswordOpen(false)}>Cancelar</Button>
-              </div>
+            </FormField>
+            <FormField label="Confirmar contraseña" required error={passwordErrors.confirmPassword}>
+              <Input
+                type="password"
+                autoComplete="new-password"
+                value={confirmPassword}
+                onChange={e => { setConfirmPassword(e.target.value); if (passwordErrors.confirmPassword) setPasswordErrors(prev => { const n = { ...prev }; delete n.confirmPassword; return n; }); }}
+                className={passwordErrors.confirmPassword ? "border-destructive" : ""}
+              />
+            </FormField>
+            <div className="flex gap-3 justify-end pt-2">
+              <Button variant="outline" onClick={() => setChangePasswordOpen(false)}>Cancelar</Button>
+              <Button onClick={handleChangePassword} disabled={!!uMutation?.isPending}>
+                {uMutation?.isPending && <Loader2 className="h-4 w-4 mr-1 animate-spin" />}
+                Guardar
+              </Button>
             </div>
-          </DialogContent>
-        </Dialog>
-      </div>
+          </div>
+        </DialogContent>
+      </Dialog>
 
       <Card>
         <CardContent className="pt-4">
