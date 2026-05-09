@@ -569,9 +569,9 @@ function CrearCitaForm({ onClose }: { onClose: () => void }) {
               Cambiar
             </Button>
           </div>
-        ) : searchResults && searchResults.length > 0 ? (
+        ) : searchResults && searchResults.data && searchResults.data.length > 0 ? (
           <div className="space-y-1">
-            {searchResults.map(p => (
+            {searchResults.data.map(p => (
               <div
                 key={p.id}
                 className="text-xs p-1 hover:bg-accent rounded cursor-pointer"
@@ -586,7 +586,7 @@ function CrearCitaForm({ onClose }: { onClose: () => void }) {
               </div>
             ))}
           </div>
-        ) : debouncedSearch && !searching && searchResults !== undefined && searchResults.length === 0 ? (
+        ) : debouncedSearch && !searching && searchResults !== undefined && searchResults.data?.length === 0 ? (
           <div className="space-y-2">
             <p className="text-xs text-muted-foreground">No se encontraron resultados para "{searchQuery}"</p>
             {!showExpressForm ? (
