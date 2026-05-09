@@ -452,10 +452,12 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
                 // Password is handled via the dedicated change-password dialog when editing
                 if (f.type === "password" && editingItem) return null;
                 return (
-                <div key={f.key} className="space-y-1">
-                  <Label className="text-sm">
-                    {f.label}{!editingItem && !f.optional && <span className="text-destructive ml-0.5">*</span>}
-                  </Label>
+                <FormField
+                  key={f.key}
+                  label={f.label}
+                  required={!editingItem && !f.optional}
+                  error={errors[f.key]}
+                >
                   {f.type === "select" ? (
                     <Select
                       value={formData[f.key] || ""}
@@ -494,8 +496,7 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
                       className={errors[f.key] ? "border-destructive" : ""}
                     />
                   )}
-                  {errors[f.key] && <p className="text-xs text-destructive">{errors[f.key]}</p>}
-                </div>
+                </FormField>
                 );
               })}
               {/* Doctor-specific fields */}
