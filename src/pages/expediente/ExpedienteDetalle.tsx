@@ -156,7 +156,7 @@ export default function ExpedienteDetalle() {
   const initials = `${(form.nombre?.[0] || "")}${(form.apellido1?.[0] || "")}`.toUpperCase() || "—";
 
   return (
-    <div className="p-4 md:p-8 pb-28">
+    <div className="p-4 md:p-8 pb-40 md:pb-36">
       <div className="mx-auto w-full max-w-5xl space-y-6">
         {/* Page header */}
         <div className="flex items-center gap-4">
