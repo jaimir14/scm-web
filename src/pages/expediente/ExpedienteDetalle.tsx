@@ -20,6 +20,7 @@ import { useActiveClinics } from "@/services/clinics.service";
 import { useDoctors } from "@/services/users.service";
 import { ConsultationImages } from "@/components/ConsultationImages";
 import { ConsultationFiles } from "@/components/ConsultationFiles";
+import { PageHeader, FormSection, FormField as Field, FormGrid, FormPage, StickyFormActions } from "@/components/ui/form-section";
 import type { Patient, CreatePatientInput } from "@/types";
 import type { Consultation } from "@/types/consultation";
 
@@ -477,32 +478,8 @@ export default function ExpedienteDetalle() {
   );
 }
 
-function FormSection({
-  icon: Icon,
-  title,
-  description,
-  children,
-}: {
-  icon: React.ComponentType<{ className?: string }>;
-  title: string;
-  description?: string;
-  children: React.ReactNode;
-}) {
-  return (
-    <Card className="overflow-hidden">
-      <div className="flex items-start gap-3 px-6 pt-6">
-        <div className="h-9 w-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
-          <Icon className="h-4 w-4" />
-        </div>
-        <div className="min-w-0">
-          <h2 className="text-base font-semibold text-foreground leading-tight">{title}</h2>
-          {description && <p className="text-xs text-muted-foreground mt-0.5">{description}</p>}
-        </div>
-      </div>
-      <CardContent className="pt-5">{children}</CardContent>
-    </Card>
-  );
-}
+/* PageHeader/FormSection/Field/StickyFormActions are now imported from
+   @/components/ui/form-section to keep the design consistent across the app. */
 
 /* ── Consultation History Card ── */
 
@@ -623,14 +600,4 @@ function ConsultationHistoryCard({
   );
 }
 
-function Field({ label, children, required, full, error }: { label: string; children: React.ReactNode; required?: boolean; full?: boolean; error?: string }) {
-  return (
-    <div className={`space-y-1 ${full ? "sm:col-span-2" : ""}`}>
-      <label className="text-xs font-medium text-muted-foreground">
-        {label}{required && <span className="text-destructive ml-0.5">*</span>}
-      </label>
-      {children}
-      {error && <p className="text-xs text-destructive">{error}</p>}
-    </div>
-  );
-}
+/* Field is imported from @/components/ui/form-section */
