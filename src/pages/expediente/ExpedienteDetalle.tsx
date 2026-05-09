@@ -600,14 +600,4 @@ function ConsultationHistoryCard({
   );
 }
 
-function Field({ label, children, required, full, error }: { label: string; children: React.ReactNode; required?: boolean; full?: boolean; error?: string }) {
-  return (
-    <div className={`space-y-1 ${full ? "sm:col-span-2" : ""}`}>
-      <label className="text-xs font-medium text-muted-foreground">
-        {label}{required && <span className="text-destructive ml-0.5">*</span>}
-      </label>
-      {children}
-      {error && <p className="text-xs text-destructive">{error}</p>}
-    </div>
-  );
-}
+/* Field is imported from @/components/ui/form-section */
