@@ -83,7 +83,7 @@ export function ImagenesClinicas() {
 
       {viewer.open && (
         <MedicalImageViewer
-          images={list.map(i => ({ url: i.url, name: i.observacion || "" }))}
+          images={list.map((i, idx) => ({ id: idx, viewUrl: i.url, fileName: i.observacion || `Imagen ${idx + 1}` }))}
           initialIndex={viewer.index}
           open={viewer.open}
           onOpenChange={(o) => setViewer(v => ({ ...v, open: o }))}
