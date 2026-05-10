@@ -7,6 +7,7 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent } from "@/components/ui/card";
 import { useAuth } from "@/contexts/AuthContext";
 import { useLogin } from "@/services/auth.service";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { toast } from "sonner";
 
 export default function Login() {
@@ -56,6 +57,9 @@ export default function Login() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/10 via-background to-accent/30 p-4">
+      <div className="absolute top-4 right-4">
+        <ThemeToggle />
+      </div>
       <Card className="w-full max-w-md shadow-xl border-0">
         <CardContent className="pt-8 pb-6 px-5 sm:pt-10 sm:pb-8 sm:px-8">
           <div className="flex flex-col items-center mb-6 sm:mb-8">

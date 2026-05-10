@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 
@@ -142,7 +143,7 @@ export default function Index() {
             <a href="#contacto" className="transition-colors hover:text-foreground">Contacto</a>
           </div>
           <div className="flex items-center gap-2">
-
+            <ThemeToggle />
             <Button size="sm" asChild>
               <a href="#contacto">Solicitar Demo</a>
             </Button>
