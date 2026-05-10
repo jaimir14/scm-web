@@ -176,30 +176,55 @@ export default function ExpedienteDetalle() {
     <div className="p-4 md:p-8 pb-40 md:pb-36">
       <div className="mx-auto w-full max-w-5xl space-y-6">
         {/* Page header */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-start gap-4">
           <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-primary to-primary/70 text-primary-foreground flex items-center justify-center text-lg font-semibold shadow-sm shrink-0">
             {initials}
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
               {isNew ? "Nuevo expediente" : `Expediente #${id}`}
+              {dentalMode && <span className="ml-2 text-primary">· Odontológico</span>}
             </p>
             <h1 className="text-2xl md:text-3xl font-bold text-foreground truncate">
               {fullName || "Paciente sin nombre"}
             </h1>
           </div>
+          <label className="hidden md:flex items-center gap-2 shrink-0 rounded-md border bg-card px-3 py-2 cursor-pointer">
+            <Smile className="h-4 w-4 text-primary" />
+            <span className="text-xs font-medium">Vista odontológica</span>
+            <Switch checked={dentalMode} onCheckedChange={setDentalMode} />
+          </label>
         </div>
+        <label className="md:hidden flex items-center justify-between gap-2 rounded-md border bg-card px-3 py-2 cursor-pointer">
+          <span className="flex items-center gap-2 text-sm">
+            <Smile className="h-4 w-4 text-primary" /> Vista odontológica
+          </span>
+          <Switch checked={dentalMode} onCheckedChange={setDentalMode} />
+        </label>
 
         <Tabs defaultValue="datos" className="space-y-6">
           <ScrollArea className="w-full">
             <TabsList className="bg-muted inline-flex w-auto min-w-full sm:min-w-0">
               <TabsTrigger value="datos" className="text-xs sm:text-sm whitespace-nowrap">Datos Personales</TabsTrigger>
               <TabsTrigger value="antecedentes" className="text-xs sm:text-sm whitespace-nowrap">Antecedentes</TabsTrigger>
-              <TabsTrigger value="padecimiento" className="text-xs sm:text-sm whitespace-nowrap">Padecimiento</TabsTrigger>
+              {dentalMode && (
+                <TabsTrigger value="odontograma" className="text-xs sm:text-sm whitespace-nowrap">Odontograma</TabsTrigger>
+              )}
+              <TabsTrigger value="padecimiento" className="text-xs sm:text-sm whitespace-nowrap">
+                {dentalMode ? "Consultas" : "Padecimiento"}
+              </TabsTrigger>
+              {dentalMode && (
+                <>
+                  <TabsTrigger value="plan" className="text-xs sm:text-sm whitespace-nowrap">Plan / Contrato</TabsTrigger>
+                  <TabsTrigger value="pagos" className="text-xs sm:text-sm whitespace-nowrap">Estado de cuenta</TabsTrigger>
+                  <TabsTrigger value="imagenes" className="text-xs sm:text-sm whitespace-nowrap">Imágenes</TabsTrigger>
+                </>
+              )}
               <TabsTrigger value="notas" className="text-xs sm:text-sm whitespace-nowrap">Notas</TabsTrigger>
             </TabsList>
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
+
 
           {/* Tab 1: Datos Personales — redesigned with grouped sections */}
           <TabsContent value="datos" className="space-y-5">
