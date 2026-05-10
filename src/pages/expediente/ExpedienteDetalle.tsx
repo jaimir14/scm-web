@@ -460,42 +460,73 @@ export default function ExpedienteDetalle() {
                 </div>
               </div>
             </FormSection>
+            {dentalMode && (
+              <AntecedentesOdontologicos value={dentalRecord} onChange={setDentalRecord} />
+            )}
           </TabsContent>
 
-          {/* Tab 3: Padecimiento Actual - READ ONLY history */}
+          {/* Odontograma — only in dental mode */}
+          {dentalMode && (
+            <TabsContent value="odontograma">
+              <Odontograma />
+            </TabsContent>
+          )}
+
+          {/* Tab 3: Padecimiento / Consultas */}
           <TabsContent value="padecimiento">
-            <FormSection icon={ClipboardList} title="Historial de consultas" description="Consultas previas del paciente">
-              <div className="flex items-center gap-2 mb-2">
-                {consultations && consultations.length > 0 && (
-                  <Badge variant="secondary" className="text-xs">
-                    {consultations.length} registro{consultations.length !== 1 ? "s" : ""}
-                  </Badge>
+            {dentalMode ? (
+              <ConsultasOdontologicas
+                consultations={consultations}
+                patientId={Number(id)}
+                loading={consultationsLoading}
+              />
+            ) : (
+              <FormSection icon={ClipboardList} title="Historial de consultas" description="Consultas previas del paciente">
+                <div className="flex items-center gap-2 mb-2">
+                  {consultations && consultations.length > 0 && (
+                    <Badge variant="secondary" className="text-xs">
+                      {consultations.length} registro{consultations.length !== 1 ? "s" : ""}
+                    </Badge>
+                  )}
+                </div>
+                {consultationsLoading ? (
+                  <div className="space-y-3">
+                    {Array.from({ length: 3 }).map((_, i) => (<Skeleton key={i} className="h-24 w-full rounded-lg" />))}
+                  </div>
+                ) : consultations && consultations.length > 0 ? (
+                  <div className="space-y-3">
+                    {consultations.map((c, idx) => (
+                      <ConsultationHistoryCard key={c.id} consultation={c} patientId={Number(id)} defaultOpen={idx === 0} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <FileText className="h-12 w-12 text-muted-foreground/30 mb-3" />
+                    <p className="text-sm text-muted-foreground">No hay consultas registradas para este paciente</p>
+                  </div>
                 )}
-              </div>
-              {consultationsLoading ? (
-                <div className="space-y-3">
-                  {Array.from({ length: 3 }).map((_, i) => (<Skeleton key={i} className="h-24 w-full rounded-lg" />))}
-                </div>
-              ) : consultations && consultations.length > 0 ? (
-                <div className="space-y-3">
-                  {consultations.map((c, idx) => (
-                    <ConsultationHistoryCard key={c.id} consultation={c} patientId={Number(id)} defaultOpen={idx === 0} />
-                  ))}
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <FileText className="h-12 w-12 text-muted-foreground/30 mb-3" />
-                  <p className="text-sm text-muted-foreground">No hay consultas registradas para este paciente</p>
-                </div>
-              )}
-            </FormSection>
+              </FormSection>
+            )}
           </TabsContent>
+
+          {dentalMode && (
+            <>
+              <TabsContent value="plan"><PlanTratamientoContrato /></TabsContent>
+              <TabsContent value="pagos"><EstadoCuenta /></TabsContent>
+              <TabsContent value="imagenes"><ImagenesClinicas /></TabsContent>
+            </>
+          )}
 
           {/* Tab 4: Notas */}
-          <TabsContent value="notas">
-            <FormSection icon={NotebookPen} title="Notas" description="Notas generales del expediente">
-              <Textarea className="min-h-[300px] md:min-h-[400px]" placeholder="Escriba notas relevantes del paciente..." value={form.notas || ""} onChange={e => updateField("notas", e.target.value)} />
+          <TabsContent value="notas" className="space-y-5">
+            <FormSection icon={NotebookPen} title="Notas clínicas generales" description="Notas generales del expediente">
+              <Textarea className="min-h-[220px]" placeholder="Escriba notas relevantes del paciente..." value={form.notas || ""} onChange={e => updateField("notas", e.target.value)} />
             </FormSection>
+            {dentalMode && (
+              <FormSection icon={Smile} title="Notas odontológicas" description="Observaciones específicas del tratamiento dental">
+                <Textarea className="min-h-[160px]" placeholder="Notas odontológicas…" />
+              </FormSection>
+            )}
           </TabsContent>
         </Tabs>
       </div>
