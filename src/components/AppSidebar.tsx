@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, CalendarDays, FolderOpen, Building2, Users, UserCog,
   FileText, BarChart3, Shield, Activity, Settings, LogOut, ChevronDown,
-  Stethoscope, ListChecks, ClipboardList, Menu, X, KeyRound
+  Stethoscope, ListChecks, ClipboardList, Menu, X, KeyRound, Wallet
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./ThemeToggle";
@@ -31,6 +31,12 @@ const navigation: NavItem[] = [
     label: "Expediente", icon: FolderOpen, children: [
       { label: "Buscar Expediente", href: "/expediente/buscar", permission: "expediente.buscar" },
       { label: "Nuevo Expediente", href: "/expediente/nuevo", permission: "expediente.crear" },
+    ]
+  },
+  {
+    label: "Facturación", icon: Wallet, children: [
+      { label: "Contratos", href: "/facturacion/contratos" },
+      { label: "Estado de Cuenta", href: "/facturacion/estado-cuenta" },
     ]
   },
   {

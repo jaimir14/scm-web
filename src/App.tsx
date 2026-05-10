@@ -25,6 +25,8 @@ import ReporteGenerico from "./pages/reportes/ReporteGenerico";
 import Bitacora from "./pages/admin/Bitacora";
 import Configuracion from "./pages/admin/Configuracion";
 import RolesPermisos from "./pages/admin/RolesPermisos";
+import Contratos from "./pages/facturacion/Contratos";
+import EstadoCuentaPage from "./pages/facturacion/EstadoCuentaPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient({
@@ -72,6 +74,8 @@ const App = () => (
                   <Route path="/mantenimientos/usuarios" element={<MantenimientoGenerico tipo="usuarios" />} />
                   <Route path="/mantenimientos/tipos-cita" element={<MantenimientoGenerico tipo="tipos-cita" />} />
                   <Route path="/mantenimientos/tratamientos" element={<MantenimientoGenerico tipo="tratamientos" />} />
+                  <Route path="/facturacion/contratos" element={<Contratos />} />
+                  <Route path="/facturacion/estado-cuenta" element={<EstadoCuentaPage />} />
                   <Route path="/reportes/citas" element={<ReporteGenerico tipo="citas" />} />
                   <Route path="/reportes/pacientes" element={<ReporteGenerico tipo="pacientes" />} />
                   <Route path="/reportes/clinicas" element={<ReporteGenerico tipo="clinicas" />} />
