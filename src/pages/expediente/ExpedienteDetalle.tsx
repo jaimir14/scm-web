@@ -46,6 +46,15 @@ export default function ExpedienteDetalle() {
 
   const [form, setForm] = useState<Partial<CreatePatientInput>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [dentalMode, setDentalMode] = useState(false);
+  const [dentalRecord, setDentalRecord] = useState<{
+    flags?: Record<string, boolean>;
+    higieneOral?: string;
+    alergias?: string;
+    medicamentos?: string;
+    enfermedades?: string;
+    observaciones?: string;
+  }>({});
 
   useEffect(() => {
     if (isNew) {
