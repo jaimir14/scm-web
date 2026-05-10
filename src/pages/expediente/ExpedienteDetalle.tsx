@@ -11,8 +11,9 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { User, Save, Loader2, ChevronDown, Calendar, Stethoscope, Activity, FileText, IdCard, Phone, MapPin, Building2, HeartPulse, ClipboardList, NotebookPen } from "lucide-react";
+import { User, Save, Loader2, ChevronDown, Calendar, Stethoscope, Activity, FileText, IdCard, Phone, MapPin, Building2, HeartPulse, ClipboardList, NotebookPen, Smile } from "lucide-react";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { Switch } from "@/components/ui/switch";
 import { toast } from "sonner";
 import { usePatient, useCreatePatient, useUpdatePatient } from "@/services/patients.service";
 import { usePatientConsultations } from "@/services/consultations.service";
@@ -21,6 +22,12 @@ import { useDoctors } from "@/services/users.service";
 import { ConsultationImages } from "@/components/ConsultationImages";
 import { ConsultationFiles } from "@/components/ConsultationFiles";
 import { PageHeader, FormSection, FormField as Field, FormGrid, FormPage, StickyFormActions } from "@/components/ui/form-section";
+import { Odontograma } from "@/components/expediente/dental/Odontograma";
+import { AntecedentesOdontologicos } from "@/components/expediente/dental/AntecedentesOdontologicos";
+import { ConsultasOdontologicas } from "@/components/expediente/dental/ConsultasOdontologicas";
+import { PlanTratamientoContrato } from "@/components/expediente/dental/PlanTratamientoContrato";
+import { EstadoCuenta } from "@/components/expediente/dental/EstadoCuenta";
+import { ImagenesClinicas } from "@/components/expediente/dental/ImagenesClinicas";
 import type { Patient, CreatePatientInput } from "@/types";
 import type { Consultation } from "@/types/consultation";
 
@@ -39,6 +46,15 @@ export default function ExpedienteDetalle() {
 
   const [form, setForm] = useState<Partial<CreatePatientInput>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [dentalMode, setDentalMode] = useState(false);
+  const [dentalRecord, setDentalRecord] = useState<{
+    flags?: Record<string, boolean>;
+    higieneOral?: string;
+    alergias?: string;
+    medicamentos?: string;
+    enfermedades?: string;
+    observaciones?: string;
+  }>({});
 
   useEffect(() => {
     if (isNew) {
@@ -160,30 +176,55 @@ export default function ExpedienteDetalle() {
     <div className="p-4 md:p-8 pb-40 md:pb-36">
       <div className="mx-auto w-full max-w-5xl space-y-6">
         {/* Page header */}
-        <div className="flex items-center gap-4">
+        <div className="flex items-start gap-4">
           <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-primary to-primary/70 text-primary-foreground flex items-center justify-center text-lg font-semibold shadow-sm shrink-0">
             {initials}
           </div>
           <div className="min-w-0 flex-1">
             <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
               {isNew ? "Nuevo expediente" : `Expediente #${id}`}
+              {dentalMode && <span className="ml-2 text-primary">· Odontológico</span>}
             </p>
             <h1 className="text-2xl md:text-3xl font-bold text-foreground truncate">
               {fullName || "Paciente sin nombre"}
             </h1>
           </div>
+          <label className="hidden md:flex items-center gap-2 shrink-0 rounded-md border bg-card px-3 py-2 cursor-pointer">
+            <Smile className="h-4 w-4 text-primary" />
+            <span className="text-xs font-medium">Vista odontológica</span>
+            <Switch checked={dentalMode} onCheckedChange={setDentalMode} />
+          </label>
         </div>
+        <label className="md:hidden flex items-center justify-between gap-2 rounded-md border bg-card px-3 py-2 cursor-pointer">
+          <span className="flex items-center gap-2 text-sm">
+            <Smile className="h-4 w-4 text-primary" /> Vista odontológica
+          </span>
+          <Switch checked={dentalMode} onCheckedChange={setDentalMode} />
+        </label>
 
         <Tabs defaultValue="datos" className="space-y-6">
           <ScrollArea className="w-full">
             <TabsList className="bg-muted inline-flex w-auto min-w-full sm:min-w-0">
               <TabsTrigger value="datos" className="text-xs sm:text-sm whitespace-nowrap">Datos Personales</TabsTrigger>
               <TabsTrigger value="antecedentes" className="text-xs sm:text-sm whitespace-nowrap">Antecedentes</TabsTrigger>
-              <TabsTrigger value="padecimiento" className="text-xs sm:text-sm whitespace-nowrap">Padecimiento</TabsTrigger>
+              {dentalMode && (
+                <TabsTrigger value="odontograma" className="text-xs sm:text-sm whitespace-nowrap">Odontograma</TabsTrigger>
+              )}
+              <TabsTrigger value="padecimiento" className="text-xs sm:text-sm whitespace-nowrap">
+                {dentalMode ? "Consultas" : "Padecimiento"}
+              </TabsTrigger>
+              {dentalMode && (
+                <>
+                  <TabsTrigger value="plan" className="text-xs sm:text-sm whitespace-nowrap">Plan / Contrato</TabsTrigger>
+                  <TabsTrigger value="pagos" className="text-xs sm:text-sm whitespace-nowrap">Estado de cuenta</TabsTrigger>
+                  <TabsTrigger value="imagenes" className="text-xs sm:text-sm whitespace-nowrap">Imágenes</TabsTrigger>
+                </>
+              )}
               <TabsTrigger value="notas" className="text-xs sm:text-sm whitespace-nowrap">Notas</TabsTrigger>
             </TabsList>
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
+
 
           {/* Tab 1: Datos Personales — redesigned with grouped sections */}
           <TabsContent value="datos" className="space-y-5">
@@ -419,42 +460,73 @@ export default function ExpedienteDetalle() {
                 </div>
               </div>
             </FormSection>
+            {dentalMode && (
+              <AntecedentesOdontologicos value={dentalRecord} onChange={setDentalRecord} />
+            )}
           </TabsContent>
 
-          {/* Tab 3: Padecimiento Actual - READ ONLY history */}
+          {/* Odontograma — only in dental mode */}
+          {dentalMode && (
+            <TabsContent value="odontograma">
+              <Odontograma />
+            </TabsContent>
+          )}
+
+          {/* Tab 3: Padecimiento / Consultas */}
           <TabsContent value="padecimiento">
-            <FormSection icon={ClipboardList} title="Historial de consultas" description="Consultas previas del paciente">
-              <div className="flex items-center gap-2 mb-2">
-                {consultations && consultations.length > 0 && (
-                  <Badge variant="secondary" className="text-xs">
-                    {consultations.length} registro{consultations.length !== 1 ? "s" : ""}
-                  </Badge>
+            {dentalMode ? (
+              <ConsultasOdontologicas
+                consultations={consultations}
+                patientId={Number(id)}
+                loading={consultationsLoading}
+              />
+            ) : (
+              <FormSection icon={ClipboardList} title="Historial de consultas" description="Consultas previas del paciente">
+                <div className="flex items-center gap-2 mb-2">
+                  {consultations && consultations.length > 0 && (
+                    <Badge variant="secondary" className="text-xs">
+                      {consultations.length} registro{consultations.length !== 1 ? "s" : ""}
+                    </Badge>
+                  )}
+                </div>
+                {consultationsLoading ? (
+                  <div className="space-y-3">
+                    {Array.from({ length: 3 }).map((_, i) => (<Skeleton key={i} className="h-24 w-full rounded-lg" />))}
+                  </div>
+                ) : consultations && consultations.length > 0 ? (
+                  <div className="space-y-3">
+                    {consultations.map((c, idx) => (
+                      <ConsultationHistoryCard key={c.id} consultation={c} patientId={Number(id)} defaultOpen={idx === 0} />
+                    ))}
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center py-12 text-center">
+                    <FileText className="h-12 w-12 text-muted-foreground/30 mb-3" />
+                    <p className="text-sm text-muted-foreground">No hay consultas registradas para este paciente</p>
+                  </div>
                 )}
-              </div>
-              {consultationsLoading ? (
-                <div className="space-y-3">
-                  {Array.from({ length: 3 }).map((_, i) => (<Skeleton key={i} className="h-24 w-full rounded-lg" />))}
-                </div>
-              ) : consultations && consultations.length > 0 ? (
-                <div className="space-y-3">
-                  {consultations.map((c, idx) => (
-                    <ConsultationHistoryCard key={c.id} consultation={c} patientId={Number(id)} defaultOpen={idx === 0} />
-                  ))}
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center py-12 text-center">
-                  <FileText className="h-12 w-12 text-muted-foreground/30 mb-3" />
-                  <p className="text-sm text-muted-foreground">No hay consultas registradas para este paciente</p>
-                </div>
-              )}
-            </FormSection>
+              </FormSection>
+            )}
           </TabsContent>
+
+          {dentalMode && (
+            <>
+              <TabsContent value="plan"><PlanTratamientoContrato /></TabsContent>
+              <TabsContent value="pagos"><EstadoCuenta /></TabsContent>
+              <TabsContent value="imagenes"><ImagenesClinicas /></TabsContent>
+            </>
+          )}
 
           {/* Tab 4: Notas */}
-          <TabsContent value="notas">
-            <FormSection icon={NotebookPen} title="Notas" description="Notas generales del expediente">
-              <Textarea className="min-h-[300px] md:min-h-[400px]" placeholder="Escriba notas relevantes del paciente..." value={form.notas || ""} onChange={e => updateField("notas", e.target.value)} />
+          <TabsContent value="notas" className="space-y-5">
+            <FormSection icon={NotebookPen} title="Notas clínicas generales" description="Notas generales del expediente">
+              <Textarea className="min-h-[220px]" placeholder="Escriba notas relevantes del paciente..." value={form.notas || ""} onChange={e => updateField("notas", e.target.value)} />
             </FormSection>
+            {dentalMode && (
+              <FormSection icon={Smile} title="Notas odontológicas" description="Observaciones específicas del tratamiento dental">
+                <Textarea className="min-h-[160px]" placeholder="Notas odontológicas…" />
+              </FormSection>
+            )}
           </TabsContent>
         </Tabs>
       </div>
