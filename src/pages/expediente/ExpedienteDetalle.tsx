@@ -203,23 +203,20 @@ export default function ExpedienteDetalle() {
           <Switch checked={dentalMode} onCheckedChange={setDentalMode} />
         </label>
 
-        <Tabs defaultValue="datos" className="space-y-6">
+        <Tabs key={dentalMode ? "dental" : "medico"} defaultValue="datos" className="space-y-6">
           <ScrollArea className="w-full">
             <TabsList className="bg-muted inline-flex w-auto min-w-full sm:min-w-0">
               <TabsTrigger value="datos" className="text-xs sm:text-sm whitespace-nowrap">Datos Personales</TabsTrigger>
-              <TabsTrigger value="antecedentes" className="text-xs sm:text-sm whitespace-nowrap">Antecedentes</TabsTrigger>
-              {dentalMode && (
-                <TabsTrigger value="odontograma" className="text-xs sm:text-sm whitespace-nowrap">Odontograma</TabsTrigger>
-              )}
-              <TabsTrigger value="padecimiento" className="text-xs sm:text-sm whitespace-nowrap">
-                {dentalMode ? "Consultas" : "Padecimiento"}
-              </TabsTrigger>
-              {dentalMode && (
+              {dentalMode ? (
                 <>
-                  <TabsTrigger value="tratamientos" className="text-xs sm:text-sm whitespace-nowrap">Tratamientos</TabsTrigger>
-                  <TabsTrigger value="plan" className="text-xs sm:text-sm whitespace-nowrap">Plan / Contrato</TabsTrigger>
-                  <TabsTrigger value="pagos" className="text-xs sm:text-sm whitespace-nowrap">Estado de cuenta</TabsTrigger>
-                  <TabsTrigger value="imagenes" className="text-xs sm:text-sm whitespace-nowrap">Imágenes</TabsTrigger>
+                  <TabsTrigger value="historial-clinico" className="text-xs sm:text-sm whitespace-nowrap">Historial Clínico</TabsTrigger>
+                  <TabsTrigger value="odontograma" className="text-xs sm:text-sm whitespace-nowrap">Diagrama Dental</TabsTrigger>
+                  <TabsTrigger value="tratamientos" className="text-xs sm:text-sm whitespace-nowrap">Historial Tratamientos</TabsTrigger>
+                </>
+              ) : (
+                <>
+                  <TabsTrigger value="antecedentes" className="text-xs sm:text-sm whitespace-nowrap">Antecedentes</TabsTrigger>
+                  <TabsTrigger value="padecimiento" className="text-xs sm:text-sm whitespace-nowrap">Padecimiento</TabsTrigger>
                 </>
               )}
               <TabsTrigger value="notas" className="text-xs sm:text-sm whitespace-nowrap">Notas</TabsTrigger>
