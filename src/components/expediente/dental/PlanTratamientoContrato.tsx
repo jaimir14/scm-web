@@ -249,9 +249,14 @@ function ContratoCard({ total }: { total: number }) {
   );
 }
 
-function Info({ col, label, value }: { col: number; label: string; value: React.ReactNode }) {
+function Info({ col = 3, label, value }: { col?: number; label: string; value: React.ReactNode }) {
+  const colCls =
+    col === 2 ? "sm:col-span-2" :
+    col === 4 ? "sm:col-span-4" :
+    col === 6 ? "sm:col-span-6" :
+    "sm:col-span-3";
   return (
-    <div className={`col-span-6 sm:col-span-${col}`}>
+    <div className={`col-span-6 ${colCls}`}>
       <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{label}</p>
       <div className="text-sm font-medium mt-0.5">{value}</div>
     </div>
