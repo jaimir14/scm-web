@@ -189,7 +189,7 @@ export default function DoctorPacientes() {
           <Card>
             <CardContent className="p-0">
               <PatientList
-                patients={searchResults}
+                patients={searchResults?.data ?? []}
                 isLoading={loadingSearch && debouncedQuery.length > 0}
                 emptyMessage={query ? "No se encontraron resultados" : "Ingrese un termino de busqueda"}
                 onSelect={handleSelect}
