@@ -408,78 +408,79 @@ export default function ExpedienteDetalle() {
             </FormSection>
           </TabsContent>
 
-          {/* Tab 2: Antecedentes */}
-          <TabsContent value="antecedentes">
-            <FormSection icon={HeartPulse} title="Antecedentes médicos" description="Historial clínico del paciente">
-              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <div className="space-y-2">
-                  <Label className="text-sm font-semibold">Antecedentes Personales Patológicos</Label>
-                  <Textarea className="min-h-[120px]" placeholder="Ingrese antecedentes patológicos..." value={form.antecedentesPatologicos || ""} onChange={e => updateField("antecedentesPatologicos", e.target.value)} />
-                </div>
-                <div className="space-y-3">
-                  <Label className="text-sm font-semibold">Antecedentes Personales No Patológicos</Label>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 rounded-md border bg-muted/30 p-3">
-                    {["Tabaco", "Etilismo", "Ejercicio", "Transfusion", "Alergias", "Drogas"].map(item => (
-                      <div key={item} className="flex items-center gap-2">
-                        <Checkbox id={item} checked={form.antecedentesNoPatologicos?.[item] || false} onCheckedChange={checked => updateNonPathological(item, !!checked)} />
-                        <label htmlFor={item} className="text-sm">{item}</label>
-                      </div>
-                    ))}
+          {/* Antecedentes — only in medical mode */}
+          {!dentalMode && (
+            <TabsContent value="antecedentes">
+              <FormSection icon={HeartPulse} title="Antecedentes médicos" description="Historial clínico del paciente">
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <div className="space-y-2">
+                    <Label className="text-sm font-semibold">Antecedentes Personales Patológicos</Label>
+                    <Textarea className="min-h-[120px]" placeholder="Ingrese antecedentes patológicos..." value={form.antecedentesPatologicos || ""} onChange={e => updateField("antecedentesPatologicos", e.target.value)} />
+                  </div>
+                  <div className="space-y-3">
+                    <Label className="text-sm font-semibold">Antecedentes Personales No Patológicos</Label>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 rounded-md border bg-muted/30 p-3">
+                      {["Tabaco", "Etilismo", "Ejercicio", "Transfusion", "Alergias", "Drogas"].map(item => (
+                        <div key={item} className="flex items-center gap-2">
+                          <Checkbox id={item} checked={form.antecedentesNoPatologicos?.[item] || false} onCheckedChange={checked => updateNonPathological(item, !!checked)} />
+                          <label htmlFor={item} className="text-sm">{item}</label>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-semibold">Antecedentes Quirúrgicos y Traumáticos</Label>
+                    <Textarea className="min-h-[120px]" placeholder="Ingrese antecedentes quirúrgicos..." value={form.antecedentesQuirurgicos || ""} onChange={e => updateField("antecedentesQuirurgicos", e.target.value)} />
+                  </div>
+                  <div className="space-y-3">
+                    <Label className="text-sm font-semibold">Antecedentes Gineco-Obstétricos</Label>
+                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+                      {["FUR", "Menopausia", "TRH", "Planificacion", "Patol. Mamas", "FUPAP", "IRS", "# CS", "Menarca"].map(f => (
+                        <Field key={f} label={f}>
+                          <Input className="h-9" value={form.antecedentesGinecoObstetricos?.[f] || ""} onChange={e => updateGynecological(f, e.target.value)} />
+                        </Field>
+                      ))}
+                    </div>
+                    <Label className="text-sm font-semibold mt-3 block">GPAC</Label>
+                    <div className="grid grid-cols-4 gap-2">
+                      {["G", "P", "A", "C"].map(f => (
+                        <Field key={f} label={f}>
+                          <Input className="h-9" value={form.antecedentesGinecoObstetricos?.[f] || ""} onChange={e => updateGynecological(f, e.target.value)} />
+                        </Field>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-semibold">Antecedentes Heredo-Familiares</Label>
+                    <Textarea className="min-h-[120px]" placeholder="Ingrese antecedentes familiares..." value={form.antecedentesHeredoFamiliares || ""} onChange={e => updateField("antecedentesHeredoFamiliares", e.target.value)} />
+                  </div>
+                  <div className="space-y-2">
+                    <Label className="text-sm font-semibold">Otros</Label>
+                    <Textarea className="min-h-[120px]" placeholder="Otros antecedentes..." value={form.antecedentesOtros || ""} onChange={e => updateField("antecedentesOtros", e.target.value)} />
                   </div>
                 </div>
-                <div className="space-y-2">
-                  <Label className="text-sm font-semibold">Antecedentes Quirúrgicos y Traumáticos</Label>
-                  <Textarea className="min-h-[120px]" placeholder="Ingrese antecedentes quirúrgicos..." value={form.antecedentesQuirurgicos || ""} onChange={e => updateField("antecedentesQuirurgicos", e.target.value)} />
-                </div>
-                <div className="space-y-3">
-                  <Label className="text-sm font-semibold">Antecedentes Gineco-Obstétricos</Label>
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {["FUR", "Menopausia", "TRH", "Planificacion", "Patol. Mamas", "FUPAP", "IRS", "# CS", "Menarca"].map(f => (
-                      <Field key={f} label={f}>
-                        <Input className="h-9" value={form.antecedentesGinecoObstetricos?.[f] || ""} onChange={e => updateGynecological(f, e.target.value)} />
-                      </Field>
-                    ))}
-                  </div>
-                  <Label className="text-sm font-semibold mt-3 block">GPAC</Label>
-                  <div className="grid grid-cols-4 gap-2">
-                    {["G", "P", "A", "C"].map(f => (
-                      <Field key={f} label={f}>
-                        <Input className="h-9" value={form.antecedentesGinecoObstetricos?.[f] || ""} onChange={e => updateGynecological(f, e.target.value)} />
-                      </Field>
-                    ))}
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-sm font-semibold">Antecedentes Heredo-Familiares</Label>
-                  <Textarea className="min-h-[120px]" placeholder="Ingrese antecedentes familiares..." value={form.antecedentesHeredoFamiliares || ""} onChange={e => updateField("antecedentesHeredoFamiliares", e.target.value)} />
-                </div>
-                <div className="space-y-2">
-                  <Label className="text-sm font-semibold">Otros</Label>
-                  <Textarea className="min-h-[120px]" placeholder="Otros antecedentes..." value={form.antecedentesOtros || ""} onChange={e => updateField("antecedentesOtros", e.target.value)} />
-                </div>
-              </div>
-            </FormSection>
-            {dentalMode && (
-              <AntecedentesOdontologicos value={dentalRecord} onChange={setDentalRecord} />
-            )}
-          </TabsContent>
-
-          {/* Odontograma — only in dental mode */}
-          {dentalMode && (
-            <TabsContent value="odontograma">
-              <Odontograma />
+              </FormSection>
             </TabsContent>
           )}
 
-          {/* Tab 3: Padecimiento / Consultas */}
-          <TabsContent value="padecimiento">
-            {dentalMode ? (
-              <ConsultasOdontologicas
-                consultations={consultations}
-                patientId={Number(id)}
-                loading={consultationsLoading}
-              />
-            ) : (
+          {/* Dental-only tabs */}
+          {dentalMode && (
+            <>
+              <TabsContent value="historial-clinico">
+                <AntecedentesOdontologicos value={dentalRecord} onChange={setDentalRecord} />
+              </TabsContent>
+              <TabsContent value="odontograma">
+                <Odontograma />
+              </TabsContent>
+              <TabsContent value="tratamientos">
+                <HistorialTratamientos patientName={fullName || "Paciente"} />
+              </TabsContent>
+            </>
+          )}
+
+          {/* Padecimiento — only in medical mode */}
+          {!dentalMode && (
+            <TabsContent value="padecimiento">
               <FormSection icon={ClipboardList} title="Historial de consultas" description="Consultas previas del paciente">
                 <div className="flex items-center gap-2 mb-2">
                   {consultations && consultations.length > 0 && (
@@ -505,18 +506,7 @@ export default function ExpedienteDetalle() {
                   </div>
                 )}
               </FormSection>
-            )}
-          </TabsContent>
-
-          {dentalMode && (
-            <>
-              <TabsContent value="tratamientos">
-                <HistorialTratamientos patientName={fullName || "Paciente"} />
-              </TabsContent>
-              <TabsContent value="plan"><PlanTratamientoContrato /></TabsContent>
-              <TabsContent value="pagos"><EstadoCuenta /></TabsContent>
-              <TabsContent value="imagenes"><ImagenesClinicas /></TabsContent>
-            </>
+            </TabsContent>
           )}
 
           {/* Tab 4: Notas */}
