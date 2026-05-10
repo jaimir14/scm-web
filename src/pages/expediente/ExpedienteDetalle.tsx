@@ -25,6 +25,7 @@ import { PageHeader, FormSection, FormField as Field, FormGrid, FormPage, Sticky
 import { Odontograma } from "@/components/expediente/dental/Odontograma";
 import { AntecedentesOdontologicos } from "@/components/expediente/dental/AntecedentesOdontologicos";
 import { ConsultasOdontologicas } from "@/components/expediente/dental/ConsultasOdontologicas";
+import { HistorialTratamientos } from "@/components/expediente/dental/HistorialTratamientos";
 import { PlanTratamientoContrato } from "@/components/expediente/dental/PlanTratamientoContrato";
 import { EstadoCuenta } from "@/components/expediente/dental/EstadoCuenta";
 import { ImagenesClinicas } from "@/components/expediente/dental/ImagenesClinicas";
@@ -215,6 +216,7 @@ export default function ExpedienteDetalle() {
               </TabsTrigger>
               {dentalMode && (
                 <>
+                  <TabsTrigger value="tratamientos" className="text-xs sm:text-sm whitespace-nowrap">Tratamientos</TabsTrigger>
                   <TabsTrigger value="plan" className="text-xs sm:text-sm whitespace-nowrap">Plan / Contrato</TabsTrigger>
                   <TabsTrigger value="pagos" className="text-xs sm:text-sm whitespace-nowrap">Estado de cuenta</TabsTrigger>
                   <TabsTrigger value="imagenes" className="text-xs sm:text-sm whitespace-nowrap">Imágenes</TabsTrigger>
@@ -511,6 +513,9 @@ export default function ExpedienteDetalle() {
 
           {dentalMode && (
             <>
+              <TabsContent value="tratamientos">
+                <HistorialTratamientos patientName={fullName || "Paciente"} />
+              </TabsContent>
               <TabsContent value="plan"><PlanTratamientoContrato /></TabsContent>
               <TabsContent value="pagos"><EstadoCuenta /></TabsContent>
               <TabsContent value="imagenes"><ImagenesClinicas /></TabsContent>
