@@ -14,6 +14,7 @@ import { useIsMobile } from "@/hooks/use-mobile";
 import { Skeleton } from "@/components/ui/skeleton";
 import { toast } from "sonner";
 import { formatNumber } from "@/lib/formatters";
+import { ApiError } from "@/lib/api";
 import { useClinics, useCreateClinic, useUpdateClinic, useDeleteClinic, useActiveClinics } from "@/services/clinics.service";
 
 import { useUsers, useCreateUser, useUpdateUser, useDeleteUser } from "@/services/users.service";
@@ -290,7 +291,7 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
     const role = (activeRolesQuery.data || []).find(r => r.id === Number(selectedRolId));
     if (!role?.features) return false;
     return role.features.some(rf => rf.feature?.clave?.startsWith("doctor."));
-  }, [tipo, formData.rol, activeRolesQuery.data]);
+  }, [tipo, formData.rolId, activeRolesQuery.data]);
 
   const openChangePassword = () => {
     setNewPassword("");
@@ -388,6 +389,17 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
       });
     }
 
+    const handleApiError = (err: Error, fallback: string) => {
+      if (err instanceof ApiError && err.details?.length) {
+        const fieldErrors: Record<string, string> = {};
+        err.details.forEach(d => { fieldErrors[d.field] = d.message; });
+        setErrors(fieldErrors);
+        toast.error("Por favor corrija los campos marcados");
+      } else {
+        toast.error(err.message || fallback);
+      }
+    };
+
     if (editingItem) {
       uMutation?.mutate(
         { id: editingItem.id, data: payload },
@@ -396,7 +408,7 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
             toast.success("Registro actualizado");
             setDialogOpen(false);
           },
-          onError: (err: Error) => toast.error(err.message || "Error al actualizar"),
+          onError: (err: Error) => handleApiError(err, "Error al actualizar"),
         }
       );
     } else {
@@ -405,7 +417,7 @@ export default function MantenimientoGenerico({ tipo }: { tipo: string }) {
           toast.success("Registro creado");
           setDialogOpen(false);
         },
-        onError: (err: Error) => toast.error(err.message || "Error al crear"),
+        onError: (err: Error) => handleApiError(err, "Error al crear"),
       });
     }
   };

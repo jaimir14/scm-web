@@ -16,9 +16,9 @@ export function removeToken(): void {
 
 class ApiError extends Error {
   status: number;
-  details?: string[];
+  details?: Array<{ field: string; message: string }>;
 
-  constructor(message: string, status: number, details?: string[]) {
+  constructor(message: string, status: number, details?: Array<{ field: string; message: string }>) {
     super(message);
     this.name = "ApiError";
     this.status = status;
