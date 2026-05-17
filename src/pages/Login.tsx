@@ -27,7 +27,7 @@ export default function Login() {
       if (!user) newErrors.user = "Usuario es requerido";
       if (!pass) newErrors.pass = "Contraseña es requerida";
       setErrors(newErrors);
-      toast.error("Por favor ingrese usuario y contrasena");
+      toast.error("Por favor ingrese usuario y contraseña");
       return;
     }
 
@@ -48,7 +48,7 @@ export default function Login() {
           toast.error(
             error instanceof Error
               ? error.message
-              : "Error al iniciar sesion"
+              : "Error al iniciar sesión"
           );
         },
       }

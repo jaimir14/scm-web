@@ -41,10 +41,10 @@ export default function Configuracion() {
   const handleSave = () => {
     updateConfig.mutate(form, {
       onSuccess: () => {
-        toast.success("Configuracion guardada exitosamente");
+        toast.success("Configuración guardada exitosamente");
       },
       onError: (error) => {
-        toast.error(error instanceof Error ? error.message : "Error al guardar configuracion");
+        toast.error(error instanceof Error ? error.message : "Error al guardar configuración");
       },
     });
   };

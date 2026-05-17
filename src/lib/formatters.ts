@@ -66,14 +66,19 @@ export function formatTimeFromDate(dateStr: string): string {
   return new Date(dateStr).toLocaleTimeString("es", { hour: "2-digit", minute: "2-digit" });
 }
 
-/** Formats a number with locale thousand separators */
-export function formatNumber(n: number): string {
-  return n.toLocaleString();
+/** Formats a number with comma thousand separators (e.g. 150,000) */
+export function formatNumber(n: number | string): string {
+  return Number(n).toLocaleString("en-US");
 }
 
-/** Formats a number as Costa Rican colones (e.g. ₡1,000) */
-export function formatCurrency(amount: number): string {
-  return `₡${amount.toLocaleString()}`;
+/** Returns the currency symbol for a given moneda code */
+export function currencySymbol(moneda: string): string {
+  return moneda === "CRC" ? "₡" : "$";
+}
+
+/** Formats a number as currency with the proper symbol (e.g. ₡150,000) */
+export function formatCurrency(amount: number | string, moneda: string = "CRC"): string {
+  return `${currencySymbol(moneda)}${Number(amount).toLocaleString("en-US")}`;
 }
 
 /** Formats a file size in bytes to a human-readable string (B / KB / MB) */

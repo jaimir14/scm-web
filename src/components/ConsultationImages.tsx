@@ -64,7 +64,7 @@ export function ConsultationImages({
 
     for (const file of Array.from(files)) {
       if (file.size > MAX_IMAGE_SIZE) {
-        toast.error(`"${file.name}" supera el limite de 20MB`);
+        toast.error(`"${file.name}" supera el límite de 20MB`);
         e.target.value = "";
         return;
       }

@@ -1,3 +1,4 @@
+import { useState, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Card, CardContent } from "@/components/ui/card";
@@ -125,8 +126,36 @@ const benefits = [
 ];
 
 
-
 export default function Index() {
+  const [formStatus, setFormStatus] = useState<'idle' | 'submitting' | 'success' | 'error'>('idle');
+  const [formError, setFormError] = useState('');
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const handleContactSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setFormStatus('submitting');
+    setFormError('');
+    try {
+      const formData = new FormData(e.currentTarget);
+      formData.append("access_key", import.meta.env.VITE_WEB3FORMS_ACCESS_KEY);
+      const response = await fetch("https://api.web3forms.com/submit", {
+        method: "POST",
+        body: formData,
+      });
+      const data = await response.json();
+      if (response.ok) {
+        setFormStatus('success');
+        formRef.current?.reset();
+      } else {
+        setFormStatus('error');
+        setFormError(data.message || 'Error desconocido');
+      }
+    } catch {
+      setFormStatus('error');
+      setFormError('Ocurrió un error. Por favor intente de nuevo.');
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Nav */}
@@ -454,43 +483,9 @@ export default function Index() {
             <Card>
               <CardContent className="p-6 md:p-8">
                 <form
+                  ref={formRef}
                   className="space-y-4"
-                  onSubmit={async (e) => {
-                    e.preventDefault();
-                    const form = e.currentTarget;
-                    const submitBtn = form.querySelector<HTMLButtonElement>('button[type="submit"]')!;
-                    const originalText = submitBtn.textContent;
-                    submitBtn.textContent = "Enviando...";
-                    submitBtn.disabled = true;
-                    const banner = form.querySelector<HTMLDivElement>('[data-form-banner]')!;
-                    banner.setAttribute('hidden', '');
-                    try {
-                      const formData = new FormData(form);
-                      formData.append("access_key", import.meta.env.VITE_WEB3FORMS_ACCESS_KEY);
-                      const response = await fetch("https://api.web3forms.com/submit", {
-                        method: "POST",
-                        body: formData,
-                      });
-                      const data = await response.json();
-                      if (response.ok) {
-                        banner.className = "flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800 dark:border-green-800 dark:bg-green-950/40 dark:text-green-300";
-                        banner.innerHTML = '<svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span>¡Mensaje enviado! Nos pondremos en contacto a la brevedad.</span>';
-                        banner.removeAttribute('hidden');
-                        form.reset();
-                      } else {
-                        banner.className = "flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-800 dark:bg-red-950/40 dark:text-red-300";
-                        banner.innerHTML = '<svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span>Error al enviar: ' + data.message + '</span>';
-                        banner.removeAttribute('hidden');
-                      }
-                    } catch {
-                      banner.className = "flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-800 dark:bg-red-950/40 dark:text-red-300";
-                      banner.innerHTML = '<svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg><span>Ocurrió un error. Por favor intente de nuevo.</span>';
-                      banner.removeAttribute('hidden');
-                    } finally {
-                      submitBtn.textContent = originalText;
-                      submitBtn.disabled = false;
-                    }
-                  }}
+                  onSubmit={handleContactSubmit}
                 >
                   <div className="grid gap-4 sm:grid-cols-2">
                     <div>
@@ -541,9 +536,20 @@ export default function Index() {
                       placeholder="Cuéntenos sobre su clínica y qué necesita..."
                     />
                   </div>
-                  <div data-form-banner hidden />
-                  <Button type="submit" size="lg" className="w-full text-base">
-                    Solicitar Demo Gratuita
+                  {formStatus === 'success' && (
+                    <div className="flex items-center gap-3 rounded-lg border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800 dark:border-green-800 dark:bg-green-950/40 dark:text-green-300">
+                      <CheckCircle2 className="h-4 w-4 shrink-0" />
+                      <span>¡Mensaje enviado! Nos pondremos en contacto a la brevedad.</span>
+                    </div>
+                  )}
+                  {formStatus === 'error' && (
+                    <div className="flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 dark:border-red-800 dark:bg-red-950/40 dark:text-red-300">
+                      <Zap className="h-4 w-4 shrink-0" />
+                      <span>{formError}</span>
+                    </div>
+                  )}
+                  <Button type="submit" size="lg" className="w-full text-base" disabled={formStatus === 'submitting'}>
+                    {formStatus === 'submitting' ? 'Enviando...' : 'Solicitar Demo Gratuita'}
                   </Button>
                 </form>
               </CardContent>

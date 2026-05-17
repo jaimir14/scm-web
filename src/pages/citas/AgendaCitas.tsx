@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { Calendar } from "@/components/ui/calendar";
 import { Button } from "@/components/ui/button";
@@ -95,17 +95,19 @@ export default function AgendaCitas() {
     }
   }, [appointments, searchParams, setSearchParams]);
 
-  // Keep date in URL
+  // Keep date in URL — use ref to avoid stale closures
+  const searchParamsRef = useRef(searchParams);
+  searchParamsRef.current = searchParams;
+
   useEffect(() => {
     if (!date) return;
     const dStr = formatDateToApi(date);
-    if (searchParams.get("date") !== dStr) {
-      const next = new URLSearchParams(searchParams);
+    if (searchParamsRef.current.get("date") !== dStr) {
+      const next = new URLSearchParams(searchParamsRef.current);
       next.set("date", dStr);
       setSearchParams(next, { replace: true });
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [date]);
+  }, [date, setSearchParams]);
 
   const handleMarkAttended = () => {
     if (!selectedAppointment) return;
@@ -435,6 +437,7 @@ function CrearCitaForm({ onClose }: { onClose: () => void }) {
   const [showExpressForm, setShowExpressForm] = useState(false);
   const [expressNombre, setExpressNombre] = useState("");
   const [expressTelefono, setExpressTelefono] = useState("");
+  const [expressCedula, setExpressCedula] = useState("");
   const [expressSexo, setExpressSexo] = useState<"MASCULINO" | "FEMENINO" | "">("");
 
   const { data: professionals } = useActiveProfessionals();
@@ -461,6 +464,10 @@ function CrearCitaForm({ onClose }: { onClose: () => void }) {
       toast.error("El sexo es requerido");
       return;
     }
+    if (!expressCedula.trim()) {
+      toast.error("La cédula o identificación es requerida");
+      return;
+    }
     const parts = expressNombre.trim().split(/\s+/);
     const nombre = parts[0];
     const apellido1 = parts.length > 1 ? parts.slice(1).join(" ") : "Por definir";
@@ -469,14 +476,13 @@ function CrearCitaForm({ onClose }: { onClose: () => void }) {
         clinicaId: Number(clinicaId),
         profesionalId: Number(profesionalId),
         tipoIdentificacion: "CEDULA",
-        numeroIdentificacion: `TEMP-${Date.now()}`,
+        numeroIdentificacion: expressCedula.trim(),
         nombre,
         apellido1,
         telefonoCelular: expressTelefono.trim(),
         sexo: expressSexo,
         estadoCivil: "SOLTERO",
         direccion: "Por definir",
-        fechaNacimiento: "2000-01-01",
       },
       {
         onSuccess: (newPatient) => {
@@ -485,6 +491,7 @@ function CrearCitaForm({ onClose }: { onClose: () => void }) {
           setShowExpressForm(false);
           setExpressNombre("");
           setExpressTelefono("");
+          setExpressCedula("");
           setExpressSexo("");
           setSearchQuery("");
           clearError("paciente");
@@ -611,6 +618,13 @@ function CrearCitaForm({ onClose }: { onClose: () => void }) {
                   />
                 </AgendaField>
                 <div className="grid grid-cols-2 gap-2">
+                  <AgendaField label="Cédula / ID" required>
+                    <Input
+                      placeholder="Ej. 1-1234-5678"
+                      value={expressCedula}
+                      onChange={e => setExpressCedula(e.target.value)}
+                    />
+                  </AgendaField>
                   <AgendaField label="Teléfono Celular">
                     <Input
                       placeholder="Teléfono"
@@ -618,6 +632,8 @@ function CrearCitaForm({ onClose }: { onClose: () => void }) {
                       onChange={e => setExpressTelefono(e.target.value)}
                     />
                   </AgendaField>
+                </div>
+                <div className="grid grid-cols-2 gap-2">
                   <AgendaField label="Sexo">
                     <Select value={expressSexo} onValueChange={v => setExpressSexo(v as "MASCULINO" | "FEMENINO")}>
                       <SelectTrigger><SelectValue placeholder="Seleccione..." /></SelectTrigger>
@@ -634,7 +650,7 @@ function CrearCitaForm({ onClose }: { onClose: () => void }) {
                     size="sm"
                     className="flex-1"
                     onClick={handleExpressCreate}
-                    disabled={!expressNombre.trim() || !expressTelefono.trim() || !expressSexo || createPatient.isPending}
+                    disabled={!expressNombre.trim() || !expressCedula.trim() || !expressSexo || createPatient.isPending}
                   >
                     {createPatient.isPending && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
                     Guardar Paciente y Continuar
@@ -643,7 +659,7 @@ function CrearCitaForm({ onClose }: { onClose: () => void }) {
                     type="button"
                     size="sm"
                     variant="ghost"
-                    onClick={() => { setShowExpressForm(false); setExpressSexo(""); }}
+                    onClick={() => { setShowExpressForm(false); setExpressSexo(""); setExpressCedula(""); }}
                     disabled={createPatient.isPending}
                   >
                     Cancelar

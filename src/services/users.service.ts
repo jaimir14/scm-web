@@ -16,6 +16,13 @@ export function useDoctors() {
   });
 }
 
+export function useDentists() {
+  return useQuery({
+    queryKey: ["users", "dentists"],
+    queryFn: () => api.get<User[]>("/api/v1/users/dentists"),
+  });
+}
+
 export function useCreateUser() {
   const queryClient = useQueryClient();
   return useMutation({

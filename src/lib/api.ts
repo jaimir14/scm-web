@@ -29,14 +29,6 @@ class ApiError extends Error {
 export { ApiError };
 
 async function handleResponse<T>(response: Response): Promise<T> {
-  if (response.status === 401) {
-    removeToken();
-    if (window.location.pathname !== "/login") {
-      window.location.href = "/login";
-    }
-    throw new ApiError("No autorizado", 401);
-  }
-
   if (response.status === 204) {
     return undefined as T;
   }
@@ -45,6 +37,20 @@ async function handleResponse<T>(response: Response): Promise<T> {
   try {
     json = await response.json();
   } catch {
+    // Si no se puede parsear JSON, no fallamos inmediatamente, 
+    // verificamos si era un error HTTP conocido primero
+  }
+
+  if (response.status === 401) {
+    removeToken();
+    if (window.location.pathname !== "/login") {
+      window.location.href = "/login";
+    }
+    const errorMessage = json?.error || json?.message || "Credenciales incorrectas o sesión expirada";
+    throw new ApiError(errorMessage, 401);
+  }
+
+  if (!json) {
     throw new ApiError(`Error ${response.status}: respuesta no valida`, response.status);
   }
 
@@ -82,18 +88,23 @@ async function request<T>(
 }
 
 async function handlePaginatedResponse<T>(response: Response): Promise<{ data: T[]; meta: PaginationMeta }> {
+  let json: any;
+  try {
+    json = await response.json();
+  } catch {
+    // Continue below
+  }
+
   if (response.status === 401) {
     removeToken();
     if (window.location.pathname !== "/login") {
       window.location.href = "/login";
     }
-    throw new ApiError("No autorizado", 401);
+    const errorMessage = json?.error || json?.message || "Credenciales incorrectas o sesión expirada";
+    throw new ApiError(errorMessage, 401);
   }
 
-  let json: any;
-  try {
-    json = await response.json();
-  } catch {
+  if (!json) {
     throw new ApiError(`Error ${response.status}: respuesta no valida`, response.status);
   }
 

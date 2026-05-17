@@ -3,7 +3,7 @@ import { Link, useLocation } from "react-router-dom";
 import {
   LayoutDashboard, CalendarDays, FolderOpen, Building2, Users, UserCog,
   FileText, BarChart3, Shield, Activity, Settings, LogOut, ChevronDown,
-  Stethoscope, ListChecks, ClipboardList, Menu, X, KeyRound, Wallet
+  Stethoscope, ListChecks, ClipboardList, Menu, X, KeyRound, Wallet, FileSignature
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "./ThemeToggle";
@@ -34,17 +34,12 @@ const navigation: NavItem[] = [
     ]
   },
   {
-    label: "Facturación", icon: Wallet, children: [
-      { label: "Contratos", href: "/facturacion/contratos" },
-      { label: "Estado de Cuenta", href: "/facturacion/estado-cuenta" },
-    ]
-  },
-  {
     label: "Mantenimientos", icon: Settings, children: [
       { label: "Clínicas", href: "/mantenimientos/clinicas", permission: "mantenimientos.clinicas" },
       { label: "Usuarios", href: "/mantenimientos/usuarios", adminOnly: true },
       { label: "Tipos de Cita", href: "/mantenimientos/tipos-cita", permission: "mantenimientos.tipos_cita" },
       { label: "Tratamientos", href: "/mantenimientos/tratamientos", permission: "mantenimientos.tratamientos" },
+      { label: "Contratos", href: "/mantenimientos/contratos", permission: "contratos.ver" },
     ]
   },
   {

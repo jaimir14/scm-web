@@ -60,7 +60,10 @@ async function mockLogin(credentials: LoginRequest): Promise<LoginResponse> {
 export async function loginApi(credentials: LoginRequest): Promise<LoginResponse> {
   try {
     return await api.post<LoginResponse>("/api/v1/auth/login", credentials);
-  } catch {
+  } catch (error: any) {
+    if (error && error.name === "ApiError") {
+      throw error;
+    }
     // Fallback to local mock when the backend is unreachable (prototype mode)
     return mockLogin(credentials);
   }
