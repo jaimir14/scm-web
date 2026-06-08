@@ -13,6 +13,22 @@ export default {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ['Rubik', 'system-ui', 'sans-serif'],
+        display: ['"Space Mono"', 'ui-monospace', 'monospace'],
+        mono: ['"Space Mono"', 'ui-monospace', 'monospace'],
+      },
+      backgroundImage: {
+        'gradient-mint': 'var(--gradient-mint)',
+        'gradient-primary': 'var(--gradient-primary)',
+        'gradient-hero': 'var(--gradient-hero)',
+        'gradient-soft': 'var(--gradient-soft)',
+      },
+      boxShadow: {
+        elegant: 'var(--shadow-elegant)',
+        glow: 'var(--shadow-glow)',
+        card: 'var(--shadow-card)',
+      },
       colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
