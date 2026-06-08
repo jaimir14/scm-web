@@ -483,6 +483,7 @@ function CrearCitaForm({ onClose }: { onClose: () => void }) {
         sexo: expressSexo,
         estadoCivil: "SOLTERO",
         direccion: "Por definir",
+        fechaNacimiento: new Date().toISOString().split("T")[0],
       },
       {
         onSuccess: (newPatient) => {
