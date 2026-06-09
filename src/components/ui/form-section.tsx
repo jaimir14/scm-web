@@ -85,17 +85,18 @@ export function FormSection({
   className,
 }: FormSectionProps) {
   return (
-    <Card className={cn("overflow-hidden", className)}>
-      <div className="flex items-start gap-3 px-6 pt-6">
+    <Card className={cn("overflow-hidden border-border/70 shadow-[var(--shadow-soft)] hover:shadow-[var(--shadow-card)] transition-shadow", className)}>
+      <div className="relative flex items-start gap-3 px-6 pt-5 pb-4 border-b border-border/50 bg-gradient-to-r from-[hsl(var(--primary-soft)/0.5)] via-card to-card">
+        <span className="absolute left-0 top-5 bottom-4 w-[3px] rounded-r-full bg-gradient-to-b from-[hsl(var(--primary))] to-[hsl(var(--primary-glow))]" />
         {Icon && (
-          <div className="h-9 w-9 rounded-lg bg-primary/10 text-primary flex items-center justify-center shrink-0">
-            <Icon className="h-4 w-4" />
+          <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-[hsl(var(--primary))] to-[hsl(var(--primary-glow))] text-primary-foreground flex items-center justify-center shrink-0 shadow-[0_4px_12px_-4px_hsl(var(--primary)/0.45)]">
+            <Icon className="h-[15px] w-[15px]" />
           </div>
         )}
         <div className="min-w-0 flex-1">
-          <h2 className="text-base font-semibold text-foreground leading-tight">{title}</h2>
+          <h2 className="text-[15px] font-semibold text-foreground leading-tight tracking-tight">{title}</h2>
           {description && (
-            <p className="text-xs text-muted-foreground mt-0.5">{description}</p>
+            <p className="text-xs text-muted-foreground mt-1">{description}</p>
           )}
         </div>
         {actions && <div className="shrink-0 flex items-center gap-2">{actions}</div>}
