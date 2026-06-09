@@ -160,21 +160,22 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
 
 
-      <div className="p-3 border-t border-sidebar-border">
-        <div className="flex items-center gap-2 px-2 py-1.5">
-          <div className="h-8 w-8 rounded-full bg-sidebar-accent flex items-center justify-center shrink-0">
-            <UserCog className="h-4 w-4" />
+      <div className="relative p-3 border-t border-white/15">
+        <div className="flex items-center gap-2.5 px-2 py-2 rounded-xl bg-white/10 backdrop-blur-sm">
+          <div className="h-9 w-9 rounded-full bg-gradient-coral flex items-center justify-center shrink-0 shadow-coral ring-2 ring-white/40">
+            <UserCog className="h-4 w-4 text-white" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium truncate">{user?.nombre ?? "Usuario"}</p>
-            <p className="text-[10px] text-sidebar-foreground/60">{user?.rol ?? ""}</p>
+            <p className="text-xs font-semibold truncate text-white">{user?.nombre ?? "Usuario"}</p>
+            <p className="text-[10px] text-white/70 truncate">{user?.rol ?? ""}</p>
           </div>
           <ThemeToggle />
-          <button onClick={() => logout()} className="p-1 hover:bg-sidebar-accent rounded">
+          <button onClick={() => logout()} className="p-1.5 hover:bg-white/15 rounded-lg transition-colors" title="Cerrar sesión">
             <LogOut className="h-4 w-4" />
           </button>
         </div>
       </div>
+
     </>
   );
 }
