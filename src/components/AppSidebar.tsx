@@ -267,9 +267,11 @@ export default function AppSidebar() {
       "flex flex-col bg-gradient-sidebar text-white h-screen sticky top-0 transition-all duration-200 z-30 border-r-0 relative overflow-hidden",
       collapsed ? "w-16" : "w-60"
     )}>
+      <span className="pointer-events-none absolute inset-x-0 top-0 h-[2px] bg-gradient-to-r from-[hsl(var(--primary-glow))] via-white/40 to-[hsl(var(--coral))] opacity-70" />
       <div className="pointer-events-none absolute -top-32 -left-20 h-72 w-72 rounded-full bg-[hsl(var(--primary-glow)/0.15)] blur-3xl" />
       <div className="pointer-events-none absolute bottom-10 -right-20 h-64 w-64 rounded-full bg-[hsl(var(--coral)/0.12)] blur-3xl" />
       <div className="relative flex items-center justify-between p-4 border-b border-white/10">
+
         {!collapsed && (
           <div className="flex items-center gap-2.5">
             <div className="h-10 w-10 rounded-2xl bg-white flex items-center justify-center shadow-md">
