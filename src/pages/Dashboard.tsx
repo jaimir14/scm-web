@@ -196,10 +196,10 @@ export default function Dashboard() {
           </Card>
 
           {/* Activity - 2 cols */}
-          <Card className="lg:col-span-2 border-border/70 bg-gradient-soft">
+          <Card className="lg:col-span-2 border-border/70 bg-card">
             <CardHeader className="pb-3">
               <CardTitle className="font-display text-base md:text-lg flex items-center gap-2">
-                <span className="p-1.5 rounded-lg bg-primary/10 text-primary">
+                <span className="p-1.5 rounded-lg bg-[hsl(var(--primary-soft))] text-[hsl(var(--primary-dark))]">
                   <Activity className="h-4 w-4" />
                 </span>
                 Actividad reciente
@@ -220,10 +220,10 @@ export default function Dashboard() {
                 ))
               ) : activity && activity.length > 0 ? (
                 <div className="relative">
-                  <div className="absolute left-[7px] top-2 bottom-2 w-px bg-border" />
+                  <div className="absolute left-[11px] top-3 bottom-3 w-px bg-gradient-to-b from-border via-border to-transparent" />
                   {activity.map((a, i) => (
-                    <div key={a.id || i} className="relative flex items-start gap-3 p-2.5 rounded-lg hover:bg-accent/40 transition-colors">
-                      <div className="relative z-10 mt-1.5 h-3.5 w-3.5 rounded-full bg-background border-2 border-primary" />
+                    <div key={a.id || i} className="group relative flex items-start gap-3 p-2.5 rounded-xl hover:bg-[hsl(var(--primary-soft)/0.45)] transition-colors">
+                      <div className="relative z-10 mt-1.5 h-2.5 w-2.5 rounded-full bg-card ring-2 ring-[hsl(var(--primary)/0.55)] group-hover:ring-[hsl(var(--primary))] group-hover:scale-110 transition-all ml-1" />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-foreground truncate">{a.accion}</p>
                         <p className="text-xs text-muted-foreground truncate">{a.detalle}</p>
