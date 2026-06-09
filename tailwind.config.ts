@@ -81,6 +81,23 @@ export default {
           DEFAULT: "hsl(var(--warning))",
           foreground: "hsl(var(--warning-foreground))",
         },
+        info: {
+          DEFAULT: "hsl(var(--info))",
+          foreground: "hsl(var(--info-foreground))",
+        },
+        coral: {
+          DEFAULT: "hsl(var(--coral))",
+          foreground: "hsl(var(--coral-foreground))",
+          soft: "hsl(var(--coral-soft))",
+        },
+        "primary-soft": {
+          DEFAULT: "hsl(var(--primary-soft))",
+          foreground: "hsl(var(--primary-soft-foreground))",
+        },
+        "accent-soft": {
+          DEFAULT: "hsl(var(--accent-soft))",
+          foreground: "hsl(var(--accent-soft-foreground))",
+        },
       },
       borderRadius: {
         lg: "var(--radius)",
