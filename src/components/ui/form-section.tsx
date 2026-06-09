@@ -37,15 +37,18 @@ export function PageHeader({
   className,
 }: PageHeaderProps) {
   return (
-    <div className={cn("flex items-start gap-4", className)}>
+    <div className={cn("relative flex items-start gap-4 rounded-2xl border border-border/60 bg-gradient-to-br from-card via-card to-[hsl(var(--primary-soft)/0.4)] p-5 md:p-6 shadow-[var(--shadow-soft)] overflow-hidden", className)}>
+      <div className="pointer-events-none absolute -top-16 -right-12 h-40 w-40 rounded-full bg-[hsl(var(--primary-glow)/0.08)] blur-3xl" />
+      <div className="pointer-events-none absolute -bottom-20 right-1/3 h-32 w-32 rounded-full bg-[hsl(var(--coral)/0.06)] blur-3xl" />
       {Icon && (
-        <div className="h-12 w-12 md:h-14 md:w-14 rounded-2xl bg-gradient-to-br from-primary to-primary/70 text-primary-foreground flex items-center justify-center shadow-sm shrink-0">
+        <div className="relative h-12 w-12 md:h-14 md:w-14 rounded-2xl bg-gradient-to-br from-[hsl(var(--primary))] to-[hsl(var(--primary-glow))] text-primary-foreground flex items-center justify-center shadow-[var(--shadow-glow)] shrink-0 ring-4 ring-[hsl(var(--primary)/0.08)]">
           <Icon className="h-5 w-5 md:h-6 md:w-6" />
+          <span className="absolute -bottom-0.5 -right-0.5 h-3 w-3 rounded-full bg-[hsl(var(--coral))] ring-2 ring-card" />
         </div>
       )}
-      <div className="min-w-0 flex-1">
+      <div className="relative min-w-0 flex-1">
         {eyebrow && (
-          <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
+          <p className="text-[10.5px] uppercase tracking-[0.14em] text-[hsl(var(--primary))] font-semibold mb-1">
             {eyebrow}
           </p>
         )}
@@ -53,10 +56,10 @@ export function PageHeader({
           {title}
         </h1>
         {description && (
-          <p className="text-sm text-muted-foreground mt-1">{description}</p>
+          <p className="text-sm text-muted-foreground mt-1.5">{description}</p>
         )}
       </div>
-      {actions && <div className="shrink-0 flex items-center gap-2">{actions}</div>}
+      {actions && <div className="relative shrink-0 flex items-center gap-2">{actions}</div>}
     </div>
   );
 }
