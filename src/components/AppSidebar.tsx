@@ -181,21 +181,25 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
       </nav>
 
 
-      <div className="relative p-3 border-t border-white/10">
-        <div className="flex items-center gap-2.5 px-2 py-2 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm">
-          <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[hsl(var(--coral))] to-[hsl(var(--primary-glow))] flex items-center justify-center shrink-0 shadow-md ring-2 ring-white/20">
-            <UserCog className="h-4 w-4 text-white" />
+      <div className="relative p-3 border-t border-white/[0.08]">
+        <div className="flex items-center gap-2.5 px-2.5 py-2.5 rounded-2xl bg-gradient-to-br from-white/[0.08] to-white/[0.03] border border-white/[0.08] backdrop-blur-sm">
+          <div className="relative shrink-0">
+            <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[hsl(var(--primary-glow))] to-[hsl(var(--coral))] flex items-center justify-center shadow-md ring-2 ring-white/15">
+              <UserCog className="h-4 w-4 text-white" />
+            </div>
+            <span className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full bg-[hsl(var(--success))] ring-2 ring-[hsl(var(--primary-dark))]" />
           </div>
           <div className="flex-1 min-w-0">
             <p className="text-xs font-semibold truncate text-white">{user?.nombre ?? "Usuario"}</p>
-            <p className="text-[10px] text-white/60 truncate">{user?.rol ?? ""}</p>
+            <p className="text-[10px] text-white/55 truncate">{user?.rol ?? ""}</p>
           </div>
           <ThemeToggle />
-          <button onClick={() => logout()} className="p-1.5 hover:bg-white/10 rounded-lg transition-colors text-white/70 hover:text-[hsl(var(--coral))]" title="Cerrar sesión">
+          <button onClick={() => logout()} className="p-1.5 hover:bg-[hsl(var(--coral)/0.15)] rounded-lg transition-colors text-white/65 hover:text-[hsl(var(--coral))]" title="Cerrar sesión">
             <LogOut className="h-4 w-4" />
           </button>
         </div>
       </div>
+
     </>
   );
 }
