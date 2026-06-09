@@ -177,35 +177,45 @@ export default function ExpedienteDetalle() {
     <div className="p-4 md:p-8 pb-40 md:pb-36">
       <div className="mx-auto w-full max-w-5xl space-y-6">
         {/* Page header */}
-        <div className="flex items-start gap-4">
-          <div className="h-14 w-14 rounded-2xl bg-gradient-to-br from-primary to-primary/70 text-primary-foreground flex items-center justify-center text-lg font-semibold shadow-sm shrink-0">
-            {initials}
+        <div className="relative overflow-hidden rounded-2xl border border-border/60 bg-card shadow-[var(--shadow-soft)]">
+          <span className="absolute inset-x-0 top-0 h-[3px] bg-gradient-to-r from-[hsl(var(--primary))] via-[hsl(var(--primary-glow))] to-[hsl(var(--coral))]" />
+          <div className="flex items-center gap-4 p-5 md:p-6">
+            <div className="relative h-14 w-14 rounded-2xl bg-gradient-to-br from-[hsl(var(--primary))] to-[hsl(var(--primary-dark))] text-primary-foreground flex items-center justify-center text-lg font-semibold shadow-[0_8px_22px_-10px_hsl(var(--primary)/0.55)] shrink-0 ring-4 ring-[hsl(var(--primary)/0.08)]">
+              {initials}
+              {dentalMode && (
+                <span className="absolute -bottom-1 -right-1 h-5 w-5 rounded-full bg-[hsl(var(--coral))] ring-2 ring-card flex items-center justify-center">
+                  <Smile className="h-3 w-3 text-white" />
+                </span>
+              )}
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-[10.5px] uppercase tracking-[0.14em] text-[hsl(var(--primary))] font-semibold">
+                {isNew ? "Nuevo expediente" : `Expediente #${id}`}
+                {dentalMode && <span className="ml-2 text-[hsl(var(--coral))]">· Odontológico</span>}
+              </p>
+              <h1 className="text-2xl md:text-3xl font-bold text-foreground leading-tight truncate mt-0.5">
+                {fullName || "Paciente sin nombre"}
+              </h1>
+            </div>
+            <label className="hidden md:flex items-center gap-2.5 shrink-0 rounded-xl border border-border/70 bg-[hsl(var(--primary-soft)/0.4)] px-3.5 py-2 cursor-pointer hover:bg-[hsl(var(--primary-soft))] transition-colors">
+              <span className="flex h-7 w-7 items-center justify-center rounded-lg bg-card text-[hsl(var(--primary))] ring-1 ring-[hsl(var(--primary)/0.15)]">
+                <Smile className="h-4 w-4" />
+              </span>
+              <span className="text-xs font-medium text-foreground">Vista odontológica</span>
+              <Switch checked={dentalMode} onCheckedChange={setDentalMode} />
+            </label>
           </div>
-          <div className="min-w-0 flex-1">
-            <p className="text-xs uppercase tracking-wider text-muted-foreground font-medium">
-              {isNew ? "Nuevo expediente" : `Expediente #${id}`}
-              {dentalMode && <span className="ml-2 text-primary">· Odontológico</span>}
-            </p>
-            <h1 className="text-2xl md:text-3xl font-bold text-foreground truncate">
-              {fullName || "Paciente sin nombre"}
-            </h1>
-          </div>
-          <label className="hidden md:flex items-center gap-2 shrink-0 rounded-md border bg-card px-3 py-2 cursor-pointer">
-            <Smile className="h-4 w-4 text-primary" />
-            <span className="text-xs font-medium">Vista odontológica</span>
+          <label className="md:hidden flex items-center justify-between gap-2 border-t border-border/60 bg-[hsl(var(--primary-soft)/0.3)] px-5 py-3 cursor-pointer">
+            <span className="flex items-center gap-2 text-sm text-foreground">
+              <Smile className="h-4 w-4 text-[hsl(var(--primary))]" /> Vista odontológica
+            </span>
             <Switch checked={dentalMode} onCheckedChange={setDentalMode} />
           </label>
         </div>
-        <label className="md:hidden flex items-center justify-between gap-2 rounded-md border bg-card px-3 py-2 cursor-pointer">
-          <span className="flex items-center gap-2 text-sm">
-            <Smile className="h-4 w-4 text-primary" /> Vista odontológica
-          </span>
-          <Switch checked={dentalMode} onCheckedChange={setDentalMode} />
-        </label>
 
         <Tabs key={dentalMode ? "dental" : "medico"} defaultValue="datos" className="space-y-6">
           <ScrollArea className="w-full">
-            <TabsList className="bg-muted inline-flex w-auto min-w-full sm:min-w-0">
+            <TabsList className="inline-flex w-auto min-w-full sm:min-w-0">
               <TabsTrigger value="datos" className="text-xs sm:text-sm whitespace-nowrap">Datos Personales</TabsTrigger>
               {dentalMode ? (
                 <>
@@ -223,6 +233,7 @@ export default function ExpedienteDetalle() {
             </TabsList>
             <ScrollBar orientation="horizontal" />
           </ScrollArea>
+
 
 
           {/* Tab 1: Datos Personales — redesigned with grouped sections */}
