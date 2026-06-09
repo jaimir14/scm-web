@@ -107,13 +107,13 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                 className={cn(
                   "group relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all",
                   isActive(item.href)
-                    ? "bg-gradient-primary text-primary-foreground shadow-glow"
-                    : "text-foreground/75 hover:bg-[hsl(var(--primary-soft))] hover:text-[hsl(var(--primary-dark))]"
+                    ? "bg-white text-[hsl(var(--primary-dark))] shadow-[0_8px_24px_-12px_rgba(0,0,0,0.35)]"
+                    : "text-white/80 hover:bg-white/10 hover:text-white"
                 )}
               >
                 <item.icon className={cn(
                   "h-[18px] w-[18px] shrink-0 transition-transform group-hover:scale-110",
-                  isActive(item.href) ? "text-white" : "text-[hsl(var(--primary))]"
+                  isActive(item.href) ? "text-[hsl(var(--primary))]" : "text-white/85"
                 )} />
                 <span className="tracking-tight">{item.label}</span>
                 {isActive(item.href) && (
@@ -127,16 +127,16 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                   className={cn(
                     "group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium w-full transition-all",
                     isChildActive(item)
-                      ? "bg-[hsl(var(--primary-soft))] text-[hsl(var(--primary-dark))]"
-                      : "text-foreground/75 hover:bg-[hsl(var(--primary-soft))] hover:text-[hsl(var(--primary-dark))]"
+                      ? "bg-white/10 text-white"
+                      : "text-white/80 hover:bg-white/10 hover:text-white"
                   )}
                 >
-                  <item.icon className="h-[18px] w-[18px] shrink-0 text-[hsl(var(--primary))] transition-transform group-hover:scale-110" />
+                  <item.icon className="h-[18px] w-[18px] shrink-0 text-white/85 transition-transform group-hover:scale-110" />
                   <span className="flex-1 text-left tracking-tight">{item.label}</span>
                   <ChevronDown className={cn("h-3.5 w-3.5 opacity-60 transition-transform", openMenus.includes(item.label) && "rotate-180")} />
                 </button>
                 {openMenus.includes(item.label) && item.children && (
-                  <div className="ml-5 mt-1 space-y-0.5 border-l border-border pl-3">
+                  <div className="ml-5 mt-1 space-y-0.5 border-l border-white/15 pl-3">
                     {item.children.map(child => (
                       <Link
                         key={child.href}
@@ -145,8 +145,8 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                         className={cn(
                           "block px-3 py-1.5 rounded-lg text-[12.5px] transition-all",
                           location.pathname === child.href
-                            ? "bg-[hsl(var(--primary-soft))] text-[hsl(var(--primary-dark))] font-medium"
-                            : "text-muted-foreground hover:bg-[hsl(var(--primary-soft)/0.6)] hover:text-[hsl(var(--primary-dark))]"
+                            ? "bg-white text-[hsl(var(--primary-dark))] font-medium shadow-sm"
+                            : "text-white/70 hover:bg-white/10 hover:text-white"
                         )}
                       >
                         {child.label}
@@ -160,17 +160,17 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         ))}
       </nav>
 
-      <div className="relative p-3 border-t border-border">
-        <div className="flex items-center gap-2.5 px-2 py-2 rounded-xl bg-[hsl(var(--primary-soft)/0.6)] border border-border">
-          <div className="h-9 w-9 rounded-full bg-gradient-primary flex items-center justify-center shrink-0 shadow-glow">
+      <div className="relative p-3 border-t border-white/10">
+        <div className="flex items-center gap-2.5 px-2 py-2 rounded-xl bg-white/5 border border-white/10 backdrop-blur-sm">
+          <div className="h-9 w-9 rounded-full bg-gradient-to-br from-[hsl(var(--coral))] to-[hsl(var(--primary-glow))] flex items-center justify-center shrink-0 shadow-md ring-2 ring-white/20">
             <UserCog className="h-4 w-4 text-white" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-semibold truncate text-foreground">{user?.nombre ?? "Usuario"}</p>
-            <p className="text-[10px] text-muted-foreground truncate">{user?.rol ?? ""}</p>
+            <p className="text-xs font-semibold truncate text-white">{user?.nombre ?? "Usuario"}</p>
+            <p className="text-[10px] text-white/60 truncate">{user?.rol ?? ""}</p>
           </div>
           <ThemeToggle />
-          <button onClick={() => logout()} className="p-1.5 hover:bg-background rounded-lg transition-colors text-muted-foreground hover:text-[hsl(var(--coral))]" title="Cerrar sesión">
+          <button onClick={() => logout()} className="p-1.5 hover:bg-white/10 rounded-lg transition-colors text-white/70 hover:text-[hsl(var(--coral))]" title="Cerrar sesión">
             <LogOut className="h-4 w-4" />
           </button>
         </div>
