@@ -41,11 +41,11 @@ const statConfig = [
   },
 ] as const;
 
-const toneStyles: Record<string, { ring: string; text: string; bg: string; dot: string; glow: string }> = {
-  primary: { ring: "ring-primary/25", text: "text-[hsl(var(--primary-dark))]", bg: "bg-[hsl(var(--primary-soft))]", dot: "bg-primary", glow: "shadow-[0_10px_30px_-12px_hsl(var(--primary)/0.45)]" },
-  info:    { ring: "ring-sky-400/30",  text: "text-sky-700",   bg: "bg-[hsl(var(--info-soft))]",    dot: "bg-sky-500", glow: "shadow-[0_10px_30px_-12px_rgba(56,189,248,0.45)]" },
-  warning: { ring: "ring-warning/30",  text: "text-amber-700", bg: "bg-amber-50",                    dot: "bg-warning", glow: "shadow-[0_10px_30px_-12px_rgba(247,185,85,0.45)]" },
-  success: { ring: "ring-emerald-400/30", text: "text-emerald-700", bg: "bg-emerald-50",            dot: "bg-success", glow: "shadow-[0_10px_30px_-12px_rgba(53,183,121,0.45)]" },
+const toneStyles: Record<string, { ring: string; text: string; bg: string; iconBg: string; dot: string; accent: string }> = {
+  primary: { ring: "ring-[hsl(var(--primary)/0.15)]", text: "text-[hsl(var(--primary-dark))]", bg: "bg-[hsl(var(--primary-soft))]", iconBg: "bg-white", dot: "bg-primary", accent: "from-[hsl(var(--primary)/0.10)] to-transparent" },
+  info:    { ring: "ring-sky-200",                     text: "text-sky-700",                    bg: "bg-sky-50",                        iconBg: "bg-white", dot: "bg-sky-500", accent: "from-sky-100/60 to-transparent" },
+  warning: { ring: "ring-amber-200",                   text: "text-amber-700",                  bg: "bg-amber-50",                      iconBg: "bg-white", dot: "bg-warning", accent: "from-amber-100/60 to-transparent" },
+  success: { ring: "ring-emerald-200",                 text: "text-emerald-700",                bg: "bg-emerald-50",                    iconBg: "bg-white", dot: "bg-success", accent: "from-emerald-100/60 to-transparent" },
 };
 
 
