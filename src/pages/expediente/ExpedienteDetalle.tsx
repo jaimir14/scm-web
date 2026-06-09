@@ -535,20 +535,25 @@ export default function ExpedienteDetalle() {
       </div>
 
       {/* Sticky save bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-20 border-t bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80">
+      <div className="fixed bottom-0 left-0 right-0 z-20 border-t border-border/60 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/80 shadow-[0_-8px_24px_-12px_hsl(220_39%_11%/0.08)]">
         <div className="mx-auto max-w-5xl px-4 md:px-8 py-3 flex items-center justify-between gap-3">
           <p className="hidden sm:block text-xs text-muted-foreground">
             Los campos marcados con <span className="text-destructive">*</span> son obligatorios.
           </p>
           <div className="flex items-center gap-2 ml-auto">
-            <Button variant="outline" onClick={() => navigate(-1)} disabled={isSaving}>Cancelar</Button>
-            <Button onClick={handleSave} disabled={isSaving}>
+            <Button variant="outline" onClick={() => navigate(-1)} disabled={isSaving} className="border-border/70">Cancelar</Button>
+            <Button
+              onClick={handleSave}
+              disabled={isSaving}
+              className="bg-gradient-to-br from-[hsl(var(--primary))] to-[hsl(var(--primary-dark))] hover:from-[hsl(var(--primary))] hover:to-[hsl(var(--primary))] text-primary-foreground shadow-[0_8px_22px_-10px_hsl(var(--primary)/0.6)] hover:shadow-[0_10px_26px_-8px_hsl(var(--primary)/0.7)] transition-all px-5"
+            >
               {isSaving ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Save className="h-4 w-4 mr-2" />}
               {isNew ? "Crear expediente" : "Guardar cambios"}
             </Button>
           </div>
         </div>
       </div>
+
     </div>
   );
 }
