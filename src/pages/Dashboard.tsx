@@ -42,10 +42,10 @@ const statConfig = [
 ] as const;
 
 const toneStyles: Record<string, { ring: string; text: string; bg: string; iconBg: string; dot: string; accent: string }> = {
-  primary: { ring: "ring-[hsl(var(--primary)/0.15)]", text: "text-[hsl(var(--primary-dark))]", bg: "bg-[hsl(var(--primary-soft))]", iconBg: "bg-white", dot: "bg-primary", accent: "from-[hsl(var(--primary)/0.10)] to-transparent" },
-  info:    { ring: "ring-sky-200",                     text: "text-sky-700",                    bg: "bg-sky-50",                        iconBg: "bg-white", dot: "bg-sky-500", accent: "from-sky-100/60 to-transparent" },
-  warning: { ring: "ring-amber-200",                   text: "text-amber-700",                  bg: "bg-amber-50",                      iconBg: "bg-white", dot: "bg-warning", accent: "from-amber-100/60 to-transparent" },
-  success: { ring: "ring-emerald-200",                 text: "text-emerald-700",                bg: "bg-emerald-50",                    iconBg: "bg-white", dot: "bg-success", accent: "from-emerald-100/60 to-transparent" },
+  primary: { ring: "ring-[hsl(var(--primary)/0.20)]", text: "text-[hsl(var(--primary-dark))]", bg: "bg-[hsl(var(--primary-soft))]", iconBg: "bg-gradient-primary text-white shadow-glow", dot: "bg-primary", accent: "from-[hsl(var(--primary)/0.14)] to-transparent" },
+  info:    { ring: "ring-sky-200",                     text: "text-sky-700",                    bg: "bg-sky-50",                        iconBg: "bg-sky-500 text-white shadow-md",       dot: "bg-sky-500", accent: "from-sky-100/70 to-transparent" },
+  warning: { ring: "ring-amber-200",                   text: "text-amber-700",                  bg: "bg-amber-50",                      iconBg: "bg-amber-500 text-white shadow-md",     dot: "bg-warning", accent: "from-amber-100/70 to-transparent" },
+  success: { ring: "ring-emerald-200",                 text: "text-emerald-700",                bg: "bg-emerald-50",                    iconBg: "bg-emerald-500 text-white shadow-md",   dot: "bg-success", accent: "from-emerald-100/70 to-transparent" },
 };
 
 
@@ -63,9 +63,9 @@ export default function Dashboard() {
     <div className="min-h-full bg-gradient-hero">
       <div className="p-4 md:p-8 space-y-6 md:space-y-8 max-w-[1600px] mx-auto">
         {/* Hero header */}
-        <header className="relative overflow-hidden rounded-3xl border border-border bg-card shadow-card">
-          <div className="absolute inset-0 bg-gradient-mint opacity-[0.08] pointer-events-none" />
-          <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-primary/20 blur-3xl pointer-events-none" />
+        <header className="relative overflow-hidden rounded-3xl border border-border bg-gradient-header shadow-card">
+          <div className="absolute -top-24 -right-24 h-64 w-64 rounded-full bg-[hsl(var(--primary)/0.18)] blur-3xl pointer-events-none" />
+          <div className="absolute -bottom-24 -left-24 h-64 w-64 rounded-full bg-[hsl(var(--accent)/0.20)] blur-3xl pointer-events-none" />
           <div className="relative p-6 md:p-8 flex flex-col md:flex-row md:items-end md:justify-between gap-4">
             <div>
               <div className="flex items-center gap-2 text-[11px] font-mono uppercase tracking-[0.2em] text-muted-foreground">
@@ -109,8 +109,8 @@ export default function Dashboard() {
                   <div className={`pointer-events-none absolute -top-16 -right-16 h-40 w-40 rounded-full bg-gradient-to-br ${t.accent} opacity-60 group-hover:opacity-100 transition-opacity`} />
                   <CardContent className="relative p-5 md:p-6">
                     <div className="flex items-start justify-between">
-                      <div className={`relative h-11 w-11 rounded-xl ${t.bg} ${t.text} ring-1 ${t.ring} flex items-center justify-center shadow-sm`}>
-                        <s.icon className="h-[18px] w-[18px]" strokeWidth={2} />
+                      <div className={`relative h-11 w-11 rounded-xl ${t.iconBg} flex items-center justify-center`}>
+                        <s.icon className="h-[18px] w-[18px]" strokeWidth={2.2} />
                       </div>
                       <ArrowUpRight className="h-4 w-4 text-muted-foreground/60 opacity-0 group-hover:opacity-100 group-hover:text-primary group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-all" />
                     </div>
