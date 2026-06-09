@@ -221,14 +221,16 @@ export default function AppSidebar() {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-64 p-0 bg-gradient-sidebar text-sidebar-foreground border-sidebar-border">
-            <div className="flex items-center gap-2 p-4 border-b border-sidebar-border">
-              <Stethoscope className="h-7 w-7 text-sidebar-primary" />
+            <div className="flex items-center gap-2.5 p-4 border-b border-white/15">
+              <div className="h-10 w-10 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center ring-1 ring-white/30">
+                <Stethoscope className="h-5 w-5 text-white" />
+              </div>
               <div>
-                <h1 className="text-base font-bold text-sidebar-primary tracking-wide">SCM</h1>
-                <p className="text-[10px] text-sidebar-foreground/60">Sistema Clínico Médico</p>
+                <h1 className="text-base font-bold text-white tracking-wide">SCM</h1>
+                <p className="text-[10px] text-white/70">Sistema Clínico Médico</p>
               </div>
             </div>
-            <div className="flex flex-col h-[calc(100%-65px)]">
+            <div className="flex flex-col h-[calc(100%-73px)]">
               <SidebarContent onNavigate={() => setMobileOpen(false)} />
             </div>
           </SheetContent>
@@ -242,22 +244,25 @@ export default function AppSidebar() {
       "flex flex-col bg-gradient-sidebar text-sidebar-foreground h-screen sticky top-0 transition-all duration-200 z-30 shadow-elegant relative overflow-hidden",
       collapsed ? "w-16" : "w-60"
     )}>
-      <div className="pointer-events-none absolute -top-20 -left-16 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
+      <div className="pointer-events-none absolute -top-20 -left-16 h-64 w-64 rounded-full bg-white/15 blur-3xl" />
       <div className="pointer-events-none absolute bottom-0 -right-10 h-56 w-56 rounded-full bg-[hsl(var(--coral)/0.25)] blur-3xl" />
-      <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
+      <div className="relative flex items-center justify-between p-4 border-b border-white/15">
         {!collapsed && (
-          <div className="flex items-center gap-2">
-            <Stethoscope className="h-7 w-7 text-sidebar-primary" />
+          <div className="flex items-center gap-2.5">
+            <div className="h-10 w-10 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center ring-1 ring-white/30 shadow-lg">
+              <Stethoscope className="h-5 w-5 text-white" />
+            </div>
             <div>
-              <h1 className="text-base font-bold text-sidebar-foreground tracking-wide">SCM</h1>
-              <p className="text-[10px] text-sidebar-foreground/60">Sistema Clínico Médico</p>
+              <h1 className="text-base font-bold text-white tracking-wide">SCM</h1>
+              <p className="text-[10px] text-white/70">Sistema Clínico Médico</p>
             </div>
           </div>
         )}
-        <button onClick={() => setCollapsed(!collapsed)} className="p-1 rounded hover:bg-sidebar-accent">
+        <button onClick={() => setCollapsed(!collapsed)} className="p-1.5 rounded-lg hover:bg-white/15 text-white transition-colors">
           {collapsed ? <Menu className="h-5 w-5" /> : <X className="h-4 w-4" />}
         </button>
       </div>
+
 
       {collapsed ? (
         <nav className="flex-1 overflow-y-auto py-2 px-2 space-y-0.5">
