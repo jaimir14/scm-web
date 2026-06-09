@@ -104,31 +104,31 @@ export default function Dashboard() {
             const t = toneStyles[s.tone];
             return (
               <Link key={s.label} to={s.href} className="group">
-                <Card className="relative overflow-hidden border-border/60 bg-card hover:border-primary/30 transition-all hover:shadow-elegant hover:-translate-y-1 duration-300">
-                  <div className="absolute -top-12 -right-12 h-32 w-32 rounded-full opacity-[0.08] group-hover:opacity-20 transition-opacity" style={{ background: `hsl(var(--primary))` }} />
-                  <CardContent className="p-4 md:p-5">
+                <Card className="relative overflow-hidden border-border/60 bg-card hover:border-primary/30 transition-all hover:shadow-elegant hover:-translate-y-0.5 duration-300">
+                  <div className={`absolute inset-x-0 top-0 h-px bg-gradient-to-r ${t.accent}`} />
+                  <div className={`pointer-events-none absolute -top-16 -right-16 h-40 w-40 rounded-full bg-gradient-to-br ${t.accent} opacity-60 group-hover:opacity-100 transition-opacity`} />
+                  <CardContent className="relative p-5 md:p-6">
                     <div className="flex items-start justify-between">
-                      <div className={`p-3 rounded-2xl ${t.bg} ${t.text} ring-1 ${t.ring} ${t.glow}`}>
-                        <s.icon className="h-5 w-5" strokeWidth={2.25} />
+                      <div className={`relative h-11 w-11 rounded-xl ${t.bg} ${t.text} ring-1 ${t.ring} flex items-center justify-center shadow-sm`}>
+                        <s.icon className="h-[18px] w-[18px]" strokeWidth={2} />
                       </div>
-
-                      <ArrowUpRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:text-primary transition" />
+                      <ArrowUpRight className="h-4 w-4 text-muted-foreground/60 opacity-0 group-hover:opacity-100 group-hover:text-primary group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-all" />
                     </div>
-                    <div className="mt-4">
+                    <div className="mt-5">
                       {statsLoading ? (
                         <>
-                          <Skeleton className="h-8 w-20 mb-2" />
-                          <Skeleton className="h-3 w-16" />
+                          <Skeleton className="h-9 w-24 mb-2" />
+                          <Skeleton className="h-3 w-20" />
                         </>
                       ) : (
                         <>
-                          <p className="font-display text-3xl md:text-4xl tracking-tight text-foreground tabular-nums">
+                          <p className="font-display text-[34px] md:text-[38px] leading-none tracking-tight text-foreground tabular-nums">
                             {stats ? formatNumber(stats[s.key] ?? 0) : "0"}
                           </p>
-                          <div className="mt-1.5 flex items-center justify-between">
-                            <p className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">{s.label}</p>
-                            <span className={`text-[10px] font-mono ${t.text} flex items-center gap-1`}>
-                              <TrendingUp className="h-3 w-3" />
+                          <div className="mt-3 flex items-center justify-between">
+                            <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">{s.label}</p>
+                            <span className={`inline-flex items-center gap-1 text-[10px] font-medium ${t.text} px-1.5 py-0.5 rounded-md ${t.bg}`}>
+                              <TrendingUp className="h-2.5 w-2.5" />
                               {s.delta}
                             </span>
                           </div>
