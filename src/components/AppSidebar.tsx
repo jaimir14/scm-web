@@ -214,7 +214,7 @@ export default function AppSidebar() {
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-64 p-0 bg-sidebar text-sidebar-foreground border-sidebar-border">
+          <SheetContent side="left" className="w-64 p-0 bg-gradient-sidebar text-sidebar-foreground border-sidebar-border">
             <div className="flex items-center gap-2 p-4 border-b border-sidebar-border">
               <Stethoscope className="h-7 w-7 text-sidebar-primary" />
               <div>
@@ -233,9 +233,11 @@ export default function AppSidebar() {
 
   return (
     <aside className={cn(
-      "flex flex-col bg-sidebar text-sidebar-foreground h-screen sticky top-0 transition-all duration-200 z-30",
+      "flex flex-col bg-gradient-sidebar text-sidebar-foreground h-screen sticky top-0 transition-all duration-200 z-30 shadow-elegant relative overflow-hidden",
       collapsed ? "w-16" : "w-60"
     )}>
+      <div className="pointer-events-none absolute -top-20 -left-16 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
+      <div className="pointer-events-none absolute bottom-0 -right-10 h-56 w-56 rounded-full bg-[hsl(var(--coral)/0.25)] blur-3xl" />
       <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
         {!collapsed && (
           <div className="flex items-center gap-2">
