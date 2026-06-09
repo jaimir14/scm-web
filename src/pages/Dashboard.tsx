@@ -104,13 +104,14 @@ export default function Dashboard() {
             const t = toneStyles[s.tone];
             return (
               <Link key={s.label} to={s.href} className="group">
-                <Card className="relative overflow-hidden border-border/70 hover:border-primary/40 transition-all hover:shadow-elegant hover:-translate-y-0.5">
-                  <div className={`absolute inset-x-0 top-0 h-px ${t.bg}`} />
+                <Card className="relative overflow-hidden border-border/60 bg-card hover:border-primary/30 transition-all hover:shadow-elegant hover:-translate-y-1 duration-300">
+                  <div className="absolute -top-12 -right-12 h-32 w-32 rounded-full opacity-[0.08] group-hover:opacity-20 transition-opacity" style={{ background: `hsl(var(--primary))` }} />
                   <CardContent className="p-4 md:p-5">
                     <div className="flex items-start justify-between">
-                      <div className={`p-2.5 rounded-xl ${t.bg} ${t.text} ring-1 ${t.ring}`}>
-                        <s.icon className="h-5 w-5" />
+                      <div className={`p-3 rounded-2xl ${t.bg} ${t.text} ring-1 ${t.ring} ${t.glow}`}>
+                        <s.icon className="h-5 w-5" strokeWidth={2.25} />
                       </div>
+
                       <ArrowUpRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:text-primary transition" />
                     </div>
                     <div className="mt-4">
