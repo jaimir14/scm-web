@@ -73,14 +73,16 @@
     --gradient-coral: linear-gradient(135deg, hsl(12 100% 67%) 0%, hsl(17 100% 75%) 100%);
     --gradient-header: linear-gradient(120deg, hsl(214 100% 96%) 0%, hsl(0 0% 100%) 50%, hsl(187 95% 94%) 100%);
 
-    /* Sidebar — solid clinical blue */
-    --gradient-sidebar: linear-gradient(180deg,
-      hsl(224 64% 25%) 0%,
-      hsl(221 70% 30%) 50%,
-      hsl(224 64% 22%) 100%);
+    /* Sidebar — refined clinical blue with subtle warmth */
+    --gradient-sidebar: linear-gradient(175deg,
+      hsl(222 55% 19%) 0%,
+      hsl(220 50% 23%) 45%,
+      hsl(218 48% 20%) 100%);
 
-    /* Shadows */
-    --shadow-soft: 0 1px 2px 0 hsl(220 39% 11% / 0.04), 0 2px 6px -1px hsl(220 39% 11% / 0.05);
+    /* Shadows — refined for premium depth */
+    --shadow-soft: 0 1px 2px 0 hsl(220 39% 11% / 0.04), 0 2px 8px -2px hsl(220 39% 11% / 0.05);
+    --shadow-input: 0 1px 2px 0 hsl(220 39% 11% / 0.04), inset 0 1px 0 0 hsl(0 0% 100% / 0.5);
+    --shadow-input-focus: 0 0 0 4px hsl(221 83% 53% / 0.12), 0 1px 2px 0 hsl(220 39% 11% / 0.06);
     --shadow-elegant: 0 24px 60px -28px hsl(221 60% 25% / 0.22), 0 8px 24px -12px hsl(220 39% 11% / 0.06);
     --shadow-glow: 0 12px 36px -10px hsl(221 83% 53% / 0.45);
     --shadow-card: 0 1px 2px hsl(220 39% 11% / 0.04), 0 8px 24px -16px hsl(221 50% 20% / 0.12);
