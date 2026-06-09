@@ -174,7 +174,7 @@ export default function Dashboard() {
                 upcoming.map((a, i) => (
                   <div
                     key={a.id || i}
-                    className="group flex items-center gap-3 md:gap-4 p-2.5 md:p-3 rounded-xl hover:bg-accent/60 transition-colors border border-transparent hover:border-border"
+                    className="group flex items-center gap-3 md:gap-4 p-2.5 md:p-3 rounded-xl hover:bg-[hsl(var(--primary-soft)/0.5)] transition-colors border border-transparent hover:border-[hsl(var(--primary)/0.15)]"
                   >
                     <div className="flex flex-col items-center justify-center min-w-[56px] py-1.5 rounded-lg bg-primary/10 text-primary">
                       <span className="font-mono text-sm font-bold leading-none">{a.hora}</span>
