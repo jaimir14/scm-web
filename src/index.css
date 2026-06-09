@@ -11,82 +11,80 @@
 
 @layer base {
   :root {
-    /* Neutrals */
-    --background: 210 40% 98%;            /* #F8FAFC */
-    --foreground: 222 47% 11%;            /* #0F172A */
+    /* Warm neutrals — crema suave */
+    --background: 36 33% 97%;             /* warm cream */
+    --foreground: 215 25% 18%;            /* elegant dark slate */
 
-    --card: 0 0% 100%;                    /* #FFFFFF */
-    --card-foreground: 222 47% 11%;
+    --card: 0 0% 100%;
+    --card-foreground: 215 25% 18%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222 47% 11%;
+    --popover-foreground: 215 25% 18%;
 
-    /* Brand: teal #0F766E */
-    --primary: 175 77% 26%;
+    /* Brand: warm vibrant teal */
+    --primary: 174 62% 36%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 168 76% 42%;          /* #14B8A6 accent for glows */
+    --primary-glow: 172 70% 45%;
 
-    /* Soft surface #F1F5F9 */
-    --secondary: 210 40% 96%;
-    --secondary-foreground: 222 47% 11%;
+    --secondary: 36 28% 94%;
+    --secondary-foreground: 215 25% 18%;
 
-    --muted: 210 40% 96%;
-    --muted-foreground: 215 16% 47%;      /* #64748B */
+    --muted: 36 24% 93%;
+    --muted-foreground: 215 14% 42%;
 
-    /* Accent = teal #14B8A6 */
-    --accent: 173 80% 40%;
-    --accent-foreground: 0 0% 100%;
+    /* Accent: coral suave */
+    --accent: 14 85% 72%;
+    --accent-foreground: 14 60% 20%;
 
-    /* Danger #DC2626 */
-    --destructive: 0 74% 50%;
+    --destructive: 0 70% 52%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 214 32% 91%;                /* #E2E8F0 */
-    --input: 214 32% 91%;
-    --ring: 175 77% 26%;
+    --border: 32 20% 88%;
+    --input: 32 20% 88%;
+    --ring: 174 62% 36%;
 
-    --radius: 0.75rem;
+    --radius: 0.85rem;
 
-    /* Semantic */
-    --success: 142 71% 38%;               /* #16A34A */
+    --success: 152 55% 40%;
     --success-foreground: 0 0% 100%;
-    --warning: 38 92% 50%;                /* #F59E0B */
-    --warning-foreground: 222 47% 11%;
-    --info: 221 83% 53%;                  /* #2563EB */
+    --warning: 36 92% 55%;
+    --warning-foreground: 215 25% 18%;
+    --info: 199 78% 48%;
     --info-foreground: 0 0% 100%;
 
-    /* Primary light surface #CCFBF1 for soft brand fills */
-    --primary-soft: 168 84% 89%;
-    --primary-soft-foreground: 175 77% 20%;
+    --primary-soft: 172 55% 90%;
+    --primary-soft-foreground: 174 62% 22%;
 
-    /* Gradients */
-    --gradient-hero: radial-gradient(1200px 600px at 10% 0%, hsl(173 80% 40% / 0.12), transparent 60%), radial-gradient(900px 500px at 90% 20%, hsl(221 83% 53% / 0.08), transparent 60%), linear-gradient(180deg, hsl(210 40% 99%), hsl(210 40% 96%));
-    --gradient-primary: linear-gradient(135deg, hsl(175 77% 26%), hsl(173 80% 40%));
-    --gradient-mint: linear-gradient(135deg, hsl(175 77% 26%) 0%, hsl(173 80% 40%) 100%);
-    --gradient-soft: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(210 40% 96%) 100%);
+    --coral: 14 85% 72%;
+    --coral-foreground: 14 60% 20%;
+    --coral-soft: 18 90% 94%;
 
-    /* Shadows — soft, premium clinical */
-    --shadow-soft: 0 1px 2px 0 hsl(222 47% 11% / 0.04), 0 1px 3px 0 hsl(222 47% 11% / 0.06);
-    --shadow-elegant: 0 10px 30px -12px hsl(175 77% 26% / 0.18);
-    --shadow-glow: 0 0 40px -10px hsl(173 80% 40% / 0.30);
-    --shadow-card: 0 1px 2px hsl(222 47% 11% / 0.04), 0 4px 16px -8px hsl(222 47% 11% / 0.08);
+    --gradient-hero: radial-gradient(1200px 600px at 10% 0%, hsl(172 70% 45% / 0.10), transparent 60%), radial-gradient(900px 500px at 90% 20%, hsl(14 85% 72% / 0.10), transparent 60%), linear-gradient(180deg, hsl(36 40% 98%), hsl(36 28% 95%));
+    --gradient-primary: linear-gradient(135deg, hsl(174 62% 32%), hsl(172 70% 45%));
+    --gradient-mint: linear-gradient(135deg, hsl(174 62% 36%) 0%, hsl(172 70% 50%) 100%);
+    --gradient-soft: linear-gradient(180deg, hsl(0 0% 100%) 0%, hsl(36 28% 95%) 100%);
+    --gradient-warm: linear-gradient(135deg, hsl(174 55% 40%) 0%, hsl(14 80% 75%) 100%);
 
-    /* Sidebar — deep teal #115E59 */
-    --sidebar-background: 174 74% 22%;
-    --sidebar-foreground: 168 84% 92%;
-    --sidebar-primary: 168 84% 78%;
-    --sidebar-primary-foreground: 174 74% 15%;
-    --sidebar-accent: 175 70% 18%;
-    --sidebar-accent-foreground: 168 84% 89%;
-    --sidebar-border: 175 60% 17%;
-    --sidebar-ring: 173 80% 50%;
+    --shadow-soft: 0 1px 2px 0 hsl(28 30% 20% / 0.04), 0 1px 3px 0 hsl(28 30% 20% / 0.06);
+    --shadow-elegant: 0 12px 32px -14px hsl(174 62% 30% / 0.22);
+    --shadow-glow: 0 0 40px -10px hsl(172 70% 50% / 0.30);
+    --shadow-card: 0 1px 2px hsl(28 30% 20% / 0.04), 0 6px 20px -10px hsl(28 30% 20% / 0.10);
 
-    /* Charts */
-    --chart-1: 175 77% 26%;
-    --chart-2: 173 80% 40%;
-    --chart-3: 221 83% 53%;
-    --chart-4: 38 92% 50%;
-    --chart-5: 142 71% 38%;
+    /* Sidebar — teal medio cálido (no marino oscuro) */
+    --sidebar-background: 174 38% 34%;
+    --sidebar-foreground: 168 50% 95%;
+    --sidebar-primary: 14 85% 78%;
+    --sidebar-primary-foreground: 14 60% 18%;
+    --sidebar-accent: 174 35% 28%;
+    --sidebar-accent-foreground: 168 60% 95%;
+    --sidebar-border: 174 30% 28%;
+    --sidebar-ring: 14 85% 72%;
+
+    --chart-1: 174 62% 36%;
+    --chart-2: 172 70% 50%;
+    --chart-3: 14 85% 72%;
+    --chart-4: 36 92% 55%;
+    --chart-5: 199 78% 48%;
   }
 
   .dark {
