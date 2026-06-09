@@ -85,11 +85,11 @@ export function FormSection({
   className,
 }: FormSectionProps) {
   return (
-    <Card className={cn("overflow-hidden border-border/70 shadow-[var(--shadow-soft)] hover:shadow-[var(--shadow-card)] transition-shadow", className)}>
-      <div className="relative flex items-start gap-3 px-6 pt-5 pb-4 border-b border-border/50 bg-gradient-to-r from-[hsl(var(--primary-soft)/0.5)] via-card to-card">
-        <span className="absolute left-0 top-5 bottom-4 w-[3px] rounded-r-full bg-gradient-to-b from-[hsl(var(--primary))] to-[hsl(var(--primary-glow))]" />
+    <Card className={cn("overflow-hidden border-border/60 bg-card shadow-[var(--shadow-soft)] hover:shadow-[var(--shadow-card)] transition-shadow rounded-2xl", className)}>
+      <div className="relative flex items-start gap-3 px-6 pt-5 pb-4 border-b border-border/50 bg-card">
+        <span className="absolute left-0 top-4 bottom-4 w-[3px] rounded-r-full bg-gradient-to-b from-[hsl(var(--primary))] to-[hsl(var(--primary-glow))]" />
         {Icon && (
-          <div className="h-9 w-9 rounded-xl bg-gradient-to-br from-[hsl(var(--primary))] to-[hsl(var(--primary-glow))] text-primary-foreground flex items-center justify-center shrink-0 shadow-[0_4px_12px_-4px_hsl(var(--primary)/0.45)]">
+          <div className="h-9 w-9 rounded-xl bg-[hsl(var(--primary-soft))] text-[hsl(var(--primary))] flex items-center justify-center shrink-0 ring-1 ring-[hsl(var(--primary)/0.12)]">
             <Icon className="h-[15px] w-[15px]" />
           </div>
         )}
