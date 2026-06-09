@@ -98,7 +98,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <>
-      <nav className="flex-1 overflow-y-auto py-2 px-2 space-y-0.5">
+      <nav className="relative flex-1 overflow-y-auto py-3 px-3 space-y-1">
         {visibleNavigation.map(item => (
           <div key={item.label}>
             {item.href ? (
@@ -106,42 +106,45 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                 to={item.href}
                 onClick={onNavigate}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
+                  "group relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all",
                   isActive(item.href)
-                    ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                    : "hover:bg-sidebar-accent text-sidebar-foreground"
+                    ? "bg-white text-[hsl(var(--primary-dark))] shadow-[0_8px_24px_-12px_rgba(0,0,0,0.25)] ring-1 ring-white/60"
+                    : "text-sidebar-foreground/85 hover:bg-white/10 hover:text-white"
                 )}
               >
-                <item.icon className="h-4 w-4 shrink-0" />
-                <span>{item.label}</span>
+                {isActive(item.href) && (
+                  <span className="absolute -left-3 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full bg-[hsl(var(--coral))]" />
+                )}
+                <item.icon className={cn("h-[18px] w-[18px] shrink-0 transition-transform group-hover:scale-110", isActive(item.href) && "text-[hsl(var(--primary))]")} />
+                <span className="tracking-tight">{item.label}</span>
               </Link>
             ) : (
               <>
                 <button
                   onClick={() => toggleMenu(item.label)}
                   className={cn(
-                    "flex items-center gap-3 px-3 py-2 rounded-md text-sm w-full transition-colors",
+                    "group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium w-full transition-all",
                     isChildActive(item)
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                      : "hover:bg-sidebar-accent text-sidebar-foreground"
+                      ? "bg-white/15 text-white"
+                      : "text-sidebar-foreground/85 hover:bg-white/10 hover:text-white"
                   )}
                 >
-                  <item.icon className="h-4 w-4 shrink-0" />
-                  <span className="flex-1 text-left">{item.label}</span>
-                  <ChevronDown className={cn("h-3 w-3 transition-transform", openMenus.includes(item.label) && "rotate-180")} />
+                  <item.icon className="h-[18px] w-[18px] shrink-0 transition-transform group-hover:scale-110" />
+                  <span className="flex-1 text-left tracking-tight">{item.label}</span>
+                  <ChevronDown className={cn("h-3.5 w-3.5 opacity-70 transition-transform", openMenus.includes(item.label) && "rotate-180")} />
                 </button>
                 {openMenus.includes(item.label) && item.children && (
-                  <div className="ml-6 mt-0.5 space-y-0.5 border-l border-sidebar-border pl-3">
+                  <div className="ml-5 mt-1 space-y-0.5 border-l border-white/20 pl-3">
                     {item.children.map(child => (
                       <Link
                         key={child.href}
                         to={child.href}
                         onClick={onNavigate}
                         className={cn(
-                          "block px-2 py-1.5 rounded text-xs transition-colors",
+                          "block px-3 py-1.5 rounded-lg text-[12.5px] transition-all",
                           location.pathname === child.href
-                            ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                            : "hover:bg-sidebar-accent text-sidebar-foreground/80"
+                            ? "bg-white text-[hsl(var(--primary-dark))] font-medium shadow-sm"
+                            : "text-sidebar-foreground/75 hover:bg-white/10 hover:text-white"
                         )}
                       >
                         {child.label}
@@ -154,6 +157,8 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
           </div>
         ))}
       </nav>
+
+
 
       <div className="p-3 border-t border-sidebar-border">
         <div className="flex items-center gap-2 px-2 py-1.5">
