@@ -41,11 +41,11 @@ const statConfig = [
   },
 ] as const;
 
-const toneStyles: Record<string, { ring: string; text: string; bg: string; dot: string; glow: string }> = {
-  primary: { ring: "ring-primary/25", text: "text-[hsl(var(--primary-dark))]", bg: "bg-[hsl(var(--primary-soft))]", dot: "bg-primary", glow: "shadow-[0_10px_30px_-12px_hsl(var(--primary)/0.45)]" },
-  info:    { ring: "ring-sky-400/30",  text: "text-sky-700",   bg: "bg-[hsl(var(--info-soft))]",    dot: "bg-sky-500", glow: "shadow-[0_10px_30px_-12px_rgba(56,189,248,0.45)]" },
-  warning: { ring: "ring-warning/30",  text: "text-amber-700", bg: "bg-amber-50",                    dot: "bg-warning", glow: "shadow-[0_10px_30px_-12px_rgba(247,185,85,0.45)]" },
-  success: { ring: "ring-emerald-400/30", text: "text-emerald-700", bg: "bg-emerald-50",            dot: "bg-success", glow: "shadow-[0_10px_30px_-12px_rgba(53,183,121,0.45)]" },
+const toneStyles: Record<string, { ring: string; text: string; bg: string; iconBg: string; dot: string; accent: string }> = {
+  primary: { ring: "ring-[hsl(var(--primary)/0.15)]", text: "text-[hsl(var(--primary-dark))]", bg: "bg-[hsl(var(--primary-soft))]", iconBg: "bg-white", dot: "bg-primary", accent: "from-[hsl(var(--primary)/0.10)] to-transparent" },
+  info:    { ring: "ring-sky-200",                     text: "text-sky-700",                    bg: "bg-sky-50",                        iconBg: "bg-white", dot: "bg-sky-500", accent: "from-sky-100/60 to-transparent" },
+  warning: { ring: "ring-amber-200",                   text: "text-amber-700",                  bg: "bg-amber-50",                      iconBg: "bg-white", dot: "bg-warning", accent: "from-amber-100/60 to-transparent" },
+  success: { ring: "ring-emerald-200",                 text: "text-emerald-700",                bg: "bg-emerald-50",                    iconBg: "bg-white", dot: "bg-success", accent: "from-emerald-100/60 to-transparent" },
 };
 
 
@@ -104,31 +104,31 @@ export default function Dashboard() {
             const t = toneStyles[s.tone];
             return (
               <Link key={s.label} to={s.href} className="group">
-                <Card className="relative overflow-hidden border-border/60 bg-card hover:border-primary/30 transition-all hover:shadow-elegant hover:-translate-y-1 duration-300">
-                  <div className="absolute -top-12 -right-12 h-32 w-32 rounded-full opacity-[0.08] group-hover:opacity-20 transition-opacity" style={{ background: `hsl(var(--primary))` }} />
-                  <CardContent className="p-4 md:p-5">
+                <Card className="relative overflow-hidden border-border/60 bg-card hover:border-primary/30 transition-all hover:shadow-elegant hover:-translate-y-0.5 duration-300">
+                  <div className={`absolute inset-x-0 top-0 h-px bg-gradient-to-r ${t.accent}`} />
+                  <div className={`pointer-events-none absolute -top-16 -right-16 h-40 w-40 rounded-full bg-gradient-to-br ${t.accent} opacity-60 group-hover:opacity-100 transition-opacity`} />
+                  <CardContent className="relative p-5 md:p-6">
                     <div className="flex items-start justify-between">
-                      <div className={`p-3 rounded-2xl ${t.bg} ${t.text} ring-1 ${t.ring} ${t.glow}`}>
-                        <s.icon className="h-5 w-5" strokeWidth={2.25} />
+                      <div className={`relative h-11 w-11 rounded-xl ${t.bg} ${t.text} ring-1 ${t.ring} flex items-center justify-center shadow-sm`}>
+                        <s.icon className="h-[18px] w-[18px]" strokeWidth={2} />
                       </div>
-
-                      <ArrowUpRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:text-primary transition" />
+                      <ArrowUpRight className="h-4 w-4 text-muted-foreground/60 opacity-0 group-hover:opacity-100 group-hover:text-primary group-hover:-translate-y-0.5 group-hover:translate-x-0.5 transition-all" />
                     </div>
-                    <div className="mt-4">
+                    <div className="mt-5">
                       {statsLoading ? (
                         <>
-                          <Skeleton className="h-8 w-20 mb-2" />
-                          <Skeleton className="h-3 w-16" />
+                          <Skeleton className="h-9 w-24 mb-2" />
+                          <Skeleton className="h-3 w-20" />
                         </>
                       ) : (
                         <>
-                          <p className="font-display text-3xl md:text-4xl tracking-tight text-foreground tabular-nums">
+                          <p className="font-display text-[34px] md:text-[38px] leading-none tracking-tight text-foreground tabular-nums">
                             {stats ? formatNumber(stats[s.key] ?? 0) : "0"}
                           </p>
-                          <div className="mt-1.5 flex items-center justify-between">
-                            <p className="text-[11px] font-mono uppercase tracking-wider text-muted-foreground">{s.label}</p>
-                            <span className={`text-[10px] font-mono ${t.text} flex items-center gap-1`}>
-                              <TrendingUp className="h-3 w-3" />
+                          <div className="mt-3 flex items-center justify-between">
+                            <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">{s.label}</p>
+                            <span className={`inline-flex items-center gap-1 text-[10px] font-medium ${t.text} px-1.5 py-0.5 rounded-md ${t.bg}`}>
+                              <TrendingUp className="h-2.5 w-2.5" />
                               {s.delta}
                             </span>
                           </div>
@@ -174,7 +174,7 @@ export default function Dashboard() {
                 upcoming.map((a, i) => (
                   <div
                     key={a.id || i}
-                    className="group flex items-center gap-3 md:gap-4 p-2.5 md:p-3 rounded-xl hover:bg-accent/60 transition-colors border border-transparent hover:border-border"
+                    className="group flex items-center gap-3 md:gap-4 p-2.5 md:p-3 rounded-xl hover:bg-[hsl(var(--primary-soft)/0.5)] transition-colors border border-transparent hover:border-[hsl(var(--primary)/0.15)]"
                   >
                     <div className="flex flex-col items-center justify-center min-w-[56px] py-1.5 rounded-lg bg-primary/10 text-primary">
                       <span className="font-mono text-sm font-bold leading-none">{a.hora}</span>
@@ -196,10 +196,10 @@ export default function Dashboard() {
           </Card>
 
           {/* Activity - 2 cols */}
-          <Card className="lg:col-span-2 border-border/70 bg-gradient-soft">
+          <Card className="lg:col-span-2 border-border/70 bg-card">
             <CardHeader className="pb-3">
               <CardTitle className="font-display text-base md:text-lg flex items-center gap-2">
-                <span className="p-1.5 rounded-lg bg-primary/10 text-primary">
+                <span className="p-1.5 rounded-lg bg-[hsl(var(--primary-soft))] text-[hsl(var(--primary-dark))]">
                   <Activity className="h-4 w-4" />
                 </span>
                 Actividad reciente
@@ -220,10 +220,10 @@ export default function Dashboard() {
                 ))
               ) : activity && activity.length > 0 ? (
                 <div className="relative">
-                  <div className="absolute left-[7px] top-2 bottom-2 w-px bg-border" />
+                  <div className="absolute left-[11px] top-3 bottom-3 w-px bg-gradient-to-b from-border via-border to-transparent" />
                   {activity.map((a, i) => (
-                    <div key={a.id || i} className="relative flex items-start gap-3 p-2.5 rounded-lg hover:bg-accent/40 transition-colors">
-                      <div className="relative z-10 mt-1.5 h-3.5 w-3.5 rounded-full bg-background border-2 border-primary" />
+                    <div key={a.id || i} className="group relative flex items-start gap-3 p-2.5 rounded-xl hover:bg-[hsl(var(--primary-soft)/0.45)] transition-colors">
+                      <div className="relative z-10 mt-1.5 h-2.5 w-2.5 rounded-full bg-card ring-2 ring-[hsl(var(--primary)/0.55)] group-hover:ring-[hsl(var(--primary))] group-hover:scale-110 transition-all ml-1" />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-foreground truncate">{a.accion}</p>
                         <p className="text-xs text-muted-foreground truncate">{a.detalle}</p>

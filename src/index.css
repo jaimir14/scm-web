@@ -74,28 +74,28 @@
     --gradient-warm: linear-gradient(135deg, hsl(180 100% 33%) 0%, hsl(7 100% 78%) 100%);
     --gradient-coral: linear-gradient(135deg, hsl(7 100% 74%) 0%, hsl(18 100% 82%) 100%);
 
-    /* Sidebar — modern gradient teal→mint with warm glow */
+    /* Sidebar — deep, sophisticated teal gradient with subtle warmth */
     --gradient-sidebar: linear-gradient(180deg,
-      hsl(179 95% 25%) 0%,
-      hsl(180 100% 30%) 35%,
-      hsl(177 90% 38%) 75%,
-      hsl(168 70% 55%) 100%);
+      hsl(196 55% 13%) 0%,
+      hsl(188 50% 17%) 30%,
+      hsl(182 45% 21%) 70%,
+      hsl(178 40% 25%) 100%);
 
     /* Shadows — soft, premium */
     --shadow-soft: 0 1px 2px 0 hsl(220 38% 14% / 0.04), 0 2px 6px -1px hsl(220 38% 14% / 0.06);
-    --shadow-elegant: 0 16px 40px -16px hsl(180 100% 25% / 0.22);
+    --shadow-elegant: 0 24px 60px -28px hsl(196 60% 12% / 0.35), 0 8px 24px -12px hsl(220 38% 14% / 0.08);
     --shadow-glow: 0 0 48px -12px hsl(177 100% 45% / 0.45);
     --shadow-card: 0 1px 2px hsl(220 38% 14% / 0.04), 0 8px 24px -12px hsl(220 38% 14% / 0.10);
     --shadow-coral: 0 12px 30px -12px hsl(7 100% 70% / 0.45);
 
     /* Sidebar tokens (used as fallback by shadcn components) */
-    --sidebar-background: 180 100% 30%;
-    --sidebar-foreground: 168 90% 96%;
+    --sidebar-background: 188 50% 17%;
+    --sidebar-foreground: 180 25% 92%;
     --sidebar-primary: 0 0% 100%;
-    --sidebar-primary-foreground: 179 95% 22%;
-    --sidebar-accent: 179 70% 22%;
-    --sidebar-accent-foreground: 168 90% 96%;
-    --sidebar-border: 179 60% 22%;
+    --sidebar-primary-foreground: 188 60% 18%;
+    --sidebar-accent: 188 40% 24%;
+    --sidebar-accent-foreground: 180 35% 96%;
+    --sidebar-border: 188 35% 24%;
     --sidebar-ring: 7 100% 78%;
 
     --chart-1: 180 100% 33%;
