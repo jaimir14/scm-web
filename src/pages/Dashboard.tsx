@@ -41,12 +41,13 @@ const statConfig = [
   },
 ] as const;
 
-const toneStyles: Record<string, { ring: string; text: string; bg: string; dot: string }> = {
-  primary: { ring: "ring-primary/30", text: "text-primary", bg: "bg-primary/10", dot: "bg-primary" },
-  info:    { ring: "ring-info/30",    text: "text-info",    bg: "bg-info/10",    dot: "bg-info" },
-  warning: { ring: "ring-warning/30", text: "text-warning", bg: "bg-warning/10", dot: "bg-warning" },
-  success: { ring: "ring-success/30", text: "text-success", bg: "bg-success/10", dot: "bg-success" },
+const toneStyles: Record<string, { ring: string; text: string; bg: string; dot: string; glow: string }> = {
+  primary: { ring: "ring-primary/25", text: "text-[hsl(var(--primary-dark))]", bg: "bg-[hsl(var(--primary-soft))]", dot: "bg-primary", glow: "shadow-[0_10px_30px_-12px_hsl(var(--primary)/0.45)]" },
+  info:    { ring: "ring-sky-400/30",  text: "text-sky-700",   bg: "bg-[hsl(var(--info-soft))]",    dot: "bg-sky-500", glow: "shadow-[0_10px_30px_-12px_rgba(56,189,248,0.45)]" },
+  warning: { ring: "ring-warning/30",  text: "text-amber-700", bg: "bg-amber-50",                    dot: "bg-warning", glow: "shadow-[0_10px_30px_-12px_rgba(247,185,85,0.45)]" },
+  success: { ring: "ring-emerald-400/30", text: "text-emerald-700", bg: "bg-emerald-50",            dot: "bg-success", glow: "shadow-[0_10px_30px_-12px_rgba(53,183,121,0.45)]" },
 };
+
 
 export default function Dashboard() {
   const { user } = useAuth();
