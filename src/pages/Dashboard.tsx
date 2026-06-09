@@ -41,12 +41,13 @@ const statConfig = [
   },
 ] as const;
 
-const toneStyles: Record<string, { ring: string; text: string; bg: string; dot: string }> = {
-  primary: { ring: "ring-primary/30", text: "text-primary", bg: "bg-primary/10", dot: "bg-primary" },
-  info:    { ring: "ring-info/30",    text: "text-info",    bg: "bg-info/10",    dot: "bg-info" },
-  warning: { ring: "ring-warning/30", text: "text-warning", bg: "bg-warning/10", dot: "bg-warning" },
-  success: { ring: "ring-success/30", text: "text-success", bg: "bg-success/10", dot: "bg-success" },
+const toneStyles: Record<string, { ring: string; text: string; bg: string; dot: string; glow: string }> = {
+  primary: { ring: "ring-primary/25", text: "text-[hsl(var(--primary-dark))]", bg: "bg-[hsl(var(--primary-soft))]", dot: "bg-primary", glow: "shadow-[0_10px_30px_-12px_hsl(var(--primary)/0.45)]" },
+  info:    { ring: "ring-sky-400/30",  text: "text-sky-700",   bg: "bg-[hsl(var(--info-soft))]",    dot: "bg-sky-500", glow: "shadow-[0_10px_30px_-12px_rgba(56,189,248,0.45)]" },
+  warning: { ring: "ring-warning/30",  text: "text-amber-700", bg: "bg-amber-50",                    dot: "bg-warning", glow: "shadow-[0_10px_30px_-12px_rgba(247,185,85,0.45)]" },
+  success: { ring: "ring-emerald-400/30", text: "text-emerald-700", bg: "bg-emerald-50",            dot: "bg-success", glow: "shadow-[0_10px_30px_-12px_rgba(53,183,121,0.45)]" },
 };
+
 
 export default function Dashboard() {
   const { user } = useAuth();
@@ -103,13 +104,14 @@ export default function Dashboard() {
             const t = toneStyles[s.tone];
             return (
               <Link key={s.label} to={s.href} className="group">
-                <Card className="relative overflow-hidden border-border/70 hover:border-primary/40 transition-all hover:shadow-elegant hover:-translate-y-0.5">
-                  <div className={`absolute inset-x-0 top-0 h-px ${t.bg}`} />
+                <Card className="relative overflow-hidden border-border/60 bg-card hover:border-primary/30 transition-all hover:shadow-elegant hover:-translate-y-1 duration-300">
+                  <div className="absolute -top-12 -right-12 h-32 w-32 rounded-full opacity-[0.08] group-hover:opacity-20 transition-opacity" style={{ background: `hsl(var(--primary))` }} />
                   <CardContent className="p-4 md:p-5">
                     <div className="flex items-start justify-between">
-                      <div className={`p-2.5 rounded-xl ${t.bg} ${t.text} ring-1 ${t.ring}`}>
-                        <s.icon className="h-5 w-5" />
+                      <div className={`p-3 rounded-2xl ${t.bg} ${t.text} ring-1 ${t.ring} ${t.glow}`}>
+                        <s.icon className="h-5 w-5" strokeWidth={2.25} />
                       </div>
+
                       <ArrowUpRight className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 group-hover:text-primary transition" />
                     </div>
                     <div className="mt-4">

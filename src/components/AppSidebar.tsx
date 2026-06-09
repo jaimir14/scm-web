@@ -98,7 +98,7 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <>
-      <nav className="flex-1 overflow-y-auto py-2 px-2 space-y-0.5">
+      <nav className="relative flex-1 overflow-y-auto py-3 px-3 space-y-1">
         {visibleNavigation.map(item => (
           <div key={item.label}>
             {item.href ? (
@@ -106,42 +106,45 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
                 to={item.href}
                 onClick={onNavigate}
                 className={cn(
-                  "flex items-center gap-3 px-3 py-2 rounded-md text-sm transition-colors",
+                  "group relative flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all",
                   isActive(item.href)
-                    ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                    : "hover:bg-sidebar-accent text-sidebar-foreground"
+                    ? "bg-white text-[hsl(var(--primary-dark))] shadow-[0_8px_24px_-12px_rgba(0,0,0,0.25)] ring-1 ring-white/60"
+                    : "text-sidebar-foreground/85 hover:bg-white/10 hover:text-white"
                 )}
               >
-                <item.icon className="h-4 w-4 shrink-0" />
-                <span>{item.label}</span>
+                {isActive(item.href) && (
+                  <span className="absolute -left-3 top-1/2 -translate-y-1/2 h-6 w-1 rounded-r-full bg-[hsl(var(--coral))]" />
+                )}
+                <item.icon className={cn("h-[18px] w-[18px] shrink-0 transition-transform group-hover:scale-110", isActive(item.href) && "text-[hsl(var(--primary))]")} />
+                <span className="tracking-tight">{item.label}</span>
               </Link>
             ) : (
               <>
                 <button
                   onClick={() => toggleMenu(item.label)}
                   className={cn(
-                    "flex items-center gap-3 px-3 py-2 rounded-md text-sm w-full transition-colors",
+                    "group flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium w-full transition-all",
                     isChildActive(item)
-                      ? "bg-sidebar-accent text-sidebar-accent-foreground"
-                      : "hover:bg-sidebar-accent text-sidebar-foreground"
+                      ? "bg-white/15 text-white"
+                      : "text-sidebar-foreground/85 hover:bg-white/10 hover:text-white"
                   )}
                 >
-                  <item.icon className="h-4 w-4 shrink-0" />
-                  <span className="flex-1 text-left">{item.label}</span>
-                  <ChevronDown className={cn("h-3 w-3 transition-transform", openMenus.includes(item.label) && "rotate-180")} />
+                  <item.icon className="h-[18px] w-[18px] shrink-0 transition-transform group-hover:scale-110" />
+                  <span className="flex-1 text-left tracking-tight">{item.label}</span>
+                  <ChevronDown className={cn("h-3.5 w-3.5 opacity-70 transition-transform", openMenus.includes(item.label) && "rotate-180")} />
                 </button>
                 {openMenus.includes(item.label) && item.children && (
-                  <div className="ml-6 mt-0.5 space-y-0.5 border-l border-sidebar-border pl-3">
+                  <div className="ml-5 mt-1 space-y-0.5 border-l border-white/20 pl-3">
                     {item.children.map(child => (
                       <Link
                         key={child.href}
                         to={child.href}
                         onClick={onNavigate}
                         className={cn(
-                          "block px-2 py-1.5 rounded text-xs transition-colors",
+                          "block px-3 py-1.5 rounded-lg text-[12.5px] transition-all",
                           location.pathname === child.href
-                            ? "bg-sidebar-primary text-sidebar-primary-foreground"
-                            : "hover:bg-sidebar-accent text-sidebar-foreground/80"
+                            ? "bg-white text-[hsl(var(--primary-dark))] font-medium shadow-sm"
+                            : "text-sidebar-foreground/75 hover:bg-white/10 hover:text-white"
                         )}
                       >
                         {child.label}
@@ -155,21 +158,24 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
         ))}
       </nav>
 
-      <div className="p-3 border-t border-sidebar-border">
-        <div className="flex items-center gap-2 px-2 py-1.5">
-          <div className="h-8 w-8 rounded-full bg-sidebar-accent flex items-center justify-center shrink-0">
-            <UserCog className="h-4 w-4" />
+
+
+      <div className="relative p-3 border-t border-white/15">
+        <div className="flex items-center gap-2.5 px-2 py-2 rounded-xl bg-white/10 backdrop-blur-sm">
+          <div className="h-9 w-9 rounded-full bg-gradient-coral flex items-center justify-center shrink-0 shadow-coral ring-2 ring-white/40">
+            <UserCog className="h-4 w-4 text-white" />
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-xs font-medium truncate">{user?.nombre ?? "Usuario"}</p>
-            <p className="text-[10px] text-sidebar-foreground/60">{user?.rol ?? ""}</p>
+            <p className="text-xs font-semibold truncate text-white">{user?.nombre ?? "Usuario"}</p>
+            <p className="text-[10px] text-white/70 truncate">{user?.rol ?? ""}</p>
           </div>
           <ThemeToggle />
-          <button onClick={() => logout()} className="p-1 hover:bg-sidebar-accent rounded">
+          <button onClick={() => logout()} className="p-1.5 hover:bg-white/15 rounded-lg transition-colors" title="Cerrar sesión">
             <LogOut className="h-4 w-4" />
           </button>
         </div>
       </div>
+
     </>
   );
 }
@@ -215,14 +221,16 @@ export default function AppSidebar() {
             </Button>
           </SheetTrigger>
           <SheetContent side="left" className="w-64 p-0 bg-gradient-sidebar text-sidebar-foreground border-sidebar-border">
-            <div className="flex items-center gap-2 p-4 border-b border-sidebar-border">
-              <Stethoscope className="h-7 w-7 text-sidebar-primary" />
+            <div className="flex items-center gap-2.5 p-4 border-b border-white/15">
+              <div className="h-10 w-10 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center ring-1 ring-white/30">
+                <Stethoscope className="h-5 w-5 text-white" />
+              </div>
               <div>
-                <h1 className="text-base font-bold text-sidebar-primary tracking-wide">SCM</h1>
-                <p className="text-[10px] text-sidebar-foreground/60">Sistema Clínico Médico</p>
+                <h1 className="text-base font-bold text-white tracking-wide">SCM</h1>
+                <p className="text-[10px] text-white/70">Sistema Clínico Médico</p>
               </div>
             </div>
-            <div className="flex flex-col h-[calc(100%-65px)]">
+            <div className="flex flex-col h-[calc(100%-73px)]">
               <SidebarContent onNavigate={() => setMobileOpen(false)} />
             </div>
           </SheetContent>
@@ -236,22 +244,25 @@ export default function AppSidebar() {
       "flex flex-col bg-gradient-sidebar text-sidebar-foreground h-screen sticky top-0 transition-all duration-200 z-30 shadow-elegant relative overflow-hidden",
       collapsed ? "w-16" : "w-60"
     )}>
-      <div className="pointer-events-none absolute -top-20 -left-16 h-64 w-64 rounded-full bg-white/10 blur-3xl" />
+      <div className="pointer-events-none absolute -top-20 -left-16 h-64 w-64 rounded-full bg-white/15 blur-3xl" />
       <div className="pointer-events-none absolute bottom-0 -right-10 h-56 w-56 rounded-full bg-[hsl(var(--coral)/0.25)] blur-3xl" />
-      <div className="flex items-center justify-between p-4 border-b border-sidebar-border">
+      <div className="relative flex items-center justify-between p-4 border-b border-white/15">
         {!collapsed && (
-          <div className="flex items-center gap-2">
-            <Stethoscope className="h-7 w-7 text-sidebar-primary" />
+          <div className="flex items-center gap-2.5">
+            <div className="h-10 w-10 rounded-2xl bg-white/15 backdrop-blur flex items-center justify-center ring-1 ring-white/30 shadow-lg">
+              <Stethoscope className="h-5 w-5 text-white" />
+            </div>
             <div>
-              <h1 className="text-base font-bold text-sidebar-foreground tracking-wide">SCM</h1>
-              <p className="text-[10px] text-sidebar-foreground/60">Sistema Clínico Médico</p>
+              <h1 className="text-base font-bold text-white tracking-wide">SCM</h1>
+              <p className="text-[10px] text-white/70">Sistema Clínico Médico</p>
             </div>
           </div>
         )}
-        <button onClick={() => setCollapsed(!collapsed)} className="p-1 rounded hover:bg-sidebar-accent">
+        <button onClick={() => setCollapsed(!collapsed)} className="p-1.5 rounded-lg hover:bg-white/15 text-white transition-colors">
           {collapsed ? <Menu className="h-5 w-5" /> : <X className="h-4 w-4" />}
         </button>
       </div>
+
 
       {collapsed ? (
         <nav className="flex-1 overflow-y-auto py-2 px-2 space-y-0.5">
