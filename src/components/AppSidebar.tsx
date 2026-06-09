@@ -214,7 +214,7 @@ export default function AppSidebar() {
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-64 p-0 bg-sidebar text-sidebar-foreground border-sidebar-border">
+          <SheetContent side="left" className="w-64 p-0 bg-gradient-sidebar text-sidebar-foreground border-sidebar-border">
             <div className="flex items-center gap-2 p-4 border-b border-sidebar-border">
               <Stethoscope className="h-7 w-7 text-sidebar-primary" />
               <div>
