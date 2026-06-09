@@ -218,14 +218,14 @@ export default function AppSidebar() {
               <Menu className="h-5 w-5" />
             </Button>
           </SheetTrigger>
-          <SheetContent side="left" className="w-64 p-0 bg-gradient-sidebar text-foreground border-r border-border">
-            <div className="flex items-center gap-2.5 p-4 border-b border-border">
-              <div className="h-10 w-10 rounded-2xl bg-gradient-primary flex items-center justify-center shadow-glow">
-                <Stethoscope className="h-5 w-5 text-white" />
+          <SheetContent side="left" className="w-64 p-0 bg-gradient-sidebar text-white border-r-0">
+            <div className="flex items-center gap-2.5 p-4 border-b border-white/10">
+              <div className="h-10 w-10 rounded-2xl bg-white flex items-center justify-center shadow-md">
+                <Stethoscope className="h-5 w-5 text-[hsl(var(--primary))]" />
               </div>
               <div>
-                <h1 className="text-base font-bold text-foreground tracking-wide">SCM</h1>
-                <p className="text-[10px] text-muted-foreground">Sistema Clínico Médico</p>
+                <h1 className="text-base font-bold text-white tracking-wide">SCM</h1>
+                <p className="text-[10px] text-white/60">Sistema Clínico Médico</p>
               </div>
             </div>
             <div className="flex flex-col h-[calc(100%-73px)]">
@@ -239,24 +239,24 @@ export default function AppSidebar() {
 
   return (
     <aside className={cn(
-      "flex flex-col bg-gradient-sidebar text-foreground h-screen sticky top-0 transition-all duration-200 z-30 border-r border-border relative overflow-hidden",
+      "flex flex-col bg-gradient-sidebar text-white h-screen sticky top-0 transition-all duration-200 z-30 border-r-0 relative overflow-hidden",
       collapsed ? "w-16" : "w-60"
     )}>
-      <div className="pointer-events-none absolute -top-32 -left-20 h-72 w-72 rounded-full bg-[hsl(var(--primary)/0.10)] blur-3xl" />
-      <div className="pointer-events-none absolute bottom-10 -right-20 h-64 w-64 rounded-full bg-[hsl(var(--accent)/0.10)] blur-3xl" />
-      <div className="relative flex items-center justify-between p-4 border-b border-border">
+      <div className="pointer-events-none absolute -top-32 -left-20 h-72 w-72 rounded-full bg-[hsl(var(--primary-glow)/0.15)] blur-3xl" />
+      <div className="pointer-events-none absolute bottom-10 -right-20 h-64 w-64 rounded-full bg-[hsl(var(--coral)/0.12)] blur-3xl" />
+      <div className="relative flex items-center justify-between p-4 border-b border-white/10">
         {!collapsed && (
           <div className="flex items-center gap-2.5">
-            <div className="h-10 w-10 rounded-2xl bg-gradient-primary flex items-center justify-center shadow-glow">
-              <Stethoscope className="h-5 w-5 text-white" />
+            <div className="h-10 w-10 rounded-2xl bg-white flex items-center justify-center shadow-md">
+              <Stethoscope className="h-5 w-5 text-[hsl(var(--primary))]" />
             </div>
             <div>
-              <h1 className="text-base font-bold text-foreground tracking-wide">SCM</h1>
-              <p className="text-[10px] text-muted-foreground">Sistema Clínico Médico</p>
+              <h1 className="text-base font-bold text-white tracking-wide">SCM</h1>
+              <p className="text-[10px] text-white/60">Sistema Clínico Médico</p>
             </div>
           </div>
         )}
-        <button onClick={() => setCollapsed(!collapsed)} className="p-1.5 rounded-lg hover:bg-[hsl(var(--primary-soft))] text-muted-foreground hover:text-[hsl(var(--primary))] transition-colors">
+        <button onClick={() => setCollapsed(!collapsed)} className="p-1.5 rounded-lg hover:bg-white/10 text-white/70 hover:text-white transition-colors">
           {collapsed ? <Menu className="h-5 w-5" /> : <X className="h-4 w-4" />}
         </button>
       </div>
@@ -266,12 +266,12 @@ export default function AppSidebar() {
           {visibleNavigation.map(item => (
             <div key={item.label}>
               {item.href ? (
-                <Link to={item.href} className="flex items-center justify-center p-2 rounded-md hover:bg-[hsl(var(--primary-soft))]">
-                  <item.icon className="h-4 w-4 text-[hsl(var(--primary))]" />
+                <Link to={item.href} className="flex items-center justify-center p-2 rounded-md hover:bg-white/10">
+                  <item.icon className="h-4 w-4 text-white/85" />
                 </Link>
               ) : (
-                <button onClick={() => { }} className="flex items-center justify-center p-2 rounded-md hover:bg-[hsl(var(--primary-soft))] w-full">
-                  <item.icon className="h-4 w-4 text-[hsl(var(--primary))]" />
+                <button onClick={() => { }} className="flex items-center justify-center p-2 rounded-md hover:bg-white/10 w-full">
+                  <item.icon className="h-4 w-4 text-white/85" />
                 </button>
               )}
             </div>
