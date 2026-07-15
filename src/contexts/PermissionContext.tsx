@@ -20,9 +20,6 @@ export function PermissionProvider({ children }: { children: ReactNode }) {
   // Admin if backend says so OR if the auth user has esAdmin flag (fallback when backend is unavailable)
   const isAdmin = permissions.includes("__admin__") || (user?.esAdmin === true);
 
-  // Prototype fallback: if backend unavailable, grant all permissions so the sidebar is not empty
-  const backendUnavailable = permissionsQuery.isError;
-
   // Not loading if: not authenticated, user is admin, query settled, or query errored (backend not ready)
   const isPermLoading = isAuthenticated && !isAdmin && permissionsQuery.isLoading && !permissionsQuery.isError;
 
@@ -30,15 +27,15 @@ export function PermissionProvider({ children }: { children: ReactNode }) {
     permissions,
     isLoading: isPermLoading,
     hasPermission: (featureKey: string) => {
-      if (isAdmin || backendUnavailable) return true;
+      if (isAdmin) return true;
       return permissions.includes(featureKey);
     },
     hasAnyPermission: (featureKeys: string[]) => {
-      if (isAdmin || backendUnavailable) return true;
+      if (isAdmin) return true;
       return featureKeys.some(key => permissions.includes(key));
     },
     isAdmin,
-  }), [permissions, isPermLoading, isAuthenticated, isAdmin, backendUnavailable]);
+  }), [permissions, isPermLoading, isAuthenticated, isAdmin]);
 
   return (
     <PermissionContext.Provider value={value}>
