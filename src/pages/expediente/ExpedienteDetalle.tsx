@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import { ApiError } from "@/lib/api";
 import { useParams, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -48,6 +49,7 @@ export default function ExpedienteDetalle() {
   const [form, setForm] = useState<Partial<CreatePatientInput>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [dentalMode, setDentalMode] = useState(false);
+  const [activeTab, setActiveTab] = useState("datos");
   const [dentalRecord, setDentalRecord] = useState<{
     flags?: Record<string, boolean>;
     higieneOral?: string;
@@ -120,6 +122,38 @@ export default function ExpedienteDetalle() {
     }));
   };
 
+  const scrollToFirstError = useCallback((errorKeys: string[]) => {
+    // Small delay to allow tab content to render
+    setTimeout(() => {
+      for (const key of errorKeys) {
+        const el = document.getElementById(`field-${key}`);
+        if (el) {
+          el.scrollIntoView({ behavior: "smooth", block: "center" });
+          // Try to focus the first input inside
+          const input = el.querySelector("input, select, textarea, button") as HTMLElement | null;
+          input?.focus();
+          break;
+        }
+      }
+    }, 100);
+  }, []);
+
+  /** Map backend ApiError field details into the form errors state. */
+  const applyBackendErrors = useCallback((error: unknown) => {
+    if (error instanceof ApiError && error.details?.length) {
+      const backendErrors: Record<string, string> = {};
+      for (const d of error.details) {
+        backendErrors[d.field] = d.message;
+      }
+      setErrors(backendErrors);
+      setActiveTab("datos");
+      toast.error("Por favor corrija los campos marcados");
+      scrollToFirstError(Object.keys(backendErrors));
+    } else {
+      toast.error(error instanceof Error ? error.message : "Error desconocido");
+    }
+  }, [scrollToFirstError]);
+
   const handleSave = () => {
     const newErrors: Record<string, string> = {};
     if (!form.nombre) newErrors.nombre = "Nombre es requerido";
@@ -128,9 +162,17 @@ export default function ExpedienteDetalle() {
     if (!form.profesionalId) newErrors.profesionalId = "Médico es requerido";
     if (!form.tipoIdentificacion) newErrors.tipoIdentificacion = "Tipo de identificación es requerido";
     if (!form.numeroIdentificacion) newErrors.numeroIdentificacion = "Número de identificación es requerido";
+    if (!form.sexo) newErrors.sexo = "Sexo es requerido";
+    if (!form.estadoCivil) newErrors.estadoCivil = "Estado civil es requerido";
+    if (!form.fechaNacimiento) newErrors.fechaNacimiento = "Fecha de nacimiento es requerida";
+    if (!form.telefonoCelular) newErrors.telefonoCelular = "Teléfono celular es requerido";
+    if (!form.direccion) newErrors.direccion = "Dirección es requerida";
     if (Object.keys(newErrors).length > 0) {
       setErrors(newErrors);
+      // Switch to the Datos Personales tab where the required fields live
+      setActiveTab("datos");
       toast.error("Por favor complete los campos requeridos");
+      scrollToFirstError(Object.keys(newErrors));
       return;
     }
 
@@ -140,9 +182,7 @@ export default function ExpedienteDetalle() {
           toast.success("Expediente creado exitosamente");
           navigate(`/expediente/${data.id}`);
         },
-        onError: (error) => {
-          toast.error(error instanceof Error ? error.message : "Error al crear expediente");
-        },
+        onError: applyBackendErrors,
       });
     } else {
       updatePatient.mutate(
@@ -151,9 +191,7 @@ export default function ExpedienteDetalle() {
           onSuccess: () => {
             toast.success("Expediente actualizado exitosamente");
           },
-          onError: (error) => {
-            toast.error(error instanceof Error ? error.message : "Error al actualizar expediente");
-          },
+          onError: applyBackendErrors,
         }
       );
     }
@@ -213,7 +251,7 @@ export default function ExpedienteDetalle() {
           </label>
         </div>
 
-        <Tabs key={dentalMode ? "dental" : "medico"} defaultValue="datos" className="space-y-6">
+        <Tabs key={dentalMode ? "dental" : "medico"} value={activeTab} onValueChange={setActiveTab} className="space-y-6">
           <ScrollArea className="w-full">
             <TabsList className="inline-flex w-auto min-w-full sm:min-w-0">
               <TabsTrigger value="datos" className="text-xs sm:text-sm whitespace-nowrap">Datos Personales</TabsTrigger>
@@ -245,7 +283,7 @@ export default function ExpedienteDetalle() {
               description="Documento oficial del paciente"
             >
               <div className="grid grid-cols-12 gap-4">
-                <div className="col-span-12 sm:col-span-4">
+                <div className="col-span-12 sm:col-span-4" id="field-tipoIdentificacion">
                   <Field label="Tipo de identificación" required error={errors.tipoIdentificacion}>
                     <Select value={form.tipoIdentificacion || ""} onValueChange={v => updateField("tipoIdentificacion", v)}>
                       <SelectTrigger className={errors.tipoIdentificacion ? "border-destructive" : ""}>
@@ -259,7 +297,7 @@ export default function ExpedienteDetalle() {
                     </Select>
                   </Field>
                 </div>
-                <div className="col-span-12 sm:col-span-8">
+                <div className="col-span-12 sm:col-span-8" id="field-numeroIdentificacion">
                   <Field label="Número de identificación" required error={errors.numeroIdentificacion}>
                     <Input
                       value={form.numeroIdentificacion || ""}
@@ -279,12 +317,12 @@ export default function ExpedienteDetalle() {
               description="Datos básicos del paciente"
             >
               <div className="grid grid-cols-12 gap-4">
-                <div className="col-span-12 sm:col-span-4">
+                <div className="col-span-12 sm:col-span-4" id="field-nombre">
                   <Field label="Nombre" required error={errors.nombre}>
                     <Input value={form.nombre || ""} onChange={e => updateField("nombre", e.target.value)} className={errors.nombre ? "border-destructive" : ""} />
                   </Field>
                 </div>
-                <div className="col-span-12 sm:col-span-4">
+                <div className="col-span-12 sm:col-span-4" id="field-apellido1">
                   <Field label="Primer apellido" required error={errors.apellido1}>
                     <Input value={form.apellido1 || ""} onChange={e => updateField("apellido1", e.target.value)} className={errors.apellido1 ? "border-destructive" : ""} />
                   </Field>
@@ -295,10 +333,10 @@ export default function ExpedienteDetalle() {
                   </Field>
                 </div>
 
-                <div className="col-span-6 sm:col-span-3">
-                  <Field label="Sexo">
+                <div className="col-span-6 sm:col-span-3" id="field-sexo">
+                  <Field label="Sexo" required error={errors.sexo}>
                     <Select value={form.sexo || ""} onValueChange={v => updateField("sexo", v)}>
-                      <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
+                      <SelectTrigger className={errors.sexo ? "border-destructive" : ""}><SelectValue placeholder="—" /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="MASCULINO">Masculino</SelectItem>
                         <SelectItem value="FEMENINO">Femenino</SelectItem>
@@ -306,10 +344,10 @@ export default function ExpedienteDetalle() {
                     </Select>
                   </Field>
                 </div>
-                <div className="col-span-6 sm:col-span-3">
-                  <Field label="Estado civil">
+                <div className="col-span-6 sm:col-span-3" id="field-estadoCivil">
+                  <Field label="Estado civil" required error={errors.estadoCivil}>
                     <Select value={form.estadoCivil || ""} onValueChange={v => updateField("estadoCivil", v)}>
-                      <SelectTrigger><SelectValue placeholder="—" /></SelectTrigger>
+                      <SelectTrigger className={errors.estadoCivil ? "border-destructive" : ""}><SelectValue placeholder="—" /></SelectTrigger>
                       <SelectContent>
                         <SelectItem value="SOLTERO">Soltero</SelectItem>
                         <SelectItem value="CASADO">Casado</SelectItem>
@@ -319,9 +357,9 @@ export default function ExpedienteDetalle() {
                     </Select>
                   </Field>
                 </div>
-                <div className="col-span-6 sm:col-span-3">
-                  <Field label="Fecha de nacimiento">
-                    <Input type="date" value={form.fechaNacimiento || ""} onChange={e => updateField("fechaNacimiento", e.target.value)} />
+                <div className="col-span-6 sm:col-span-3" id="field-fechaNacimiento">
+                  <Field label="Fecha de nacimiento" required error={errors.fechaNacimiento}>
+                    <Input type="date" value={form.fechaNacimiento || ""} onChange={e => updateField("fechaNacimiento", e.target.value)} className={errors.fechaNacimiento ? "border-destructive" : ""} />
                   </Field>
                 </div>
                 <div className="col-span-6 sm:col-span-3">
@@ -352,9 +390,9 @@ export default function ExpedienteDetalle() {
               description="Cómo contactar al paciente"
             >
               <div className="grid grid-cols-12 gap-4">
-                <div className="col-span-12 sm:col-span-6">
-                  <Field label="Teléfono celular">
-                    <Input value={form.telefonoCelular || ""} onChange={e => updateField("telefonoCelular", e.target.value)} placeholder="+506 8888 8888" />
+                <div className="col-span-12 sm:col-span-6" id="field-telefonoCelular">
+                  <Field label="Teléfono celular" required error={errors.telefonoCelular}>
+                    <Input value={form.telefonoCelular || ""} onChange={e => updateField("telefonoCelular", e.target.value)} placeholder="+506 8888 8888" className={errors.telefonoCelular ? "border-destructive" : ""} />
                   </Field>
                 </div>
                 <div className="col-span-12 sm:col-span-6">
@@ -377,11 +415,11 @@ export default function ExpedienteDetalle() {
                     <Input value={form.otroTelefono || ""} onChange={e => updateField("otroTelefono", e.target.value)} />
                   </Field>
                 </div>
-                <div className="col-span-12">
-                  <Field label="Dirección">
+                <div className="col-span-12" id="field-direccion">
+                  <Field label="Dirección" required error={errors.direccion}>
                     <div className="relative">
                       <MapPin className="h-4 w-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
-                      <Input className="pl-9" value={form.direccion || ""} onChange={e => updateField("direccion", e.target.value)} placeholder="Provincia, cantón, distrito, señas exactas" />
+                      <Input className={`pl-9 ${errors.direccion ? "border-destructive" : ""}`} value={form.direccion || ""} onChange={e => updateField("direccion", e.target.value)} placeholder="Provincia, cantón, distrito, señas exactas" />
                     </div>
                   </Field>
                 </div>
@@ -395,7 +433,7 @@ export default function ExpedienteDetalle() {
               description="Clínica y médico responsable"
             >
               <div className="grid grid-cols-12 gap-4">
-                <div className="col-span-12 sm:col-span-6">
+                <div className="col-span-12 sm:col-span-6" id="field-clinicaId">
                   <Field label="Clínica" required error={errors.clinicaId}>
                     <Select value={form.clinicaId ? String(form.clinicaId) : ""} onValueChange={v => updateField("clinicaId", Number(v))}>
                       <SelectTrigger className={errors.clinicaId ? "border-destructive" : ""}><SelectValue placeholder="Seleccione clínica..." /></SelectTrigger>
@@ -405,7 +443,7 @@ export default function ExpedienteDetalle() {
                     </Select>
                   </Field>
                 </div>
-                <div className="col-span-12 sm:col-span-6">
+                <div className="col-span-12 sm:col-span-6" id="field-profesionalId">
                   <Field label="Médico responsable" required error={errors.profesionalId}>
                     <Select value={form.profesionalId ? String(form.profesionalId) : ""} onValueChange={v => updateField("profesionalId", Number(v))}>
                       <SelectTrigger className={errors.profesionalId ? "border-destructive" : ""}><SelectValue placeholder="Seleccione médico..." /></SelectTrigger>
